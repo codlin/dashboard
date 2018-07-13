@@ -25,10 +25,18 @@ SECRET_KEY = '8z1axouni((bx4d26l$6jwe^9x5c_vnx1xw6z7gr+l0c&p=m-j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['135.252.122.189']
 
 
 # Application definition
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'monitor.apps.MonitorConfig',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +85,11 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'djongo',
+        'ENFORCE_SCHEMA': True,
+        'NAME': 'crtdashboard',
+        'HOST': '135.242.139.122',
+        'PORT': 27017,
     }
 }
 
