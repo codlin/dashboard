@@ -3,30 +3,24 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import generic
 
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import LoadJobStatus, LoadPipeline
 from .serializers import LoadJobStatusSerializer, LoadPipelineSerializer
 
 # Create your views here.
-class IndexView(generic.View):
-    template_name = 'monitor/index.html'
-    context_object_name = 'latest_jobstatus_table'
-
-    def get_queryset(self):
-        latest_jobstatus = LoadJobStatus.objects.order_by('-timestamp')[:5]
-        
-def loadpipeline_list(request):
-    if request.method == 'GET':
+class LoadPipelineList(APIView):
+    def get(self, request,  format=None):
         pipeline = LoadPipeline.objects.all()
         serializer = LoadPipelineSerializer(pipeline, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = LoadPipelineSerializer(data=data)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = LoadPipelineSerializer(data=request.data)
         if not serializer.is_valid():
-            return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         loadname = serializer.get_fields().get('load_name')
         rootbuildnum = serializer.get_fields().get('root_buildnum')
@@ -36,5 +30,6 @@ def loadpipeline_list(request):
         else:
             serializer.save()
         
-        return JsonResponse(serializer.data, status=201)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         
