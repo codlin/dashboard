@@ -12,4 +12,4 @@ class LoadPipelineSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoadPipeline
-        fields = ('load_name', 'jobs')
+        fields = ('load_name', 'root_buildnum', 'jobs')
