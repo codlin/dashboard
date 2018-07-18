@@ -16,20 +16,19 @@ class LoadPipelineList(APIView):
         pipeline = LoadPipeline.objects.all()
         serializer = LoadPipelineSerializer(pipeline, many=True)
         return Response(serializer.data)
-    
+
     def post(self, request, format=None):
         serializer = LoadPipelineSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         loadname = serializer.get_fields().get('load_name')
         rootbuildnum = serializer.get_fields().get('root_buildnum')
-        item = LoadPipeline.objects.filter(load_name=loadname, root_buildnum=rootbuildnum)
+        item = LoadPipeline.objects.filter(
+            load_name=loadname, root_buildnum=rootbuildnum)
         if item:
-            serializer.update(item, data)
+            serializer.update(item, request.data)
         else:
             serializer.save()
-        
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
