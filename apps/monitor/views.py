@@ -11,6 +11,8 @@ from .models import LoadJobStatus, LoadPipeline
 from .serializers import LoadJobStatusSerializer, LoadPipelineSerializer
 
 # Create your views here.
+
+
 class LoadPipelineList(APIView):
     def get(self, request,  format=None):
         pipeline = LoadPipeline.objects.all()
