@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'monitor.apps.MonitorConfig',
+    'apps.monitor.apps.MonitorConfig',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +89,15 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'crt_auto',
+        'HOST': '135.242.139.122',
+        'PORT': 33306,
+        'USER': 'root',
+        'PASSWORD': '123456',
+    },
+
+    'mongodb': {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,
         'NAME': 'crtdashboard',

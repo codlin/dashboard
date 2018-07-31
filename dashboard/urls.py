@@ -19,11 +19,11 @@ from django.conf.urls import url, include
 
 from rest_framework.routers import DefaultRouter
 
-from monitor.view import LoadPipelineList
+from apps.monitor.views import LoadStatusView
 
 router = DefaultRouter()
 
-router.register(r'loads', LoadPipelineList, base_name="loads")
+router.register(r'api/loads', LoadStatusView, base_name="loads")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

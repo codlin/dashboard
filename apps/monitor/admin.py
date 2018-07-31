@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import LoadPipeline
+from .models import LoadStatus
 
 # Register your models here.
-admin.site.register(LoadPipeline)
+admin.site.register(LoadStatus)
