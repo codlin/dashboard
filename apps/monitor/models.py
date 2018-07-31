@@ -1,6 +1,7 @@
 from django.db import models
 import djongo.models
 
+
 # class LoadJobStatus(djongo.models.Model):
 #     job_name = djongo.models.CharField(max_length=256)
 #     build_on = djongo.models.CharField(max_length=16, default='master')

@@ -39,21 +39,22 @@ loadStatusFilter = {
 class LoadStatusView(viewsets.ModelViewSet):
     serializer_class = LoadStatusSerializer
     def get_queryset(self):
-        productid = self.request.query_params.get('productid', default='fzmfdd')
+        print(self.request.__dict__)
+        productid = self.request.query_params.get('productid')
         load_prefix = loadStatusFilter.get(productid, None)
         if load_prefix is None:
-            Response(status=status.HTTP_400_BAD_REQUEST)
+            return LoadStatus.objects.filter(start_time__lte='1900-01-1 00:00:00')
 
         print(load_prefix)
         Loads = LoadStatus.objects.filter(
-            load_name__startswith=load_prefix).order_by('-start_time')[:50]
+            load_name__startswith=load_prefix).order_by('-start_time')
         
         print(Loads)
 
         # get load info, if exist, execute incremental update
         loadFrom = self.request.query_params.get('from', default=None)
         if loadFrom:
-            Loads = Loads.filter(start_time__gte=loadFrom.starttime)
+            Loads = Loads.filter(start_time__gt=loadFrom)
         
         return Loads
 

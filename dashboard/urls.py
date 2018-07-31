@@ -23,11 +23,11 @@ from apps.monitor.views import LoadStatusView
 
 router = DefaultRouter()
 
-router.register(r'api/loads', LoadStatusView, base_name="loads")
+router.register(r'loads', LoadStatusView, base_name="loads")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # router的path路径
-    re_path('^', include(router.urls)),
+    re_path('^api/', include(router.urls)),
 ]
