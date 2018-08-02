@@ -1,12 +1,12 @@
 // configure base URL
-let host = 'http://135.252.122.189:8000/api'
-
+let host = process.env.ROOT_API
 let axios = require('axios')
 
 /*
   axios wrapper
 */
 function apiAxios (method, url, params, success, failure) {
+  console.log(process.env)
   axios({
     method: method,
     url: url,

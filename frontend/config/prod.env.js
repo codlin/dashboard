@@ -1,5 +1,13 @@
 'use strict'
-module.exports = {
-  NODE_ENV: '"production"',
-  API_GW: 'http://135.252.122.189:8000/api'
-}
+
+require('dotenv').config()
+let _ = require('lodash')
+let env = {}
+
+env = _(process.env)
+  .pickBy((value, key) => key.match(/^VUE_APP_/))
+  .mapKeys((value, key) => key.substring('VUE_APP_'.length))
+  .mapValues(value => `"${value}"`)
+  .value()
+
+module.exports = env

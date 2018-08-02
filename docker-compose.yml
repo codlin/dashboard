@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 
 services:
   django:
@@ -11,12 +11,13 @@ services:
     command: ["bash","startup.sh"]
   nginx:
     restart: always
-    build: ./nginx
+    build: .
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./backend/:/usr/share/nginx/html/dist:ro
+      - ./backend:/usr/share/nginx/html/dist:ro
+    command: ["nginx", "-g", "daemon off;"]
     links:
       - django
     depends_on:
