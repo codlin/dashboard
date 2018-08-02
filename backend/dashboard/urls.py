@@ -27,9 +27,10 @@ router = DefaultRouter()
 router.register(r'loads', LoadStatusView, base_name="loads")
 
 urlpatterns = [
-    url(r'^', TemplateView.as_view(template_name="index.html")),
     path('admin/', admin.site.urls),
 
     # router的path路径
     re_path('^api/', include(router.urls)),
+
+    # url(r'^', TemplateView.as_view(template_name="index.html")),
 ]

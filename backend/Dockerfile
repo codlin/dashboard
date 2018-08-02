@@ -25,4 +25,3 @@ RUN python3 -m pip install -r requirements.txt
 ENV http_proxy ""
 ENV https_proxy ""
 
-CMD ["python3", "manage.py runserver 0:8000"]

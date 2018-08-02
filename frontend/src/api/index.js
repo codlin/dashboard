@@ -1,5 +1,5 @@
 // configure base URL
-let host = 'https://135.252.122.189:8000/api'
+let host = 'http://135.252.122.189:8000/api'
 
 let axios = require('axios')
 
@@ -16,7 +16,7 @@ function apiAxios (method, url, params, success, failure) {
     withCredentials: false
   })
     .then(function (res) {
-      if (res.data.success === true) {
+      if (res.status === 200) {
         if (success) {
           success(res)
         }

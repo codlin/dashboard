@@ -124,9 +124,319 @@ export default {
 
       // UI Components related
       dataChkbox: null,
-      passrateChkBox: null
+      passrateChkBox: null,
 
       // test data
+      test_loads: {
+        'fzmfdd':
+          [
+            {
+              start_time: '2018-07-25 09:20:57',
+              load_name: 'FLF18_ENB_0000_010120_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 100,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-26 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000001',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-27 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000002',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-28 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000003',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 09:20:57',
+              load_name: 'FLF18_ENB_0000_010120_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 100,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-26 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000001',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-27 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000002',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-28 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000003',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            }, {
+              start_time: '2018-07-25 09:20:57',
+              load_name: 'FLF18_ENB_0000_010120_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 100,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-26 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000001',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-27 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000002',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-28 15:06:32',
+              load_name: 'FLF18SP_ENB_0000_000375_000003',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            }
+          ],
+        'fzmtdd':
+          [
+            {
+              start_time: '2018-07-27 09:20:57',
+              load_name: 'TLF18_ENB_0000_010120_000000',
+              passed_num: 317,
+              failed_num: 15,
+              norun_num: 28,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'TLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            }
+          ],
+        'cfzcfdd':
+          [
+            {
+              start_time: '2018-07-27 09:20:57',
+              load_name: 'FLC18_ENB_0000_010120_000000',
+              passed_num: 317,
+              failed_num: 15,
+              norun_num: 28,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'FLC18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            }
+          ],
+        'cfzctdd':
+          [
+            {
+              start_time: '2018-07-27 09:20:57',
+              load_name: 'TLC18_ENB_0000_010120_000000',
+              passed_num: 317,
+              failed_num: 15,
+              norun_num: 28,
+              total_num: 335,
+              first_passrate: 89.6,
+              passrate: 91.6,
+              cases: 'Link'
+            },
+            {
+              start_time: '2018-07-25 15:06:32',
+              load_name: 'TLF18SP_ENB_0000_000375_000000',
+              passed_num: 307,
+              failed_num: 15,
+              norun_num: 18,
+              total_num: 335,
+              first_passrate: 35,
+              passrate: 40,
+              cases: 'Link'
+            }
+          ]
+      }
     }
   },
 
@@ -139,8 +449,8 @@ export default {
           let today = getCurrentDate()
           let days = (this.dataChkbox === 'theweek') ? 7 : 1
           filteredData = filteredData.filter((item, i) => {
-            let startTime = item.start_time
-            let date = startTime.substring(0, startTime.indexOf(' ')).trim()
+            let starTime = item.start_time
+            let date = starTime.substring(0, starTime.indexOf(' ')).trim()
             return daysBetween(today, date) <= days
           })
         }
@@ -211,10 +521,12 @@ export default {
              * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
              * 2. When you modify the length of the array, e.g. vm.items.length = newLength
              * **/
+            console.log(res.data)
             Vue.set(this.loads, this.productId, res.data)
             console.log('getLoadList: data ', this.loads[this.productId])
           },
           er => {
+            // Vue.set(this.loads, this.productId, this.test_loads[this.productId])
             console.error('getLoadList: ', er)
           })
       } else {

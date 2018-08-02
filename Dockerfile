@@ -7,6 +7,8 @@ ENV REFRESHED_AT 2018-08-01
 ENV http_proxy http://135.245.48.34:8000
 ENV https_proxy http://135.245.48.34:8000
 
+ENV NODE_ENV production
+
 WORKDIR /app
 RUN npm install
 RUN npm run build

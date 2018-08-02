@@ -16,8 +16,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./frontend/dist/:/usr/share/nginx/html/:ro
-      - ./backend/public:/usr/share/nginx//html/backend/public:ro
+      - ./backend/:/usr/share/nginx/html/dist:ro
     links:
       - django
     depends_on:
