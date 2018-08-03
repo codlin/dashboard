@@ -9,7 +9,6 @@ from jenkinsapi.jenkins import Jenkins
 def convertToDateTime(timestamp):
     return datetime.utcfromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
-
 def getLoadName(jenkins_params_dict):
     for _, v in jenkins_params_dict:
         if re.match(r'[F|T]L[F|C]', v):

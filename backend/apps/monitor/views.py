@@ -2,32 +2,19 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import LoadStatus
-from .serializers import LoadStatusSerializer
+from .models import Product, SysMenu, LoadStatus
+from .serializers import ProductSerializer, SysMenuSerializer, LoadStatusSerializer
 
 # Create your views here.
-# class LoadPipelineList(APIView):
-#     def get(self, request, format=None):
-#         pipeline = LoadPipeline.objects.all()
-#         serializer = LoadPipelineSerializer(pipeline, many=True)
-#         return Response(serializer.data)
+class ProductApi(viewsets.ModelViewSet):
+    serializer_class = ProductSerializer
+    def get_queryset(self):
+        return Product.objects.all()
 
-#     def post(self, request, format=None):
-#         serializer = LoadPipelineSerializer(data=request.data)
-#         if not serializer.is_valid():
-#             return Response(
-#                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#         loadname = serializer.get_fields().get('load_name')
-#         rootbuildnum = serializer.get_fields().get('root_buildnum')
-#         item = LoadPipeline.objects.filter(
-#             load_name=loadname, root_buildnum=rootbuildnum)
-#         if item:
-#             serializer.update(item, request.data)
-#         else:
-#             serializer.save()
-
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+class SysMenuApi(viewsets.ModelViewSet):
+    serializer_class = SysMenuSerializer
+    def get_queryset(self):
+        return SysMenu.objects.all()
 
 loadStatusFilter = {
     'fzmfdd': 'FLF',
@@ -35,7 +22,6 @@ loadStatusFilter = {
     'cfzcfdd': 'FLC',
     'cfzctdd': 'TLC'
 }
-
 
 class LoadStatusView(viewsets.ModelViewSet):
     serializer_class = LoadStatusSerializer

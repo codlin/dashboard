@@ -61,7 +61,7 @@
             <td class="text-xs-left">{{ props.item.first_passrate }}</td>
             <td class="text-xs-left">{{ props.item.passrate }}</td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadcases', params: { productId: productId, loadName: props.item.load_name, startTime: props.item.start_time } }">{{ props.item.cases }}</router-link>
+              <router-link :to="{ name: 'loadcases', params: { productId: productId, loadName: props.item.load_name, startTime: props.item.start_time } }">LINK</router-link>
             </td>
           </tr>
         </template>
@@ -124,319 +124,7 @@ export default {
 
       // UI Components related
       dataChkbox: null,
-      passrateChkBox: null,
-
-      // test data
-      test_loads: {
-        'fzmfdd':
-          [
-            {
-              start_time: '2018-07-25 09:20:57',
-              load_name: 'FLF18_ENB_0000_010120_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-26 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000001',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-27 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000002',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-28 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000003',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 09:20:57',
-              load_name: 'FLF18_ENB_0000_010120_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-26 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000001',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-27 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000002',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-28 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000003',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            }, {
-              start_time: '2018-07-25 09:20:57',
-              load_name: 'FLF18_ENB_0000_010120_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-26 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000001',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-27 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000002',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-28 15:06:32',
-              load_name: 'FLF18SP_ENB_0000_000375_000003',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            }
-          ],
-        'fzmtdd':
-          [
-            {
-              start_time: '2018-07-27 09:20:57',
-              load_name: 'TLF18_ENB_0000_010120_000000',
-              passed_num: 317,
-              failed_num: 15,
-              norun_num: 28,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'TLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ],
-        'cfzcfdd':
-          [
-            {
-              start_time: '2018-07-27 09:20:57',
-              load_name: 'FLC18_ENB_0000_010120_000000',
-              passed_num: 317,
-              failed_num: 15,
-              norun_num: 28,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'FLC18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ],
-        'cfzctdd':
-          [
-            {
-              start_time: '2018-07-27 09:20:57',
-              load_name: 'TLC18_ENB_0000_010120_000000',
-              passed_num: 317,
-              failed_num: 15,
-              norun_num: 28,
-              total_num: 335,
-              first_passrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              start_time: '2018-07-25 15:06:32',
-              load_name: 'TLF18SP_ENB_0000_000375_000000',
-              passed_num: 307,
-              failed_num: 15,
-              norun_num: 18,
-              total_num: 335,
-              first_passrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ]
-      }
+      passrateChkBox: null
     }
   },
 
@@ -526,7 +214,6 @@ export default {
             console.log('getLoadList: data ', this.loads[this.productId])
           },
           er => {
-            // Vue.set(this.loads, this.productId, this.test_loads[this.productId])
             console.error('getLoadList: ', er)
           })
       } else {
@@ -536,11 +223,14 @@ export default {
 
     // incremental get loads
     increGetLoadList () {
-      console.log('Enter increGetLoadList: product', this.productId)
+      console.log('Enter increGetLoadList: product', this.productId, this.loads[this.productId][0].start_time)
       let params = this.loads[this.productId] ? { productid: this.productId, from: this.loads[this.productId][0].start_time } : { productid: this.productId }
       this.$api.get('/loads', params,
         r => {
-          this.loads[this.productId].unshift(r.data)
+          console.log('data:', r.data)
+          if (r.data.length > 0) {
+            this.loads[this.productId].unshift(r.data)
+          }
         },
         r => {
           console.log('getLoadList: mock data')

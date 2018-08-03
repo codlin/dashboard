@@ -8,11 +8,10 @@
                    flat>
           <v-toolbar-items>
             <v-btn flat
-                   v-for="product in products"
-                   :key="product.id"
-                   @click="updateNV(product)"
-                   :to="{ name: 'index', params: { productId: product.id } }">
-              {{ product.name }}
+                   v-for="product in productItems"
+                   :key="product.name"
+                   @click="forwardDefaultPage(product)">
+              {{ product.text }}
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
@@ -34,6 +33,7 @@
 
 <script>
 import breadcrumbs from '../../components/breadcrums/breadcrums'
+import { getTimestamp } from '../../../static/js/utils.js'
 
 export default {
   components: {
@@ -58,7 +58,9 @@ export default {
   },
 
   computed: {
-
+    productItems () {
+      return this.products
+    }
   },
 
   created () {
@@ -67,52 +69,27 @@ export default {
 
   methods: {
     getProducts () {
-      console.log('Enter getProducts')
-      this.$api.sync_get('/products', null,
+      console.log(getTimestamp(), 'Enter getProducts:')
+      this.$api.get('/products', null,
         r => {
-          console.log('getProducts: get result')
           this.products = r.data
-          this.forwardDefaultPage()
+          console.log(getTimestamp(), 'getProducts: get result', this.products)
+
+          this.forwardDefaultPage(this.products[0])
         },
         r => {
-          console.log('getProducts: get mock data')
-          this.products = [
-            {
-              id: 'fzmfdd',
-              name: 'FZM FDD'
-            },
-            {
-              id: 'fzmtdd',
-              name: 'FZM TDD'
-            },
-            {
-              id: 'cfzcfdd',
-              name: 'CFZC FDD'
-            },
-            {
-              id: 'cfzctdd',
-              name: 'cFZC TDD'
-            }
-          ]
-          this.forwardDefaultPage()
+          console.log('Failed: ', r)
         })
 
-      console.log('Leave getProducts')
+      console.log(getTimestamp(), 'Leave getProducts')
     },
 
-    forwardDefaultPage () {
-      const product = this.products[0].id
-      this.loadsRouteList.push({ text: this.products[0].name, disabled: true })
-      // routeItems.forEach(value => { this.loadsRouteList.push(value) })
-      this.$router.push({ path: `/loads/index/${product}` })
-    },
+    forwardDefaultPage (product) {
+      console.log(product)
+      this.$router.push({ name: 'index', params: { productId: product.name } })
+    }
 
     // UI Components related
-    updateNV (product) {
-      console.info(product)
-      // this.loadsRouteList.pop()
-      this.loadsRouteList.push(product.name)
-    }
   }
 
 }

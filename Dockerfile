@@ -10,8 +10,16 @@ ENV NODE_ENV production
 
 WORKDIR /app
 COPY frontend/package*.json ./
-COPY frontend .
-RUN ls -l /app && npm install
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash - \
+    && apt-get install -y nodejs \
+    && npm install vue \
+    && npm install -g @vue/cli \
+    && npm install -g @vue/cli-init \
+    && npm install --save vue-axios axios vue-router vuex jwt-decode jsonwebtoken node-jose
+
+RUN rm -rf node_modules && npm install
+COPY frontend ./
 RUN npm run build
 
 # Nginx

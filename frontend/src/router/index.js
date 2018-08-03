@@ -5,10 +5,15 @@ import app from '../views/app/app'
 import Head from '../views/head/head'
 import footer from '../views/footer/footer'
 
-const index = () => import('../views/loads/index')
-const loadsByProduct = () => import('../views/loads/loads')
-const loadTLs = () => import('../views/loads/loadtestlines')
-const loadCases = () => import('../views/loads/loadcases')
+import index from '../views/loads/index'
+import loadsByProduct from '../views/loads/loads'
+import loadTLs from '../views/loads/loadtestlines'
+import loadCases from '../views/loads/loadcases'
+
+// const index = () => import('../views/loads/index')
+// const loadsByProduct = () => import('../views/loads/loads')
+// const loadTLs = () => import('../views/loads/loadtestlines')
+// const loadCases = () => import('../views/loads/loadcases')
 
 Vue.use(Router)
 

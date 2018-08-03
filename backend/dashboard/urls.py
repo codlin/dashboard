@@ -20,10 +20,12 @@ from django.views.generic import TemplateView
 
 from rest_framework.routers import DefaultRouter
 
-from apps.monitor.views import LoadStatusView
+from apps.monitor.views import LoadStatusView, ProductApi, SysMenuApi
 
 router = DefaultRouter()
 
+router.register(r'menu', SysMenuApi, base_name="menu")
+router.register(r'products', ProductApi, base_name="products")
 router.register(r'loads', LoadStatusView, base_name="loads")
 
 urlpatterns = [

@@ -1,3 +1,7 @@
+export const getTimestamp = () => {
+  return new Date().getTime()
+}
+
 export const getBeforeDate = n => {
   var date = new Date()
   var year, month, day

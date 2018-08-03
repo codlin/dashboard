@@ -1,5 +1,20 @@
 from rest_framework import serializers
-from .models import LoadStatus
+from .models import LoadStatus, Product, SysMenu
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+class SysMenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SysMenu
+        fields = "__all__"
+
+class LoadStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoadStatus
+        fields="__all__"
 
 # class LoadJobStatusSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -13,8 +28,3 @@ from .models import LoadStatus
 #     class Meta:
 #         model = LoadPipeline
 #         fields = ('load_name', 'root_buildnum', 'jobs')
-
-class LoadStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoadStatus
-        fields="__all__"

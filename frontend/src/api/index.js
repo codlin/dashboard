@@ -6,14 +6,12 @@ let axios = require('axios')
   axios wrapper
 */
 function apiAxios (method, url, params, success, failure) {
-  console.log(process.env)
   axios({
     method: method,
     url: url,
     data: method === 'POST' || method === 'PUT' ? params : null,
     params: method === 'GET' || method === 'DELETE' ? params : null,
-    baseURL: host,
-    withCredentials: false
+    baseURL: host
   })
     .then(function (res) {
       if (res.status === 200) {
