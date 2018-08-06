@@ -10,8 +10,8 @@ ENV https_proxy http://135.245.48.34:8000
 ENV NODE_ENV development
 
 WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm cache clean --force && rm -rf node_modules && npm install --save
+COPY frontend/package.json ./
+RUN npm cache clean && rm -rf node_modules && npm install --save
 COPY frontend ./
 RUN npm run build
 
