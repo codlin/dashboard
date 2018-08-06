@@ -1,6 +1,6 @@
+let axios = require('axios')
 // configure base URL
 let host = process.env.ROOT_API
-let axios = require('axios')
 
 /*
   axios wrapper

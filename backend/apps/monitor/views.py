@@ -30,7 +30,7 @@ class LoadStatusView(viewsets.ModelViewSet):
         productid = self.request.query_params.get('productid')
         load_prefix = loadStatusFilter.get(productid, None)
         if load_prefix is None:
-            return LoadStatus.objects.filter(start_time__lte='1900-01-1 00:00:00')
+            return LoadStatus.objects.filter(start_time__lte='1900-01-1 00:00:00Z')
 
         Loads = LoadStatus.objects.filter(
             load_name__startswith=load_prefix).order_by('-start_time')
