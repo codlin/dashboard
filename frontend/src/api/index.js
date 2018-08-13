@@ -1,6 +1,5 @@
 let axios = require('axios')
 // configure base URL
-let host = process.env.ROOT_API
 
 /*
   axios wrapper
@@ -10,8 +9,7 @@ function apiAxios (method, url, params, success, failure) {
     method: method,
     url: url,
     data: method === 'POST' || method === 'PUT' ? params : null,
-    params: method === 'GET' || method === 'DELETE' ? params : null,
-    baseURL: host
+    params: method === 'GET' || method === 'DELETE' ? params : null
   })
     .then(function (res) {
       if (res.status === 200) {
@@ -37,21 +35,6 @@ function apiAxios (method, url, params, success, failure) {
     })
 }
 
-// axios synchronous method
-async function apiAxiosPromise (relativeURL, params) {
-  try {
-    let url = host + relativeURL
-    if (params) {
-      url += params
-    }
-
-    const response = await axios.get(url)
-    console.log(response)
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 // return api function
 export default {
   get: function (url, params, success, failure) {
@@ -65,30 +48,5 @@ export default {
   },
   delete: function (url, params, success, failure) {
     return apiAxios('DELETE', url, params, success, failure)
-  },
-  sync_get: (url, params, success, failure) => {
-    apiAxiosPromise(url, params)
-      .then(function (res) {
-        if (res.data.success === true) {
-          if (success) {
-            success(res)
-          }
-        } else {
-          if (failure) {
-            failure(res)
-          } else {
-            console.error('error: ' + JSON.stringify(res.data))
-          }
-        }
-      })
-      .catch(function (err) {
-        if (failure) {
-          failure(err)
-        } else {
-          if (err) {
-            console.error('api error: ' + err.response)
-          }
-        }
-      })
   }
 }

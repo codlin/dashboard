@@ -203,7 +203,7 @@ export default {
     // get loads list
     getLoadList () {
       if (this.loads[this.productId] == null) {
-        this.$api.get('/loads', { productid: this.productId },
+        this.$api.get('/api/loads', { productid: this.productId },
           res => {
             /** Due to limitations in JavaScript, Vue cannot detect the following changes to an array:
              * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
@@ -225,7 +225,7 @@ export default {
     increGetLoadList () {
       console.log('Enter increGetLoadList: product', this.productId, this.loads[this.productId][0].start_time)
       let params = this.loads[this.productId] ? { productid: this.productId, from: this.loads[this.productId][0].start_time } : { productid: this.productId }
-      this.$api.get('/loads', params,
+      this.$api.get('/api/loads', params,
         r => {
           console.log('data:', r.data)
           if (r.data.length > 0) {

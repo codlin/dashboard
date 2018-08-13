@@ -70,7 +70,7 @@ export default {
   methods: {
     getProducts () {
       console.log(getTimestamp(), 'Enter getProducts:')
-      this.$api.get('/products', null,
+      this.$api.get('/api/products', null,
         r => {
           this.products = r.data
           console.log(getTimestamp(), 'getProducts: get result', this.products)

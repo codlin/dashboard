@@ -420,7 +420,7 @@ export default {
     getLoadList () {
       console.log('Enter getLoadList: ', this.loadName)
       if (this.loads[this.productId] == null) {
-        this.$api.get('/loads', this.productId,
+        this.$api.get('/api/loads', this.productId,
           res => {
             this.loads = res.data
           },
@@ -444,7 +444,7 @@ export default {
     increGetLoadList () {
       console.log('Enter increGetLoadList: product', this.productId)
       let latestLoad = this.loads[this.productId][0]
-      this.$api.get('/loads', { productid: this.productId, from: { timestart: latestLoad.startTime, load: latestLoad.loadName } },
+      this.$api.get('/api/loads', { productid: this.productId, from: { timestart: latestLoad.startTime, load: latestLoad.loadName } },
         r => {
           this.loads[this.productId].unshift(r.data)
         },
