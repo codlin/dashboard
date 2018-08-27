@@ -70,6 +70,11 @@ export default {
   methods: {
     getProducts () {
       console.log(getTimestamp(), 'Enter getProducts:')
+      if (this.products.length > 0) {
+        console.log('product already exist.')
+        return
+      }
+
       this.$api.get('/api/products', null,
         r => {
           this.products = r.data

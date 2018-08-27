@@ -2,38 +2,58 @@
   <div>
     <v-card flat>
       <v-card-title>
-        <strong>Details</strong>
+        <strong>{{ loadName }}</strong>
         <v-spacer></v-spacer>
-        <v-text-field v-model="load_search"
+        <v-text-field v-model="item_search"
                       append-icon="search"
                       label="Search"
                       single-line
                       hide-details></v-text-field>
       </v-card-title>
+
       <v-data-table :pagination.sync="pagination"
-                    :headers="loadTblHeaders"
-                    :items="loads[productId]"
-                    :search="load_search"
+                    :headers="tableHeaders"
+                    :items="testlines"
+                    :search="item_search"
+                    :class="['text-xs-left', 'border 1px solid black']"
                     hide-actions>
+        <template slot="headers"
+                  slot-scope="props">
+          <tr>
+            <th colspan="3"> Load Summary </th>
+            <th colspan="2"> check_site </th>
+            <th colspan="2"> healthCheckup </th>
+            <th colspan="2"> upgrade </th>
+          </tr>
+          <tr>
+            <th v-for="header in tableHeaders"
+                :key="header.key"
+                :class="['column sortable']"
+                @click="changeSort(header.value)">
+              {{ header.text }}
+            </th>
+          </tr>
+        </template>
+
         <template slot="items"
                   slot-scope="props">
-          <tr :bgcolor=tableRowColor(props.item)>
-            <td>{{ props.item.starttime }}</td>
-            <td class="text-xs-left">{{ props.item.load }}</td>
-            <td class="text-xs-left">{{ props.item.passed }}</td>
-            <td class="text-xs-left">{{ props.item.failed }}</td>
-            <td class="text-xs-left">{{ props.item.norun }}</td>
-            <td class="text-xs-left">{{ props.item.total }}</td>
-            <td class="text-xs-left">{{ props.item.firstpassrate }}</td>
-            <td class="text-xs-left">{{ props.item.passrate }}</td>
-            <td class="text-xs-left">{{ props.item.cases }}</td>
+          <tr>
+            <td>{{ props.item.testline }}</td>
+            <td class="text-xs-left">{{ props.item.btsid }}</td>
+            <td class="text-xs-left">{{ props.item.ca }}</td>
+            <td class="text-xs-left">{{ props.item.check_site_result }}</td>
+            <td class="text-xs-left">{{ props.item.check_site_timestamp }}</td>
+            <td class="text-xs-left">{{ props.item.healthCheckup_result }}</td>
+            <td class="text-xs-left">{{ props.item.healthCheckup_timestamp }}</td>
+            <td class="text-xs-left">{{ props.item.upgrade_result }}</td>
+            <td class="text-xs-left">{{ props.item.upgrade_timestamp }}</td>
           </tr>
         </template>
         <v-alert slot="no-results"
                  :value="true"
                  color="error"
                  icon="warning">
-          Your search for "{{ load_search }}" found no results.
+          Your search for "{{ item_search }}" found no results.
         </v-alert>
       </v-data-table>
     </v-card>
@@ -41,366 +61,73 @@
 </template>
 
 <script>
-import Vue from 'vue'
-
 export default {
   props: {
-    productId: {
-      type: String,
-      required: true
-    },
     loadName: {
       type: String,
       required: true
-    },
-    startTime: {
-      type: String,
-      required: true
     }
+  },
+
+  created () {
+    // get data from server
+    this.getLoadToTLs()
   },
 
   data () {
     return {
       // json data retrieved from server
-      loads: [],
-      loadTblHeaders: [],
+      testlines: [],
+      tableHeaders: [
+        { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
+        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
+        { key: 'ca', text: 'CA', align: 'left', value: 'ca' },
+        { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result' },
+        { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp' },
+        { key: 'healthCheckup_result', text: 'result', align: 'left', value: 'healthCheckup_result' },
+        { key: 'healthCheckup_timestamp', text: 'timestamp', align: 'left', value: 'healthCheckup_timestamp' },
+        { key: 'upgrade_result', text: 'result', align: 'left', value: 'upgrade_result' },
+        { key: 'upgrade_timestamp', text: 'timestamp', align: 'left', value: 'upgrade_timestamp' }
+      ],
 
       // vars from json data which will be used in the template
 
       // table data
-      load_search: '',
+      item_search: '',
       // sorting by descending
-      pagination: { sortBy: 'starttime', descending: true, rowsPerPage: -1 },
+      pagination: { sortBy: 'testline', descending: false, rowsPerPage: -1 },
 
       // UI Components related
 
       // test data
-      test_loads: {
-        'fzmfdd':
-          [
-            {
-              starttime: '2018-07-25 09:20:57',
-              load: 'FLF18_ENB_0000_010120_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-26 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000001',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-27 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000002',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-28 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000003',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 09:20:57',
-              load: 'FLF18_ENB_0000_010120_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-26 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000001',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-27 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000002',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-28 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000003',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            }, {
-              starttime: '2018-07-25 09:20:57',
-              load: 'FLF18_ENB_0000_010120_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 100,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-26 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000001',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-27 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000002',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-28 15:06:32',
-              load: 'FLF18SP_ENB_0000_000375_000003',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            }
-          ],
-        'fzmtdd':
-          [
-            {
-              starttime: '2018-07-27 09:20:57',
-              load: 'TLF18_ENB_0000_010120_000000',
-              passed: 317,
-              failed: 15,
-              norun: 28,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'TLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ],
-        'cfzcfdd':
-          [
-            {
-              starttime: '2018-07-27 09:20:57',
-              load: 'FLC18_ENB_0000_010120_000000',
-              passed: 317,
-              failed: 15,
-              norun: 28,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'FLC18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ],
-        'cfzctdd':
-          [
-            {
-              starttime: '2018-07-27 09:20:57',
-              load: 'TLC18_ENB_0000_010120_000000',
-              passed: 317,
-              failed: 15,
-              norun: 28,
-              total: 335,
-              firstpassrate: 89.6,
-              passrate: 91.6,
-              cases: 'Link'
-            },
-            {
-              starttime: '2018-07-25 15:06:32',
-              load: 'TLF18SP_ENB_0000_000375_000000',
-              passed: 307,
-              failed: 15,
-              norun: 18,
-              total: 335,
-              firstpassrate: 35,
-              passrate: 40,
-              cases: 'Link'
-            }
-          ]
-      },
-      test_loadTblHeaders: [
-        { text: 'Start Time', align: 'left', value: 'starttime' },
-        { text: 'Load', align: 'left', value: 'load' },
-        { text: 'Passed', align: 'left', value: 'passed' },
-        { text: 'Failed', align: 'left', value: 'failed' },
-        { text: 'NA', align: 'left', value: 'norun' },
-        { text: 'Total', align: 'left', value: 'total' },
-        { text: 'First PassRate (%)', align: 'left', value: 'firstpassrate' },
-        { text: 'PassRate (%)', align: 'left', value: 'passRate' },
-        { text: 'Cases', align: 'left', value: 'cases' }
+      test_testlines: [
+        {
+          testline: '135.252.122.157',
+          btsid: '709',
+          ca: 'Uplane',
+          check_site_result: 'SUCCESS',
+          check_site_timestamp: '2018-08-27 10:03:01',
+          healthCheckup_result: 'SUCCESS',
+          healthCheckup_timestamp: '2018-08-27 10:05:19',
+          upgrade_result: 'SUCCESS',
+          upgrade_timestamp: '2018-08-27 10:14:55'
+        },
+        {
+          testline: '135.252.122.155',
+          btsid: '707',
+          ca: 'LTE3296',
+          check_site_result: 'SUCCESS',
+          check_site_timestamp: '2018-08-27 10:03:01',
+          healthCheckup_result: 'SUCCESS',
+          healthCheckup_timestamp: '2018-08-27 10:05:19',
+          upgrade_result: 'SUCCESS',
+          upgrade_timestamp: '2018-08-27 10:14:55'
+        }
       ]
     }
   },
 
   computed: {
-
   },
 
   watch: {
@@ -411,74 +138,25 @@ export default {
      * So we should watch $route for reacting URLs' changing
      **/
     '$route' (to, from) {
-      this.getLoadList()
+      this.getLoadToTLs()
     }
   },
 
   methods: {
     // get loads list
-    getLoadList () {
-      console.log('Enter getLoadList: ', this.loadName)
-      if (this.loads[this.productId] == null) {
-        this.$api.get('/api/loads', this.productId,
-          res => {
-            this.loads = res.data
-          },
-          er => {
-            console.error('getLoadList: ', er)
-            /** Due to limitations in JavaScript, Vue cannot detect the following changes to an array:
-             * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
-             * 2. When you modify the length of the array, e.g. vm.items.length = newLength
-             * **/
-            Vue.set(this.loads, this.productId, this.test_loads[this.productId])
-            console.log('getLoadList: mock data ', this.loads[this.productId])
-          })
-      } else {
-        this.increGetLoadList()
-      }
-
-      console.log('Leave getLoadList')
-    },
-
-    // incremental get loads
-    increGetLoadList () {
-      console.log('Enter increGetLoadList: product', this.productId)
-      let latestLoad = this.loads[this.productId][0]
-      this.$api.get('/api/loads', { productid: this.productId, from: { timestart: latestLoad.startTime, load: latestLoad.loadName } },
-        r => {
-          this.loads[this.productId].unshift(r.data)
+    getLoadToTLs () {
+      console.log('Enter getLoadToTLs: ', this.loadName)
+      this.$api.get('/api/loadtls', this.loadName,
+        res => {
+          this.testlines = res.data
         },
-        r => {
-          console.log('getLoadList: mock data')
-          Vue.set(this.loads, this.productId, this.test_loads[this.productId].concat(this.loads[this.productId]))
+        er => {
+          console.error('getLoadToTLs: ', er)
+          this.testlines = this.test_testlines
         })
-
-      console.log('Leave getLoadList')
-    },
+    }
 
     // UI releated
-    tableRowColor (item) {
-      console.log(item)
-      if (item.passrate === 100) {
-        return '#E8F5E9'
-      } else if (item.passrate < 50) {
-        return '#FBE9E7'
-      }
-    },
-
-    // for testing
-    // init page data
-    test_initPageData () {
-      this.loadTblHeaders = this.test_loadTblHeaders
-    }
-  },
-
-  created () {
-    // for testing
-    this.test_initPageData()
-
-    // get data from server
-    this.getLoadList()
   },
 
   beforeRouteEnter (to, from, next) {
@@ -489,8 +167,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .v-tabs__div {
-//   text-transform: none;
-//   font-size: 12px;
-// }
 </style>

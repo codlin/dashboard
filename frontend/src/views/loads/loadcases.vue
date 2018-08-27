@@ -2,7 +2,7 @@
   <div>
     <v-card flat>
       <v-card-title>
-        <strong>Details</strong>
+        <strong> {{ loadName }} </strong>
         <v-spacer></v-spacer>
         <v-text-field v-model="load_search"
                       append-icon="search"

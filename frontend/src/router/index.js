@@ -64,7 +64,7 @@ var router = new Router({
               }
             },
             {
-              path: 'index/:productId/:loadName/:startTime/tls',
+              path: 'index/:loadName/tls',
               name: 'loadtls',
               component: loadTLs,
               props: true,
@@ -73,7 +73,7 @@ var router = new Router({
               }
             },
             {
-              path: 'index/:productId/:loadName/:startTime/cases',
+              path: 'index/:loadName/cases',
               name: 'loadcases',
               component: loadCases,
               props: true,

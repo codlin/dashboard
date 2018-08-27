@@ -52,7 +52,7 @@
           <tr :bgcolor=tableRowColor(props.item)>
             <td>{{ props.item.start_time }}</td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadtls', params: { productId: productId, loadName: props.item.load_name, startTime: props.item.start_time } }">{{ props.item.load_name }}</router-link>
+              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.load_name } }">{{ props.item.load_name }}</router-link>
             </td>
             <td class="text-xs-left">{{ props.item.passed_num }}</td>
             <td class="text-xs-left">{{ props.item.failed_num }}</td>
@@ -61,7 +61,7 @@
             <td class="text-xs-left">{{ props.item.first_passrate }}</td>
             <td class="text-xs-left">{{ props.item.passrate }}</td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadcases', params: { productId: productId, loadName: props.item.load_name, startTime: props.item.start_time } }">LINK</router-link>
+              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.load_name } }">LINK</router-link>
             </td>
           </tr>
         </template>

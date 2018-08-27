@@ -11,13 +11,13 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       // proxy all requests starting with /api to cunstom host
-      // '/api': {
-      //   target: 'http://135.252.122.189:8000/api',
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     '^/api': ''
-      //   }
-      // }
+      '/api': {
+        target: 'http://135.251.123.212/api',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
     },
 
     // Various Dev Server settings
