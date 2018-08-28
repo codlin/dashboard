@@ -195,7 +195,7 @@ export default {
       this.$store.dispatch('setRelatedChips', [
         {
           text: 'cases',
-          path: '/loads/index/fzmtdd/' + this.loadName + '/cases'
+          path: '/loads/index/' + this.loadName + '/cases'
         }
       ])
     },
@@ -218,11 +218,6 @@ export default {
       this.pagination.sortBy = header.value
       this.pagination.descending = !this.pagination.descending
     }
-  },
-
-  beforeRouteEnter (to, from, next) {
-    console.info('beforeRouteEnter:', to.path)
-    next()
   }
 }
 </script>
