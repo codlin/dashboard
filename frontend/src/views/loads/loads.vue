@@ -89,9 +89,6 @@ export default {
   },
 
   created () {
-    // for testing
-    this.test_initPageData()
-
     // get data from server
     this.getLoadList()
 
@@ -181,23 +178,12 @@ export default {
         },
         {
           disabled: false,
-          text: 'FZM FDD',
-          path: '/loads/index/fzmfdd'
-        },
-        {
-          disabled: true,
-          text: 'FLF18SP_ENB_0000_000375_000009',
-          path: '/loads/index/fzmtdd/FLF18SP_ENB_0000_000375_000009'
+          text: this.productId.toUpperCase(),
+          path: '/loads/index/' + this.productId
         }
       ])
 
-      // create related chips
-      this.$store.dispatch('setrelatedChips', [
-        {
-          text: 'cases',
-          path: '/loads/index/fzmtdd/FLF18SP_ENB_0000_000375_000009'
-        }
-      ])
+      this.$store.dispatch('setRelatedChips', [])
     },
 
     // get loads list
@@ -223,8 +209,7 @@ export default {
 
     // incremental get loads
     increGetLoadList () {
-      console.log('Enter increGetLoadList: product', this.productId, this.loads[this.productId][0].start_time)
-      let params = this.loads[this.productId] ? { productid: this.productId, from: this.loads[this.productId][0].start_time } : { productid: this.productId }
+      let params = this.loads[this.productId].length === 0 ? { productid: this.productId } : { productid: this.productId, from: this.loads[this.productId][0].start_time }
       this.$api.get('/api/loads', params,
         r => {
           console.log('data:', r.data)
@@ -252,12 +237,9 @@ export default {
     refreshData () {
       console.log(this.dataChkbox)
       this.increGetLoadList()
-    },
+    }
 
     // for testing
-    // init page data
-    test_initPageData () {
-    }
   }
 }
 </script>

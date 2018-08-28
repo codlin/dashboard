@@ -12,25 +12,28 @@
       </v-card-title>
 
       <v-data-table :pagination.sync="pagination"
-                    :headers="tableHeaders"
+                    :headers="subHeaders"
                     :items="testlines"
                     :search="item_search"
-                    :class="['text-xs-left', 'border 1px solid black']"
+                    :class="['text-xs-left']"
                     hide-actions>
         <template slot="headers"
                   slot-scope="props">
           <tr>
-            <th colspan="3"> Load Summary </th>
-            <th colspan="2"> check_site </th>
-            <th colspan="2"> healthCheckup </th>
-            <th colspan="2"> upgrade </th>
-          </tr>
-          <tr>
-            <th v-for="header in tableHeaders"
+            <th v-for="header in headers"
                 :key="header.key"
-                :class="['column sortable']"
-                @click="changeSort(header.value)">
+                :colspan="header.colspan">
               {{ header.text }}
+            </th>
+          </tr>
+
+          <tr>
+            <th v-for="header in subHeaders"
+                :key="header.key"
+                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+                @click="changeSort(header)">
+              {{ header.text }}
+              <v-icon small>arrow_upward</v-icon>
             </th>
           </tr>
         </template>
@@ -38,14 +41,26 @@
         <template slot="items"
                   slot-scope="props">
           <tr>
-            <td>{{ props.item.testline }}</td>
+            <td class="text-xs-left">
+              <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
+                 target="_blank">{{ props.item.testline }}</a>
+            </td>
             <td class="text-xs-left">{{ props.item.btsid }}</td>
             <td class="text-xs-left">{{ props.item.ca }}</td>
-            <td class="text-xs-left">{{ props.item.check_site_result }}</td>
+            <td class="text-xs-left">
+              <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
+                 target="_blank">{{ props.item.check_site_result }}</a>
+            </td>
             <td class="text-xs-left">{{ props.item.check_site_timestamp }}</td>
-            <td class="text-xs-left">{{ props.item.healthCheckup_result }}</td>
+            <td class="text-xs-left">
+              <a href="http://10.52.200.190/view/AICT_3_FDD/job/healthCheckup_AICT3_FDD/24854/console"
+                 target="_blank">{{ props.item.healthCheckup_result }}</a>
+            </td>
             <td class="text-xs-left">{{ props.item.healthCheckup_timestamp }}</td>
-            <td class="text-xs-left">{{ props.item.upgrade_result }}</td>
+            <td class="text-xs-left">
+              <a href="http://10.52.200.190/view/AICT_3_FDD/job/upgrade_FDD_AICT3/24065/console"
+                 target="_blank">{{ props.item.upgrade_result }}</a>
+            </td>
             <td class="text-xs-left">{{ props.item.upgrade_timestamp }}</td>
           </tr>
         </template>
@@ -72,13 +87,24 @@ export default {
   created () {
     // get data from server
     this.getLoadToTLs()
+    this.createBreadcrums()
   },
 
   data () {
     return {
       // json data retrieved from server
       testlines: [],
-      tableHeaders: [
+
+      // header leverl I
+      headers: [
+        { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '3' },
+        { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2' },
+        { key: 'healthcheckup', text: 'Health Checkup Job', value: 'healthcheckup', align: 'left', colspan: '2' },
+        { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2' }
+      ],
+
+      // header leverl II
+      subHeaders: [
         { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
         { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
         { key: 'ca', text: 'CA', align: 'left', value: 'ca' },
@@ -102,17 +128,6 @@ export default {
       // test data
       test_testlines: [
         {
-          testline: '135.252.122.157',
-          btsid: '709',
-          ca: 'Uplane',
-          check_site_result: 'SUCCESS',
-          check_site_timestamp: '2018-08-27 10:03:01',
-          healthCheckup_result: 'SUCCESS',
-          healthCheckup_timestamp: '2018-08-27 10:05:19',
-          upgrade_result: 'SUCCESS',
-          upgrade_timestamp: '2018-08-27 10:14:55'
-        },
-        {
           testline: '135.252.122.155',
           btsid: '707',
           ca: 'LTE3296',
@@ -120,6 +135,29 @@ export default {
           check_site_timestamp: '2018-08-27 10:03:01',
           healthCheckup_result: 'SUCCESS',
           healthCheckup_timestamp: '2018-08-27 10:05:19',
+          upgrade_result: 'Failed',
+          upgrade_timestamp: '2018-08-27 10:14:55'
+        },
+        {
+          testline: '135.252.122.157',
+          btsid: '709',
+          ca: 'Uplane',
+          check_site_result: 'SUCCESS',
+          check_site_timestamp: '2018-08-27 10:03:01',
+          healthCheckup_result: 'Failed',
+          healthCheckup_timestamp: '2018-08-27 10:05:20',
+          upgrade_result: 'SUCCESS',
+          upgrade_timestamp: '2018-08-27 10:14:55'
+        },
+
+        {
+          testline: '135.252.122.159',
+          btsid: '720',
+          ca: 'Uplane',
+          check_site_result: 'SUCCESS',
+          check_site_timestamp: '2018-08-27 10:03:01',
+          healthCheckup_result: 'SUCCESS',
+          healthCheckup_timestamp: '2018-08-27 10:05:21',
           upgrade_result: 'SUCCESS',
           upgrade_timestamp: '2018-08-27 10:14:55'
         }
@@ -143,6 +181,25 @@ export default {
   },
 
   methods: {
+    createBreadcrums () {
+      // create breadcrums
+      this.$store.dispatch('pushBreadcrumbs',
+        {
+          disabled: false,
+          text: this.loadName,
+          path: '/loads/index/' + this.loadName + '/tls'
+        }
+      )
+
+      // create related chips
+      this.$store.dispatch('setRelatedChips', [
+        {
+          text: 'cases',
+          path: '/loads/index/fzmtdd/' + this.loadName + '/cases'
+        }
+      ])
+    },
+
     // get loads list
     getLoadToTLs () {
       console.log('Enter getLoadToTLs: ', this.loadName)
@@ -154,9 +211,13 @@ export default {
           console.error('getLoadToTLs: ', er)
           this.testlines = this.test_testlines
         })
-    }
+    },
 
     // UI releated
+    changeSort (header) {
+      this.pagination.sortBy = header.value
+      this.pagination.descending = !this.pagination.descending
+    }
   },
 
   beforeRouteEnter (to, from, next) {
@@ -167,4 +228,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+tr {
+  border: #cccccc solid 1px;
+}
+
+th {
+  height: 0%;
+}
+
+tr.border_top {
+  border-top: #cccccc solid 1px;
+  border-bottom: #cccccc solid 0px;
+}
+tr.border_bottom {
+  border-top: #cccccc solid 0px;
+  border-bottom: #cccccc solid 1px;
+}
 </style>

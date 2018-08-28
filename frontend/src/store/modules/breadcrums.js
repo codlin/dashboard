@@ -1,4 +1,5 @@
 const SET_BREADCRUMS = 'SET_BREADCRUMS'
+const PUSH_BREADCRUMS = 'PUSH_BREADCRUMS'
 const SET_CHIPS = 'SET_CHIPS'
 
 /** breadcrums item struct
@@ -35,6 +36,9 @@ const mutations = {
   [SET_BREADCRUMS] (state, obj) {
     state.breadcrums = obj
   },
+  [PUSH_BREADCRUMS] (state, obj) {
+    state.breadcrums.push(obj)
+  },
   [SET_CHIPS] (state, obj) {
     state.relatedChips = obj
   }
@@ -46,7 +50,8 @@ function makeAction (type) {
 }
 const actions = {
   setBreadcrumbs: makeAction(SET_BREADCRUMS),
-  setrelatedChips: makeAction(SET_CHIPS)
+  pushBreadcrumbs: makeAction(PUSH_BREADCRUMS),
+  setRelatedChips: makeAction(SET_CHIPS)
 }
 
 export default {

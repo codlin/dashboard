@@ -40,6 +40,10 @@ export default {
     breadcrumbs
   },
 
+  created () {
+    this.getProducts()
+  },
+
   data () {
     return {
       // json data retrieved from server
@@ -63,8 +67,8 @@ export default {
     }
   },
 
-  created () {
-    this.getProducts()
+  watch: {
+
   },
 
   methods: {
@@ -92,9 +96,14 @@ export default {
     forwardDefaultPage (product) {
       console.log(product)
       this.$router.push({ name: 'index', params: { productId: product.name } })
-    }
+    },
 
     // UI Components related
+    createBreadcrums () {
+      // create breadcrums
+      this.$store.dispatch('setBreadcrumbs', [])
+      this.$store.dispatch('setRelatedChips', [])
+    }
   }
 
 }
