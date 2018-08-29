@@ -2,8 +2,17 @@
   <div>
     <v-card flat>
       <v-card-title>
-        <strong>{{ loadName }}</strong>
+        <v-toolbar-title>Details</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-content>
+          <v-layout align-center
+                    justify-start>
+            <v-checkbox hide-details
+                        v-model="resultChkbox"
+                        value="failed"
+                        label="FAILED"></v-checkbox>
+          </v-layout>
+        </v-content>
         <v-text-field v-model="item_search"
                       append-icon="search"
                       label="Search"
@@ -13,7 +22,7 @@
 
       <v-data-table :pagination.sync="pagination"
                     :headers="subHeaders"
-                    :items="testlines"
+                    :items="filteredItems"
                     :search="item_search"
                     :class="['text-xs-left']"
                     hide-actions>
@@ -124,6 +133,7 @@ export default {
       pagination: { sortBy: 'testline', descending: false, rowsPerPage: -1 },
 
       // UI Components related
+      resultChkbox: null,
 
       // test data
       test_testlines: [
@@ -166,6 +176,21 @@ export default {
   },
 
   computed: {
+    filteredItems () {
+      let filteredData = this.testlines
+
+      if (this.resultChkbox !== null) {
+        filteredData = filteredData.filter((item, i) => {
+          if (this.resultChkbox.toUpperCase() === 'FAILED') {
+            return (item.check_site_result.toUpperCase() === 'FAILED') ||
+              (item.healthCheckup_result.toUpperCase() === 'FAILED') ||
+              (item.upgrade_result.toUpperCase() === 'FAILED')
+          }
+        })
+      }
+
+      return filteredData
+    }
   },
 
   watch: {

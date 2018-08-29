@@ -49,7 +49,7 @@
                     hide-actions>
         <template slot="items"
                   slot-scope="props">
-          <tr :bgcolor=tableRowColor(props.item)>
+          <tr>
             <td>{{ props.item.start_time }}</td>
             <td class="text-xs-left">
               <router-link :to="{ name: 'loadtls', params: { loadName: props.item.load_name } }">{{ props.item.load_name }}</router-link>
