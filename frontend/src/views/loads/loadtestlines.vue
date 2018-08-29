@@ -95,7 +95,7 @@ export default {
       // json data retrieved from server
       testlines: [],
 
-      // header leverl I
+      // header level I
       headers: [
         { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '3' },
         { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2' },
@@ -103,7 +103,7 @@ export default {
         { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2' }
       ],
 
-      // header leverl II
+      // header level II
       subHeaders: [
         { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
         { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },

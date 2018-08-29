@@ -17,11 +17,11 @@
           <v-layout align-center
                     justify-start>
             <v-checkbox hide-details
-                        v-model="dataChkbox"
+                        v-model="dateChkbox"
                         label="7 Days"
                         value="theweek"></v-checkbox>
             <v-checkbox hide-details
-                        v-model="dataChkbox"
+                        v-model="dateChkbox"
                         label="24-hour"
                         value="24hour"></v-checkbox>
             <v-checkbox hide-details
@@ -120,7 +120,7 @@ export default {
       pagination: { sortBy: 'start_time', descending: true, rowsPerPage: -1 },
 
       // UI Components related
-      dataChkbox: null,
+      dateChkbox: null,
       passrateChkBox: null
     }
   },
@@ -129,10 +129,10 @@ export default {
     filteredItems () {
       let filteredData = this.loads[this.productId]
 
-      if (this.dataChkbox !== null || this.passrateChkBox !== null) {
-        if (this.dataChkbox !== null) {
+      if (this.dateChkbox !== null || this.passrateChkBox !== null) {
+        if (this.dateChkbox !== null) {
           let today = getCurrentDate()
-          let days = (this.dataChkbox === 'theweek') ? 7 : 1
+          let days = (this.dateChkbox === 'theweek') ? 7 : 1
           filteredData = filteredData.filter((item, i) => {
             let starTime = item.start_time
             let date = starTime.substring(0, starTime.indexOf(' ')).trim()
@@ -235,7 +235,7 @@ export default {
     },
 
     refreshData () {
-      console.log(this.dataChkbox)
+      console.log(this.dateChkbox)
       this.increGetLoadList()
     }
 

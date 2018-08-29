@@ -32,19 +32,14 @@ const getters = {
   }
 }
 
-function findFirstIndex (el, obj) {
-  return (
-    el.disabled === obj.disabled && el.text === obj.text && el.path === obj.path
-  )
-}
-
 // mutations
 const mutations = {
   [SET_BREADCRUMS] (state, obj) {
     state.breadcrums = obj
   },
   [PUSH_BREADCRUMS] (state, obj) {
-    let idx = state.breadcrums.findIndex(findFirstIndex, obj)
+    let idx = state.breadcrums.findIndex(o => o.path === obj.path)
+    console.log(idx)
     if (idx === -1) {
       state.breadcrums.push(obj)
     } else {
