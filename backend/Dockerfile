@@ -20,7 +20,7 @@ ADD requirements.txt /app
 
 # Using pip:
 RUN python3 -m pip install --no-cache-dir -r requirements.txt \
-    && && rm -rf requirements.txt \
+    && rm -rf requirements.txt \
     && apt-get purge -y --auto-remove $buildDeps
 
 ENV http_proxy ""
