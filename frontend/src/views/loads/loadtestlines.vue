@@ -1,7 +1,8 @@
 <template>
   <div>
     <v-card flat>
-      <v-card-title>
+      <v-toolbar flat
+                 color="white">
         <v-toolbar-title>Details</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-content>
@@ -18,7 +19,7 @@
                       label="Search"
                       single-line
                       hide-details></v-text-field>
-      </v-card-title>
+      </v-toolbar>
 
       <v-data-table :pagination.sync="pagination"
                     :headers="subHeaders"
