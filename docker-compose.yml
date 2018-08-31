@@ -5,19 +5,19 @@ services:
     restart: always
     build: ./backend
     expose:
-      - "8000"
+      - '8000'
     volumes:
       - ./backend:/app
-    command: ["bash","startup.sh"]
+    command: ['bash', 'startup.sh']
   nginx:
     restart: always
     build: .
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
-      - ./backend:/usr/share/nginx/html/dist:ro
-    command: ["nginx", "-g", "daemon off;"]
+      - ./backend:/usr/share/nginx/html/app:ro
+    command: ['nginx', '-g', 'daemon off;']
     links:
       - django
     depends_on:
