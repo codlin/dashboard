@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'crt_auto',
+        'NAME': 'crtdb',
         'HOST': '135.242.139.122',
         'PORT': 33306,
         'USER': 'root',
