@@ -40,7 +40,7 @@ class LoadStatusViewApi(viewsets.ModelViewSet):
             return LoadStatus.objects.filter(start_time__lte='1900-01-1 00:00:00Z')
 
         Loads = LoadStatus.objects.filter(
-            load_name__startswith=load_prefix).order_by('-start_time')
+            loadname__startswith=load_prefix).order_by('-start_time')
 
         # get load info, if exist, execute incremental update
         loadFrom = self.request.query_params.get('from', default=None)
