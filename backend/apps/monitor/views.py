@@ -2,8 +2,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Product, SysMenu, LoadStatus
-from .serializers import ProductSerializer, SysMenuSerializer, LoadStatusSerializer
+from .models import Product, SysMenu, Testline, TesecasePath, Testcase, TestcaseRelease, LoadTestcaseSchedule, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .serializers import ProductSerializer, SysMenuSerializer, TestlineSerializer, TesecasePathSerializer, TestcaseSerializer, TestcaseReleaseSerializer, LoadTestcaseScheduleSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
 # Create your views here.
 class ProductApi(viewsets.ModelViewSet):
@@ -23,7 +23,7 @@ loadStatusFilter = {
     'cfzctdd': 'TLC'
 }
 
-class LoadStatusView(viewsets.ModelViewSet):
+class LoadStatusViewApi(viewsets.ModelViewSet):
     serializer_class = LoadStatusSerializer
 
     def get_queryset(self):

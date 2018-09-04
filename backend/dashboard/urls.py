@@ -20,13 +20,13 @@ from django.views.generic import TemplateView
 
 from rest_framework.routers import DefaultRouter
 
-from apps.monitor.views import LoadStatusView, ProductApi, SysMenuApi
+from apps.monitor.views import LoadStatusViewApi, ProductApi, SysMenuApi
 
 router = DefaultRouter()
 
 router.register(r'menu', SysMenuApi, base_name="menu")
 router.register(r'products', ProductApi, base_name="products")
-router.register(r'loads', LoadStatusView, base_name="loads")
+router.register(r'loads', LoadStatusViewApi, base_name="loads")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
