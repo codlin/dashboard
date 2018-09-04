@@ -95,8 +95,8 @@ var router = new Router({
           }
         },
         {
-          path: 'cases',
-          name: 'cases',
+          path: 'case',
+          name: 'case',
           components: {
             head: Head,
             footer: footer

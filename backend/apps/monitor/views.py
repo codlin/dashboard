@@ -6,15 +6,21 @@ from .models import Product, SysMenu, Testline, TesecasePath, Testcase, Testcase
 from .serializers import ProductSerializer, SysMenuSerializer, TestlineSerializer, TesecasePathSerializer, TestcaseSerializer, TestcaseReleaseSerializer, LoadTestcaseScheduleSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
 # Create your views here.
+
+
 class ProductApi(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
+
     def get_queryset(self):
         return Product.objects.all()
 
+
 class SysMenuApi(viewsets.ModelViewSet):
     serializer_class = SysMenuSerializer
+
     def get_queryset(self):
         return SysMenu.objects.all()
+
 
 loadStatusFilter = {
     'fzmfdd': 'FLF',
@@ -22,6 +28,7 @@ loadStatusFilter = {
     'cfzcfdd': 'FLC',
     'cfzctdd': 'TLC'
 }
+
 
 class LoadStatusViewApi(viewsets.ModelViewSet):
     serializer_class = LoadStatusSerializer
