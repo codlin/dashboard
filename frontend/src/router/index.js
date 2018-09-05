@@ -10,6 +10,8 @@ import loadsByProduct from '../views/loads/loads'
 import loadTLs from '../views/loads/loadtestlines'
 import loadCases from '../views/loads/loadcases'
 
+import testline from '../views/testline/testlines'
+
 // const index = () => import('../views/loads/index')
 // const loadsByProduct = () => import('../views/loads/loads')
 // const loadTLs = () => import('../views/loads/loadtestlines')
@@ -88,6 +90,7 @@ var router = new Router({
           name: 'testline',
           components: {
             head: Head,
+            content: testline,
             footer: footer
           },
           meta: {
@@ -99,6 +102,7 @@ var router = new Router({
           name: 'case',
           components: {
             head: Head,
+            content: testline,
             footer: footer
           },
           meta: {
