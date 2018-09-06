@@ -350,8 +350,10 @@ export default {
     save () {
       this.$validator.validate().then(result => {
         if (result) {
-          console.log('validate result:', result)
+          console.log('editedIndex:', this.editedIndex)
           if (this.editedIndex > -1) {
+            console.log('old data:', this.testlines[this.editedIndex])
+            console.log('new data:', this.editedItem)
             if (isObjectValueEqual(this.testlines[this.editedIndex], this.editedItem)) {
               this.close()
               return

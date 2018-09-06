@@ -5,6 +5,8 @@ import djongo.models
 # CRT product data, e.g.:
 # fzmfdd: 'FZM FDD'
 # cfzcfdd: 'CFZC TDD'
+
+
 class Product(models.Model):
     name = models.CharField('Product Name', max_length=16)
     text = models.CharField('Product Text', max_length=16)
@@ -16,6 +18,8 @@ class Product(models.Model):
         return self.name
 
 # <system menu>
+
+
 class SysMenu(models.Model):
     index = models.PositiveSmallIntegerField('Index')
     level = models.PositiveSmallIntegerField('Level')
@@ -31,14 +35,16 @@ class SysMenu(models.Model):
 
 #------------------testline table-----------------------#
 # <testline>
+
+
 class Testline(models.Model):
     mode = models.CharField('Mode', max_length=8)
     sitetype = models.CharField('Site Type', max_length=16)
     node = models.CharField('Jenkins Node', max_length=64)
-    btsid = models.PositiveIntegerField('BTSID', primary_key=True)
+    btsid = models.CharField('BTSID', max_length=8, primary_key=True)
     ca = models.CharField('CA', max_length=64)
     jenkinsjob = models.CharField('Jenkins Job', max_length=255)
-    mbtsid = models.PositiveIntegerField('Mobility BTSID')
+    mbtsid = models.CharField('Mobility BTSID', max_length=8)
     mnode = models.CharField('Mobility Node', max_length=64)
 
     class Meta:
@@ -49,6 +55,8 @@ class Testline(models.Model):
 
 #------------------case-related table-----------------------#
 # <case path>
+
+
 class TesecasePath(models.Model):
     path = models.CharField('Case path', max_length=255)
 
@@ -59,6 +67,8 @@ class TesecasePath(models.Model):
         return self.path
 
 # <testcase>
+
+
 class Testcase(models.Model):
     casename = models.CharField('Case name', max_length=255)
     path = models.ForeignKey(TesecasePath, on_delete=models.CASCADE)
@@ -70,6 +80,8 @@ class Testcase(models.Model):
         return self.casename
 
 # <release -- testcase>
+
+
 class TestcaseRelease(models.Model):
     release = models.CharField('Release', max_length=16)
     case = models.ForeignKey(Testcase, on_delete=models.CASCADE)
@@ -81,10 +93,12 @@ class TestcaseRelease(models.Model):
         return self.release
 
 # <load--testcase--testline> scheduler
+
+
 class LoadTestcaseSchedule(models.Model):
     loadname = models.CharField('Load Name', max_length=64)
     case = models.ForeignKey(Testcase, on_delete=models.DO_NOTHING)
-    btsid = models.PositiveIntegerField('BTSID')
+    btsid = models.CharField('BTSID', max_length=8)
 
     class Meta:
         db_table = "crt_load_testcase_schedule"
@@ -94,10 +108,12 @@ class LoadTestcaseSchedule(models.Model):
 
 #------------------run history table-----------------------#
 # <load--testcase status>
+
+
 class LoadTestcaseStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64)
     casename = models.CharField('Case name', max_length=255)
-    btsid = models.PositiveIntegerField('BTSID')
+    btsid = models.CharField('BTSID', max_length=8)
     node = models.CharField('Jenkins Node', max_length=64)
     result = models.CharField('Result', max_length=64)
     suite = models.CharField('Suite', max_length=64)
@@ -109,10 +125,12 @@ class LoadTestcaseStatus(models.Model):
         return "{}_{}".format(self.loadname, self.casename)
 
 # <load--testline status>
+
+
 class LoadTestlineStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64)
     testline = models.CharField('Testline', max_length=255)
-    btsid = models.PositiveIntegerField('BTSID')
+    btsid = models.CharField('BTSID', max_length=8)
     ca = models.CharField('CA', max_length=64)
 
     checksite_time = models.DateTimeField('Checksite Time')
@@ -134,6 +152,8 @@ class LoadTestlineStatus(models.Model):
         return "{}_{}".format(self.loadname, self.btsid)
 
 # <load> status
+
+
 class LoadStatus(models.Model):
     start_time = models.DateTimeField('Start Time')
     loadname = models.CharField('Load', max_length=30)
