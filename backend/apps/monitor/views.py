@@ -43,3 +43,9 @@ class LoadStatusViewApi(viewsets.ModelViewSet):
             Loads = Loads.filter(start_time__gt=loadFrom)
 
         return Loads
+
+class TestlineViewApi(viewsets.ModelViewSet):
+    serializer_class = TestlineSerializer
+
+    def get_queryset(self):
+        return Testline.objects.all()

@@ -11,10 +11,13 @@ import 'vuetify/dist/vuetify.min.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'babel-polyfill'
 
+import VeeValidate from 'vee-validate'
+
 Vue.prototype.$api = api
 Vue.config.productionTip = false
 
 Vue.use(Vuetify)
+Vue.use(VeeValidate)
 
 /* eslint-disable no-new */
 new Vue({

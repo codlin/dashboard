@@ -13,7 +13,6 @@
                  @click="refreshData">
             <v-icon>refresh</v-icon>
           </v-btn>
-
           <v-spacer></v-spacer>
           <v-content>
             <v-layout align-center
@@ -31,6 +30,127 @@
                         label="Search"
                         single-line
                         hide-details></v-text-field>
+          <v-dialog v-model="dialog"
+                    lazy-validation>
+            <v-btn slot="activator"
+                   color="primary"
+                   dark
+                   class="mb-2">New Testline</v-btn>
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+              </v-card-title>
+              <v-alert :value="alert"
+                       :type="alert_type"
+                       transition="scale-transition">
+                {{ alert_text }}
+              </v-alert>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <v-layout wrap>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.mode"
+                                    required
+                                    data-vv-name="mode"
+                                    label="Mode"
+                                    v-validate="'required|max:8'"
+                                    :counter="8"
+                                    :error-messages="errors.collect('mode')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.sitetype"
+                                    required
+                                    data-vv-name="sitetype"
+                                    label="Site Type"
+                                    v-validate="'required|max:16'"
+                                    :counter="16"
+                                    :error-messages="errors.collect('sitetype')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.node"
+                                    required
+                                    data-vv-name="node"
+                                    label="Node"
+                                    v-validate="'required|max:64'"
+                                    :counter="64"
+                                    :error-messages="errors.collect('node')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.btsid"
+                                    required
+                                    data-vv-name="btsid"
+                                    label="BTSID"
+                                    v-validate="'required|max_value:12345678'"
+                                    :counter="8"
+                                    :error-messages="errors.collect('btsid')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.ca"
+                                    required
+                                    data-vv-name="ca"
+                                    label="CA"
+                                    v-validate="'required|max:16'"
+                                    :counter="16"
+                                    :error-messages="errors.collect('ca')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.jenkinsjob"
+                                    required
+                                    data-vv-name="jenkinsjob"
+                                    label="Jenkins Job"
+                                    v-validate="'required|max:255'"
+                                    :counter="255"
+                                    :error-messages="errors.collect('jenkinsjob')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.mbtsid"
+                                    required
+                                    data-vv-name="mbtsid"
+                                    label="Mobility BTSID"
+                                    v-validate="'max_value:12345678'"
+                                    :counter="8"
+                                    :error-messages="errors.collect('mbtsid')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
+                      <v-text-field v-model="editedItem.mnode"
+                                    required
+                                    data-vv-name="mnode"
+                                    label="Mobility Node"
+                                    v-validate="'max:64'"
+                                    :counter="64"
+                                    :error-messages="errors.collect('mnode')"></v-text-field>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1"
+                       flat
+                       @click.native="close">Cancel</v-btn>
+                <v-btn color="blue darken-1"
+                       flat
+                       @click.native="save">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-toolbar>
 
         <v-data-table :pagination.sync="pagination"
@@ -50,6 +170,17 @@
               <td>{{ props.item.jenkinsjob }}</td>
               <td>{{ props.item.mbtsid }}</td>
               <td>{{ props.item.mnode }}</td>
+              <td>
+                <v-icon small
+                        class="mr-2"
+                        @click="editItem(props.item)">
+                  edit
+                </v-icon>
+                <v-icon small
+                        @click="deleteItem(props.item)">
+                  delete
+                </v-icon>
+              </td>
             </tr>
           </template>
           <v-alert slot="no-results"
@@ -65,20 +196,21 @@
 </template>
 
 <script>
-import { getTimestamp } from '../../../static/js/utils.js'
-
+import { isObjectValueEqual } from '../../../static/js/utils.js'
 export default {
   created () {
     this.getProducts()
+    this.getTestlines()
   },
 
   data () {
     return {
-      // json data retrieved from server
+      /* json data retrieved from server */
       products: [],
-
       testlines: [],
 
+      /* UI Components related */
+      // table data
       tblHeaders: [
         { text: 'Mode', align: 'left', value: 'mode' },
         { text: 'Site Type', align: 'left', value: 'sitetype' },
@@ -87,18 +219,37 @@ export default {
         { text: 'CA', align: 'left', value: 'ca' },
         { text: 'Jenkins Job', align: 'left', value: 'jenkinsjob' },
         { text: 'Mobility BTSID', align: 'left', value: 'mbtsid' },
-        { text: 'Mobility Node', align: 'left', value: 'mnode' }
+        { text: 'Mobility Node', align: 'left', value: 'mnode' },
+
+        // keep this colum at last
+        { text: 'Actions', align: 'left', value: 'actions', sortable: false }
       ],
 
-      // vars from json data which will be used in the template
-
-      // table data
       item_search: '',
-      // sorting by descending
-      pagination: { sortBy: 'mode', descending: true, rowsPerPage: -1 },
+      productChkbox: null,
 
-      // UI Components related
-      productChkbox: null
+      // sorting by descending
+      pagination: { sortBy: 'mode', descending: false, rowsPerPage: -1 },
+
+      // New testline template
+      dialog: false,
+      valid: false,
+      editedIndex: -1,
+      // edited item
+      editedItem: {
+        mode: '',
+        sitetype: '',
+        node: '',
+        btsid: '',
+        ca: '',
+        jenkinsjob: '',
+        mbtsid: '',
+        mnode: ''
+      },
+      // alert
+      alert: false,
+      alert_type: 'success',
+      alert_text: 'This is a success alert.'
     }
   },
 
@@ -114,6 +265,10 @@ export default {
 
       console.log('filter data: ', filteredData)
       return filteredData
+    },
+
+    formTitle () {
+      return this.editedIndex === -1 ? 'New Testline' : 'Edit Testline'
     }
   },
 
@@ -127,12 +282,16 @@ export default {
      **/
     $route () {
       this.getTestlines()
+    },
+
+    dialog (val) {
+      val || this.close()
     }
   },
 
   methods: {
     getProducts () {
-      console.log(getTimestamp(), 'Enter getProducts:')
+      console.log('Enter getProducts:')
       if (this.products.length > 0) {
         console.log('product already exist.')
         return
@@ -141,20 +300,20 @@ export default {
       this.$api.get('/api/products', null,
         r => {
           this.products = r.data
-          console.log(getTimestamp(), 'getProducts: get result', this.products)
+          console.log('getProducts: get result', this.products)
         },
         r => {
           console.log('Failed: ', r)
         })
 
-      console.log(getTimestamp(), 'Leave getProducts')
+      console.log('Leave getProducts')
     },
 
     getTestlines () {
       this.$api.get('/api/testlines', null,
         r => {
           this.testlines = r.data
-          console.log(getTimestamp(), 'getTestlines: ', this.testlines)
+          console.log('getTestlines: ', this.testlines)
         },
         r => {
           console.log('Failed: ', r)
@@ -162,9 +321,77 @@ export default {
     },
 
     refreshData () {
-      console.log(this.productChkbox)
-    }
+      this.getTestlines()
+    },
 
+    editItem (item) {
+      this.editedIndex = this.testlines.indexOf(item)
+      console.log('index:', this.editedIndex)
+      this.editedItem = Object.assign({}, item)
+      console.log('editedItem:', this.editedItem)
+      this.dialog = true
+    },
+
+    deleteItem (item) {
+      const index = this.testlines.indexOf(item)
+      confirm('Are you sure you want to delete this item?') && this.testlines.splice(index, 1)
+    },
+
+    close () {
+      this.dialog = false
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+        this.$validator.reset()
+        this.clear_alert()
+      }, 300)
+    },
+
+    save () {
+      this.$validator.validate().then(result => {
+        if (result) {
+          console.log('validate result:', result)
+          if (this.editedIndex > -1) {
+            if (isObjectValueEqual(this.testlines[this.editedIndex], this.editedItem)) {
+              this.close()
+              return
+            }
+          }
+
+          this.$api.post('/api/testlines', this.editedItem,
+            r => {
+              console.log('Push data successfully.')
+              if (this.editedIndex > -1) {
+                Object.assign(this.testlines[this.editedIndex], this.editedItem)
+              } else {
+                this.testlines.push(this.editedItem)
+              }
+              this.success_alert()
+              setTimeout(() => {
+                this.close()
+              }, 1000)
+            },
+            r => {
+              console.log('Error: ', r)
+              this.fail_alert()
+            })
+        }
+      })
+    },
+
+    clear_alert () {
+      this.alert = false
+    },
+    fail_alert () {
+      this.alert = true
+      this.alert_type = 'error'
+      this.alert_text = 'Push data to server failed, please try it later.'
+    },
+    success_alert () {
+      this.alert = true
+      this.alert_type = 'success'
+      this.alert_text = 'Push data successfully.'
+    }
     // for testing
   }
 }

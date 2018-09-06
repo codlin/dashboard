@@ -93,7 +93,7 @@ class LoadTestcaseSchedule(models.Model):
         return "{}_{}_{}".format(self.loadname, self.btsid, self.case)
 
 #------------------run history table-----------------------#
-# <load--testcase status> 
+# <load--testcase status>
 class LoadTestcaseStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64)
     casename = models.CharField('Case name', max_length=255)
