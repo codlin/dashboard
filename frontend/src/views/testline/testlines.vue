@@ -334,7 +334,18 @@ export default {
 
     deleteItem (item) {
       const index = this.testlines.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.testlines.splice(index, 1)
+
+      if (confirm('Are you sure you want to delete this item?')) {
+        // delete an exist testline
+        this.$api.delete('/api/testlines/', { btsid: this.editedItem.btsid },
+          r => {
+            console.log('Delete data successfully.')
+            this.testlines.splice(index, 1)
+          },
+          r => {
+            console.log('Error: ', r)
+          })
+      }
     },
 
     close () {
@@ -351,43 +362,62 @@ export default {
       this.$validator.validate().then(result => {
         if (result) {
           console.log('editedIndex:', this.editedIndex)
+          // testline exist
           if (this.editedIndex > -1) {
             console.log('old data:', this.testlines[this.editedIndex])
             console.log('new data:', this.editedItem)
+            // if testline is no change, close it.
             if (isObjectValueEqual(this.testlines[this.editedIndex], this.editedItem)) {
               this.close()
-              return
+            } else {
+              // update an exist testline
+              this.$api.put('/api/testlines/', this.editedItem,
+                r => {
+                  console.log('Update data successfully.')
+                  Object.assign(this.testlines[this.editedIndex], this.editedItem)
+                  this.success_alert()
+                  setTimeout(() => {
+                    this.close()
+                  }, 1000)
+                },
+                r => {
+                  console.log('Error: ', r)
+                  this.fail_alert(r)
+                })
             }
-          }
-
-          this.$api.post('/api/testlines', this.editedItem,
-            r => {
-              console.log('Push data successfully.')
-              if (this.editedIndex > -1) {
-                Object.assign(this.testlines[this.editedIndex], this.editedItem)
-              } else {
+          } else {
+            // create a new testline
+            this.$api.post('/api/testlines/', this.editedItem,
+              r => {
+                console.log('Push data successfully.')
                 this.testlines.push(this.editedItem)
-              }
-              this.success_alert()
-              setTimeout(() => {
-                this.close()
-              }, 1000)
-            },
-            r => {
-              console.log('Error: ', r)
-              this.fail_alert()
-            })
+                this.success_alert()
+                setTimeout(() => {
+                  this.close()
+                }, 1000)
+              },
+              r => {
+                console.log('Error: ', r)
+                this.fail_alert(r)
+              })
+          }
         }
       })
+    },
+
+    getCookie (name) {
+      let value = '; ' + document.cookie
+      let parts = value.split('; ' + name + '=')
+      if (parts.length === 2) return parts.pop().split(';').shift()
     },
 
     clear_alert () {
       this.alert = false
     },
-    fail_alert () {
+    fail_alert (r) {
       this.alert = true
       this.alert_type = 'error'
-      this.alert_text = 'Push data to server failed, please try it later.'
+      this.alert_text = 'Push data to server failed. ' + r
     },
     success_alert () {
       this.alert = true

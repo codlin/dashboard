@@ -1,4 +1,7 @@
 let axios = require('axios')
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+
 // configure base URL
 
 /*
@@ -12,7 +15,8 @@ function apiAxios (method, url, params, success, failure) {
     params: method === 'GET' || method === 'DELETE' ? params : null
   })
     .then(function (res) {
-      if (res.status === 200) {
+      console.log(res)
+      if (res.status === 200 || res.status === 201) {
         if (success) {
           success(res)
         }
