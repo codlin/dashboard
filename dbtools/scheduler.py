@@ -3,7 +3,7 @@ import sys
 import imp
 import time
 
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BlockingScheduler
 from helper import get_files
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -26,12 +26,9 @@ def load_tasks():
 
 
 if __name__ == "__main__":
-    scheduler = BackgroundScheduler()
+    scheduler = BlockingScheduler()
     tasks = load_tasks()
     for task_entry in tasks:
         scheduler.add_job(task_entry, 'interval', minutes=1)
 
     scheduler.start()
-
-    while True:
-        time.sleep(1)
