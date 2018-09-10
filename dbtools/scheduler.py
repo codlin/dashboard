@@ -1,6 +1,7 @@
-import os
+﻿import os
 import sys
 import imp
+import time
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from helper import get_files
@@ -28,9 +29,9 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler()
     tasks = load_tasks()
     for task_entry in tasks:
-        scheduler.add_job(task_entry, 'interval', minute=5)
+        scheduler.add_job(task_entry, 'interval', minutes=1)
 
     scheduler.start()
 
     while True:
-        pass
+        time.sleep(1)

@@ -1,11 +1,11 @@
-# pylint: disable=E0401
+﻿# pylint: disable=E0401
 import os
 import sys
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from root.scripts import *
+from scripts import *
 
 
 def task_entry():
-    pass
+    print('task is running...')
