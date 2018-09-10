@@ -1,17 +1,11 @@
-﻿# pylint: disable=E0401
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 import sys
 
-import jenkins
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
 from scripts import *
-
-jenkins_job = [
-    {
-
-    }
-]
 
 
 def task_entry():

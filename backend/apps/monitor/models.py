@@ -83,14 +83,14 @@ class Testcase(models.Model):
 
 
 class TestcaseRelease(models.Model):
-    release = models.CharField('Release', max_length=16)
+    load_release = models.CharField('Release', max_length=16)
     case = models.ForeignKey(Testcase, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "crt_testcase_release"
 
     def __str__(self):
-        return self.release
+        return self.load_release
 
 # <load--testcase--testline> scheduler
 
@@ -129,18 +129,22 @@ class LoadTestcaseStatus(models.Model):
 
 class LoadTestlineStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64)
-    testline = models.CharField('Testline', max_length=255)
+    testline = models.CharField('Testline', max_length=64)
     btsid = models.CharField('BTSID', max_length=8)
     ca = models.CharField('CA', max_length=64)
 
+    checksite_buildid = models.CharField('Checksite Build ID', max_length=8)
     checksite_time = models.DateTimeField('Checksite Time')
     checksite_status = models.CharField('Checksite Status', max_length=8)
     checksite_url = models.CharField('Checksite URL', max_length=512)
 
+    healthcheck_buildid = models.CharField(
+        'Healthcheck Build ID', max_length=8)
     healthcheck_time = models.DateTimeField('Healthcheck Time')
     healthcheck_status = models.CharField('Healthcheck Status', max_length=8)
     healthcheck_url = models.CharField('Healthcheck URL', max_length=512)
 
+    upgrade_buildid = models.CharField('Upgrade Build ID', max_length=8)
     upgrade_time = models.DateTimeField('Upgrade Time')
     upgrade_status = models.CharField('Upgrade Status', max_length=8)
     upgrade_url = models.CharField('Upgrade URL', max_length=512)
