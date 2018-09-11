@@ -11,59 +11,7 @@ import time
 
 from MYSQL import Pymysql
 from jenkins import JenkinsMonitor
-
-
-class JenkinsMonitorTbl(object):
-    def __init__(self):
-        self.db = Pymysql()
-        self.jenkins_info = dict()
-        self.monitor_jobs = dict()
-        self.jenkins_monitor = []
-
-        self._retrieve_data()
-
-    def __del__(self):
-        self.db.close_DB()
-
-    def _retrieve_data(self):
-        self._retrieve_jenkins_info()
-        self._retrieve_monitor_job()
-        self._retrieve_jenkins_monitor()
-
-    def _retrieve_jenkins_info(self):
-        sql = r"select * from crt_jenkins_info"
-        results = self.db.get_DB(sql)
-        print(results)
-        for item in results:
-            self.jenkins_info[item.id] = item
-            self.jenkins_info[item.url] = item.id
-
-    def _retrieve_monitor_job(self):
-        sql = r"select * from crt_jenkins_job"
-        results = self.db.get_DB(sql)
-        print(results)
-        for item in results:
-            self.monitor_jobs[item.id] = item.job
-            self.monitor_jobs[item.job] = item.id
-
-    def _retrieve_jenkins_monitor(self):
-        sql = r"select * from crt_jenkins_monitor"
-        results = self.db.get_DB(sql)
-        print(results)
-        for item in results:
-            self.jenkins_monitor.append(item)
-
-    @property
-    def jenkins_items(self):
-        return self.jenkins_info
-
-    @property
-    def monitor_jobs(self):
-        return self.monitor_jobs
-
-    @property
-    def jenkins_monitor(self):
-        return self.jenkins_monitor
+from jenkins_monitor_table import JenkinsMonitorTbl
 
 
 class loadTestlinesTblCUID(object):
@@ -79,29 +27,24 @@ class loadTestlinesTblCUID(object):
         results = self.db.get_DB(sql)
         return results
 
-    def get_jenkins_items(self, jekins_url):
-        jenkins_id = r"select id from crt_jenkins_info where url = '{}'".format(
-            jekins_url)
-        sql = r"select * from crt_load_testline_status_page where jenkins_id IN ({})".format(
-            jenkins_id)
+    def get_job_builds_id(self, jenkins_id, job_id):
+        sql = r"select build_id from crt_load_testline_status_page where url_id = '{}' and job_id = '{}'".format(
+            jenkins_id, job_id)
         # print(sql)
         results = self.db.get_DB(sql)
         # print(results)
         return results
 
     def get_unfinished_builds(self):
-        sql = r"select * from crt_load_testline_status_page where upgrade_status is null  or upgrade_status = 'null'"
+        sql = r"select * from crt_load_testline_status_page where build_status is null  or build_status = 'null' or build_status = ''"
         print(sql)
         results = self.db.get_DB(sql)
         print(results)
         return results
 
-    def get_checksite_lastbuildid(self, jenkins_id, job_id):
-        jenkins_id = r"select id from crt_jenkins_info where url = '{}'".format(
-            jekins_url)
-
-        job = r"select id from crt_jenkins_job where url = '{}'".format(
-            job_name)
+    def get_job_lastbuildid(self, jenkins_id, job_id):
+        ids = self.get_job_builds_id(jenkins_id, job_id)
+        return ids[0]
 
 
 class loadTestlinesJekins(object):

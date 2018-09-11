@@ -167,39 +167,16 @@ class LoadTestlineStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64)
     testline = models.CharField('Testline', max_length=64)
     btsid = models.CharField('BTSID', max_length=8)
-    ca = models.CharField('CA', max_length=64)
 
-    jenkins = models.ForeignKey(JenkinsInfo, on_delete=models.DO_NOTHING)
-
-    checksite_name = models.ForeignKey(
-        JenkinsJobs, related_name='job_checksite', on_delete=models.DO_NOTHING)
-    checksite_buildid = models.CharField('Checksite Build ID', max_length=8)
-    checksite_time = models.CharField('Checksite Time', max_length=32)
-    checksite_status = models.CharField(
-        'Checksite Status', max_length=8, null=True, blank=True)
-    checksite_url = models.CharField('Checksite URL', max_length=512)
-
-    # FZC no these colums
-    healthcheck_name = models.ForeignKey(
-        JenkinsJobs, related_name='job_healthcheck', on_delete=models.DO_NOTHING, null=True, lank=True)
-    healthcheck_buildid = models.CharField(
-        'Healthcheck Build ID', max_length=8, null=True, blank=True)
-    healthcheck_time = models.CharField(
-        'Healthcheck Time', max_length=32, null=True, blank=True)
-    healthcheck_status = models.CharField(
-        'Healthcheck Status', max_length=8, null=True, blank=True)
-    healthcheck_url = models.CharField(
-        'Healthcheck URL', max_length=512, null=True, blank=True)
-
-    upgrade_name = models.ForeignKey(
-        JenkinsJobs, related_name='job_upgrade', on_delete=models.DO_NOTHING, null=True, blank=True)
-    upgrade_buildid = models.CharField(
-        'Upgrade Build ID', max_length=8, null=True, blank=True)
-    upgrade_time = models.CharField(
-        'Upgrade Time', max_length=32, null=True, blank=True)
-    upgrade_status = models.CharField(
-        'Upgrade Status', max_length=8, null=True, blank=True)
-    upgrade_url = models.CharField('Upgrade URL', max_length=512, null=True, blank=True)
+    url = models.ForeignKey(
+        JenkinsInfo, related_name='jenkins_url', on_delete=models.DO_NOTHING)
+    job = models.ForeignKey(
+        JenkinsJobs, related_name='job_name', on_delete=models.DO_NOTHING)
+    build_id = models.CharField('Build ID', max_length=8)
+    build_time = models.CharField('Build Time', max_length=32)
+    build_status = models.CharField(
+        'Build Status', max_length=8, null=True, blank=True)
+    build_url = models.CharField('Build URL', max_length=512)
 
     class Meta:
         db_table = "crt_load_testline_status_page"
