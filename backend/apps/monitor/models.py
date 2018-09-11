@@ -181,7 +181,7 @@ class LoadTestlineStatus(models.Model):
 
     # FZC no these colums
     healthcheck_name = models.ForeignKey(
-        JenkinsJobs, related_name='job_healthcheck', on_delete=models.DO_NOTHING, blank=True)
+        JenkinsJobs, related_name='job_healthcheck', on_delete=models.DO_NOTHING, null=True, lank=True)
     healthcheck_buildid = models.CharField(
         'Healthcheck Build ID', max_length=8, null=True, blank=True)
     healthcheck_time = models.CharField(
@@ -192,13 +192,14 @@ class LoadTestlineStatus(models.Model):
         'Healthcheck URL', max_length=512, null=True, blank=True)
 
     upgrade_name = models.ForeignKey(
-        JenkinsJobs, related_name='job_upgrade', on_delete=models.DO_NOTHING)
-    upgrade_buildid = models.CharField('Upgrade Build ID', max_length=8)
+        JenkinsJobs, related_name='job_upgrade', on_delete=models.DO_NOTHING, null=True, blank=True)
+    upgrade_buildid = models.CharField(
+        'Upgrade Build ID', max_length=8, null=True, blank=True)
     upgrade_time = models.CharField(
         'Upgrade Time', max_length=32, null=True, blank=True)
     upgrade_status = models.CharField(
         'Upgrade Status', max_length=8, null=True, blank=True)
-    upgrade_url = models.CharField('Upgrade URL', max_length=512)
+    upgrade_url = models.CharField('Upgrade URL', max_length=512, null=True, blank=True)
 
     class Meta:
         db_table = "crt_load_testline_status_page"
