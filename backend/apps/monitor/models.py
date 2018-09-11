@@ -124,6 +124,42 @@ class LoadTestcaseStatus(models.Model):
     def __str__(self):
         return "{}_{}".format(self.loadname, self.casename)
 
+
+class JenkinsJobs(models.Model):
+    job = models.CharField('Jenkins Job', max_length=255, unique=True)
+
+    class Meta:
+        db_table = "crt_jenkins_job"
+
+    def __str__(self):
+        return self.job
+
+
+class JenkinsInfo(models.Model):
+    url = models.CharField('Jenkins URL', max_length=128, unique=True)
+    user = models.CharField('Jenkins User', max_length=16)
+    passwd = models.CharField('Jenkins Password', max_length=16)
+
+    jobs = models.ManyToManyField(JenkinsJobs, through='JenkinsJobMonitor')
+
+    class Meta:
+        db_table = "crt_jenkins_info"
+
+    def __str__(self):
+        return self.url
+
+
+class JenkinsJobMonitor(models.Model):
+    jenkins = models.ForeignKey(JenkinsInfo, on_delete=models.CASCADE)
+    jobs = models.ForeignKey(JenkinsJobs, on_delete=models.CASCADE)
+    product = models.CharField('Product', max_length=8)
+
+    class Meta:
+        db_table = "crt_jenkins_monitor"
+
+    def __str__(self):
+        return "{}_{}_{}".format(self.product, self.jenkins, self.jobs)
+
 # <load--testline status>
 
 
@@ -133,20 +169,35 @@ class LoadTestlineStatus(models.Model):
     btsid = models.CharField('BTSID', max_length=8)
     ca = models.CharField('CA', max_length=64)
 
+    jenkins = models.ForeignKey(JenkinsInfo, on_delete=models.DO_NOTHING)
+
+    checksite_name = models.ForeignKey(
+        JenkinsJobs, related_name='job_checksite', on_delete=models.DO_NOTHING)
     checksite_buildid = models.CharField('Checksite Build ID', max_length=8)
-    checksite_time = models.DateTimeField('Checksite Time')
-    checksite_status = models.CharField('Checksite Status', max_length=8)
+    checksite_time = models.CharField('Checksite Time', max_length=32)
+    checksite_status = models.CharField(
+        'Checksite Status', max_length=8, null=True, blank=True)
     checksite_url = models.CharField('Checksite URL', max_length=512)
 
+    # FZC no these colums
+    healthcheck_name = models.ForeignKey(
+        JenkinsJobs, related_name='job_healthcheck', on_delete=models.DO_NOTHING, blank=True)
     healthcheck_buildid = models.CharField(
-        'Healthcheck Build ID', max_length=8)
-    healthcheck_time = models.DateTimeField('Healthcheck Time')
-    healthcheck_status = models.CharField('Healthcheck Status', max_length=8)
-    healthcheck_url = models.CharField('Healthcheck URL', max_length=512)
+        'Healthcheck Build ID', max_length=8, null=True, blank=True)
+    healthcheck_time = models.CharField(
+        'Healthcheck Time', max_length=32, null=True, blank=True)
+    healthcheck_status = models.CharField(
+        'Healthcheck Status', max_length=8, null=True, blank=True)
+    healthcheck_url = models.CharField(
+        'Healthcheck URL', max_length=512, null=True, blank=True)
 
+    upgrade_name = models.ForeignKey(
+        JenkinsJobs, related_name='job_upgrade', on_delete=models.DO_NOTHING)
     upgrade_buildid = models.CharField('Upgrade Build ID', max_length=8)
-    upgrade_time = models.DateTimeField('Upgrade Time')
-    upgrade_status = models.CharField('Upgrade Status', max_length=8)
+    upgrade_time = models.CharField(
+        'Upgrade Time', max_length=32, null=True, blank=True)
+    upgrade_status = models.CharField(
+        'Upgrade Status', max_length=8, null=True, blank=True)
     upgrade_url = models.CharField('Upgrade URL', max_length=512)
 
     class Meta:
@@ -159,14 +210,15 @@ class LoadTestlineStatus(models.Model):
 
 
 class LoadStatus(models.Model):
-    start_time = models.DateTimeField('Start Time')
-    loadname = models.CharField('Load', max_length=30)
-    passed_num = models.PositiveIntegerField('Passed')
-    failed_num = models.PositiveIntegerField('Failed')
-    norun_num = models.PositiveIntegerField('NA')
-    total_num = models.PositiveIntegerField('Total')
-    first_passrate = models.FloatField('First PassRate')
-    passrate = models.FloatField('PassRate')
+    start_time = models.CharField('Start Time', max_length=32)
+    loadname = models.CharField('Load', max_length=32, unique=True)
+    passed_num = models.CharField('Passed', max_length=8)
+    failed_num = models.CharField('Failed', max_length=8)
+    norun_num = models.CharField('NA', max_length=8)
+    total_num = models.CharField('Total', max_length=8)
+    first_passrate = models.CharField('First PassRate', max_length=8)
+    passrate = models.CharField('PassRate', max_length=8)
+    debug = models.CharField('Debug', max_length=8)
 
     class Meta:
         db_table = "crt_loadstatus_page"

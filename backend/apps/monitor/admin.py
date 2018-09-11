@@ -1,6 +1,7 @@
+# pylint: disable=W0614
 from django.contrib import admin
 
-from .models import Product, SysMenu, Testline, TesecasePath, Testcase, TestcaseRelease, LoadTestcaseSchedule, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .models import *
 
 # Register your models here.
 admin.site.register(Product)
@@ -13,3 +14,6 @@ admin.site.register(LoadTestcaseSchedule)
 admin.site.register(LoadTestcaseStatus)
 admin.site.register(LoadTestlineStatus)
 admin.site.register(LoadStatus)
+admin.site.register(JenkinsInfo)
+admin.site.register(JenkinsJobs)
+admin.site.register(JenkinsJobMonitor)

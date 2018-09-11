@@ -78,11 +78,21 @@ class JenkinsMonitor(object):
         self.jobs[job_name] = self.jenkins.get_job(job_name)
         return self.jobs[job_name]
 
+    def get_job(self, job_name):
+        if job_name in self.jobs.keys():
+            return self.jobs[job_name]
+
+        return None
+
     def remove_job(self, job_name):
         if job_name in self.jobs.keys():
             return self.jobs.pop(job_name)
 
         return None
+
+    def add_jobs(self, jobs_name):
+        for job_name in jobs_name:
+            self.add_job(job_name)
 
     # return dict(job_name, job)
     def get_monitor_jobs(self):
