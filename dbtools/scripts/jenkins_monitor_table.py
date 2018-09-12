@@ -16,7 +16,9 @@ class JenkinsMonitorTbl(object):
     def __init__(self):
         self.db = Pymysql()
 
-        self.jenkins_info = dict()
+        self.jenkins_tuples = ()
+        self.jenkins_dict = dict()
+
         self.monitor_jobs = dict()
         self.jenkins_monitor = []
 
@@ -33,9 +35,11 @@ class JenkinsMonitorTbl(object):
         sql = r"select * from crt_jenkins_info"
         results = self.db.get_DB(sql)
         print(results)
+        self.jenkins_tuples = results
+
         for item in results:
-            self.jenkins_info[item.id] = item
-            self.jenkins_info[item.url] = item.id
+            self.jenkins_dict[item.id] = item
+            self.jenkins_dict[item.url] = item.id
 
     def _retrieve_monitor_job(self):
         sql = r"select * from crt_jenkins_job"
@@ -53,8 +57,12 @@ class JenkinsMonitorTbl(object):
             self.jenkins_monitor.append(item)
 
     @property
-    def jenkins(self):
-        return self.jenkins_info
+    def jenkins_tuples(self):
+        return self.jenkins_tuples
+
+    @property
+    def jenkins_dict(self):
+        return self.jenkins_dict
 
     @property
     def monitor_jobs(self):

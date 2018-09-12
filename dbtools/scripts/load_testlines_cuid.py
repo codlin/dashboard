@@ -13,6 +13,8 @@ from MYSQL import Pymysql
 from jenkins import JenkinsMonitor
 from jenkins_monitor_table import JenkinsMonitorTbl
 
+# databse operation
+
 
 class loadTestlinesTblCUID(object):
     def __init__(self):
@@ -47,15 +49,16 @@ class loadTestlinesTblCUID(object):
         return ids[0]
 
 
-class loadTestlinesJekins(object):
+# jenkins operation
+class JenkinsMonitor(object):
     def __init__(self):
-        self.jenkins_monitor = []
-
+        self.monitor = JenkinsMonitorTbl()
         self._init_jenkins()
 
     def _init_jenkins(self):
-        for jenkins in crt_jenkins:
-            monitor = JenkinsMonitor(jenkins['url'], 'scpadm', 'scpadm')
+        jenkins = self.monitor.jenkins_tuples
+        for jenkins_id, url, user, passwd in jenkins:
+            monitor = JenkinsMonitor(url, user, passwd)
             monitor.add_jobs(jenkins['jobs'])
             self.jenkins_monitor.append(monitor)
 
