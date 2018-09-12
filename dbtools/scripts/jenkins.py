@@ -1,6 +1,5 @@
 import warnings
 import re
-from abc import abstractmethod
 from datetime import datetime
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.job import Job
@@ -25,16 +24,9 @@ def convertToDateTime(timestamp):
 
 
 '''
-job methods:
-get_first_buildnumber()
-get_last_buildnumber()
-get_build_ids()
-build = get_build(int(build_num))
-get_build_json(build)
-
 build methods:
 build.get_params()
-
+get_build_json(build)
 get_build_console_url(build)
 get_build_timestamp(build)
 get_build_duration(build)
@@ -44,10 +36,6 @@ get_build_duration(build)
 class JenkinsJobBuild(object):
     def __init__(self, build):
         self._build = build
-
-    @property
-    def info(self):
-        return self._build
 
     @property
     def json_data(self):
@@ -61,56 +49,43 @@ class JenkinsJobBuild(object):
     def timestamp(self):
         return convertToDateTime(self.json_data['timestamp'])
 
-    @abstractmethod
-    def getFilteredBuildInfo(self, filter_params={}):
-        pass
+
+'''
+job methods:
+get_first_buildnumber()
+get_last_buildnumber()
+get_build_ids()
+build = get_build(int(build_num))
+'''
 
 
-class JenkinsMonitor(object):
-    def __init__(self, url, user, passwd):
+class JenkinsJob(object):
+    def __init__(self, url, user, passwd, job_name):
         self.jenkins = Jenkins(url, user, passwd)
-        self.jobs = dict()
+        self.job = self.jenkins.get_job(job_name)
 
-    def add_job(self, job_name):
-        if job_name in self.jobs.keys():
-            return
+    def get_build(self, build_num):
+        return JenkinsJobBuild(self.job.get_build(build_num))
 
-        self.jobs[job_name] = self.jenkins.get_job(job_name)
-        return self.jobs[job_name]
+    def get_last_buildnumber(self):
+        return self.job.get_last_buildnumber()
 
-    def get_job(self, job_name):
-        if job_name in self.jobs.keys():
-            return self.jobs[job_name]
+    def get_last_build(self):
+        return JenkinsJobBuild(self.job.get_last_build())
 
-        return None
+    def get_first_buildnumber(self):
+        return self.job.get_first_buildnumber()
 
-    def remove_job(self, job_name):
-        if job_name in self.jobs.keys():
-            return self.jobs.pop(job_name)
+    def get_first_build(self):
+        return JenkinsJobBuild(self.job.get_first_build())
 
-        return None
+    def get_build_ids(self):
+        self.job.get_build_ids()
 
-    def add_jobs(self, jobs_name):
-        for job_name in jobs_name:
-            self.add_job(job_name)
-
-    # return dict(job_name, job)
-    def get_monitor_jobs(self):
-        return self.jobs
+    @property
+    def job(self):
+        return self.job
 
 
-# test
 if __name__ == "__main__":
-    monitor = JenkinsMonitor('http://10.52.200.190', 'scpadm', 'scpadm')
-
-    job = monitor.add_job('check_site_state_FDD_AICT3')
-    # builds = job.get_build_ids()
-    # s = map(str, builds)
-    # print(', '.join(s))
-
-    build = JenkinsJobBuild(job.get_build(job.get_last_buildnumber()))
-    print("info: ", build.info)
-    print("params: ", build.info.get_params())
-    print("json data: ", build.json_data)
-    print("console url: ", build.console_url)
-    print("timestamp: ", build.timestamp)
+    pass

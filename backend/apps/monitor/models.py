@@ -165,14 +165,14 @@ class JenkinsJobMonitor(models.Model):
     task = models.CharField('Task Name', max_length=32, default="")
     jenkins = models.ForeignKey(
         JenkinsInfo, on_delete=models.CASCADE, default="")
-    jobs = models.ForeignKey(JenkinsJobs, on_delete=models.CASCADE, default="")
+    job = models.ForeignKey(JenkinsJobs, on_delete=models.CASCADE, default="")
 
     class Meta:
         db_table = "crt_jenkins_monitor"
-        unique_together = ("task", "jenkins", "jobs")
+        unique_together = ("task", "jenkins", "job")
 
     def __str__(self):
-        return "{}_{}_{}".format(self.task, self.jenkins, self.jobs)
+        return "{}_{}_{}".format(self.task, self.jenkins, self.job)
 
 # <load--testline status>
 
@@ -182,10 +182,10 @@ class LoadTestlineStatus(models.Model):
     testline = models.CharField('Testline', max_length=64, default="")
     btsid = models.CharField('BTSID', max_length=8, default="")
 
-    url = models.ForeignKey(
-        JenkinsInfo, related_name='jenkins_url', on_delete=models.DO_NOTHING, default="")
-    job = models.ForeignKey(
-        JenkinsJobs, related_name='job_name', on_delete=models.DO_NOTHING, default="")
+    url = models.CharField('Jenkins URL', max_length=128,
+                           unique=True, default="")
+    job = models.CharField('Jenkins Job', max_length=255,
+                           unique=True, default="")
     build_id = models.CharField('Build ID', max_length=8, default="")
     build_time = models.CharField('Build Time', max_length=32, default="")
     build_status = models.CharField(
