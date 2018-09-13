@@ -2,9 +2,10 @@
 import sys
 import imp
 import time
-
 from apscheduler.schedulers.background import BlockingScheduler
-from helper import get_files
+# pylint: disable=E0401
+from common.helper import get_files
+from common.logger import logger
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, root)
@@ -19,7 +20,7 @@ def load_tasks():
             continue
 
         file_path = os.path.join(path, f)
-        print('load module from: {}'.format(file_path))
+        logger.info('load module from: {}'.format(file_path))
         item = imp.load_source('task_entry', file_path)
         tasks.append(item.task_entry)
 

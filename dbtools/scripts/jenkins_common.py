@@ -1,9 +1,17 @@
+import os
+import sys
 import warnings
 import re
+import json
+import requests
 from datetime import datetime
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.job import Job
 from jenkinsapi.build import Build
+# pylint: disable=E0401
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, root)
+from common.logger import logger
 
 
 def convertToDateTime(timestamp):
@@ -48,6 +56,10 @@ class JenkinsJobBuild(object):
     def timestamp(self):
         return convertToDateTime(self.json_data['timestamp'])
 
+    @property
+    def inner(self):
+        return self._build
+
 
 class JenkinsJob(object):
     '''
@@ -60,29 +72,40 @@ class JenkinsJob(object):
 
     def __init__(self, url, user, passwd, job_name):
         self.jenkins = Jenkins(url, user, passwd)
-        self.job = self.jenkins.get_job(job_name)
+        self.job_name = job_name
+        self._job = self.jenkins.get_job(job_name)
 
     def get_build(self, build_num):
-        return JenkinsJobBuild(self.job.get_build(build_num))
+        logger.debug("get jenkins build, id: {}".format(build_num))
+        return JenkinsJobBuild(self._job.get_build(build_num))
+
+    def get_all_builds(self, filters=[]):
+        url = "{}/job/{}/api/json?tree=allBuilds[{}]".format(
+              self.jenkins.baseurl, self.job_name, ",".join(filters))
+        logger.debug(url)
+        response = requests.get(url)
+        json_data = json.loads(response.text)
+        logger.debug(json_data)
+        return json_data['allBuilds']
 
     def get_last_buildnumber(self):
-        return self.job.get_last_buildnumber()
+        return self._job.get_last_buildnumber()
 
     def get_last_build(self):
-        return JenkinsJobBuild(self.job.get_last_build())
+        return JenkinsJobBuild(self._job.get_last_build())
 
     def get_first_buildnumber(self):
-        return self.job.get_first_buildnumber()
+        return self._job.get_first_buildnumber()
 
     def get_first_build(self):
-        return JenkinsJobBuild(self.job.get_first_build())
+        return JenkinsJobBuild(self._job.get_first_build())
 
     def get_build_ids(self):
-        self.job.get_build_ids()
+        self._job.get_build_ids()
 
     @property
     def job(self):
-        return self.job
+        return self._job
 
 
 if __name__ == "__main__":

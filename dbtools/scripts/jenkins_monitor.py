@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import json
 import requests
 from datetime import datetime
@@ -13,6 +15,10 @@ from abc import abstractmethod
 
 from MYSQL import Pymysql
 from jenkins_common import JenkinsJob
+# pylint: disable=E0401
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, root)
+from common.logger import logger
 
 
 class DataInterface(object):
@@ -51,9 +57,9 @@ class JenkinsMonitorTbl(object):
                WHERE m.jenkins_id = jenkins.id AND m.job_id = job.id"
         if task_name:
             sql += r" and task = '{}'".format(task_name)
-        # print(sql)
+        logger.debug(sql)
         monitor_task = self.db.get_DB(sql)
-        # print(monitor_task)
+        logger.debug(monitor_task)
         return monitor_task
 
     @property

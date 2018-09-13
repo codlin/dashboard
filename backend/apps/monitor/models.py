@@ -178,14 +178,12 @@ class JenkinsJobMonitor(models.Model):
 
 
 class LoadTestlineStatus(models.Model):
-    loadname = models.CharField('Load name', max_length=64, default="")
+    loadname = models.CharField('Load name',  max_length=64, default="")
     testline = models.CharField('Testline', max_length=64, default="")
-    btsid = models.CharField('BTSID', max_length=8, default="")
-
-    url = models.CharField('Jenkins URL', max_length=128,
-                           unique=True, default="")
-    job = models.CharField('Jenkins Job', max_length=255,
-                           unique=True, default="")
+    btsid = models.CharField(
+        'BTSID', null=True, blank=True, max_length=8, default="")
+    url = models.CharField('Jenkins URL', max_length=128, default="")
+    job = models.CharField('Jenkins Job', max_length=255, default="")
     build_id = models.CharField('Build ID', max_length=8, default="")
     build_time = models.CharField('Build Time', max_length=32, default="")
     build_status = models.CharField(
@@ -194,10 +192,10 @@ class LoadTestlineStatus(models.Model):
 
     class Meta:
         db_table = "crt_load_testline_status_page"
-        unique_together = ("loadname", "btsid", "url", "job", "build_id")
+        unique_together = ("loadname", "testline", "url", "job", "build_id")
 
     def __str__(self):
-        return "{}_{}".format(self.loadname, self.btsid)
+        return "{}_{}".format(self.loadname, self.testline)
 
 # <load> status
 
