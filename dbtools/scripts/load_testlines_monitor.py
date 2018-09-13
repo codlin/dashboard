@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# pylint: disable=E0401
 import json
 import requests
 from datetime import datetime
@@ -12,7 +12,9 @@ import time
 from MYSQL import Pymysql
 from jenkins_monitor import JenkinsMonitorManager, JenkinsMonitorTbl, JenkinsMonitorTask, DataInterface
 
-# require data type
+'''
+Data type for DataInterface.require_data
+'''
 DB_UNFINISHED_BUILD_ID = 'DB_UNFINISHED_BUILD_ID'
 DB_LATEST_BUILD_ID = 'DB_LATEST_BUILD_ID'
 
@@ -54,6 +56,10 @@ def parse_build_data(build):
 
 
 class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
+    '''
+    A concrete job monitor for load testline
+    '''
+
     def __init__(self, **kwargs):
         super(JenkinsJobBuildMonitorTask, self).__init__(**kwargs)
 
@@ -80,10 +86,12 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
         print(data)
         return data
 
-# databse operation
-
 
 class loadTestlinesTblCUID(DataInterface):
+    '''
+    A backend for JenkinsJobBuildMonitorTask, provide data to task and post result into database.
+    '''
+
     def __init__(self):
         self.db = Pymysql()
 
@@ -149,6 +157,9 @@ def _create_load_testlines_tasks():
 
 
 def load_testlines_task_entry():
+    '''
+    A task entry which can be added into python scheduler.
+    '''
     tasks = _create_load_testlines_tasks()
     monitor = JenkinsMonitorManager(tasks)
     monitor.run()

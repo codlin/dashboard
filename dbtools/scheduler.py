@@ -15,10 +15,11 @@ def load_tasks():
     path = os.path.join(root, 'tasks')
     files = get_files(path)
     for f in files:
-        if f == '__init__.py':
+        if f.endswith('__init__.py') or f.endswith('.pyc'):
             continue
 
         file_path = os.path.join(path, f)
+        print('load module from: {}'.format(file_path))
         item = imp.load_source('task_entry', file_path)
         tasks.append(item.task_entry)
 
@@ -29,6 +30,6 @@ if __name__ == "__main__":
     scheduler = BlockingScheduler()
     tasks = load_tasks()
     for task_entry in tasks:
-        scheduler.add_job(task_entry, 'interval', minutes=1)
+        scheduler.add_job(task_entry, 'interval', minutes=10)
 
     scheduler.start()

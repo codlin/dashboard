@@ -23,17 +23,16 @@ def convertToDateTime(timestamp):
     return result
 
 
-'''
-build methods:
-build.get_params()
-get_build_json(build)
-get_build_console_url(build)
-get_build_timestamp(build)
-get_build_duration(build)
-'''
-
-
 class JenkinsJobBuild(object):
+    '''
+    build methods:
+    build.get_params()
+    get_build_json(build)
+    get_build_console_url(build)
+    get_build_timestamp(build)
+    get_build_duration(build)
+    '''
+
     def __init__(self, build):
         self._build = build
 
@@ -50,16 +49,15 @@ class JenkinsJobBuild(object):
         return convertToDateTime(self.json_data['timestamp'])
 
 
-'''
-job methods:
-get_first_buildnumber()
-get_last_buildnumber()
-get_build_ids()
-build = get_build(int(build_num))
-'''
-
-
 class JenkinsJob(object):
+    '''
+    job methods:
+    get_first_buildnumber()
+    get_last_buildnumber()
+    get_build_ids()
+    build = get_build(int(build_num))
+    '''
+
     def __init__(self, url, user, passwd, job_name):
         self.jenkins = Jenkins(url, user, passwd)
         self.job = self.jenkins.get_job(job_name)

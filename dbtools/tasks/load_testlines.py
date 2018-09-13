@@ -5,8 +5,10 @@ import sys
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from scripts import *
+from scripts.load_testlines_monitor import load_testlines_task_entry
 
 
 def task_entry():
-    print('task is running...')
+    print('load_testlines task is starting...')
+    load_testlines_task_entry()
+    print('load_testlines task is done.')

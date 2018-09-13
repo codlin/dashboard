@@ -12,12 +12,20 @@ import threading
 from abc import abstractmethod
 
 from MYSQL import Pymysql
-from jenkins import JenkinsJob
+from jenkins_common import JenkinsJob
 
 
 class DataInterface(object):
+    '''
+    A interface for communicating data between Jenkins and backends (e.g.: database)
+    Jenkins will call these method, and a backend should implete the interface.
+    '''
     @abstractmethod
     def require_data(self, type=None, **kwargs):
+        '''
+        params:
+             type: data type, a concrete monitor task use this type to require data
+        '''
         raise NotImplementedError
 
     @abstractmethod
@@ -26,6 +34,11 @@ class DataInterface(object):
 
 
 class JenkinsMonitorTbl(object):
+    '''
+    Jenkins monitor table
+    items format: ((url_1, user_1, passwd_1, job_1), (url_2, user_2, passwd_2, job_2),)
+    '''
+
     def __init__(self, task_name=None):
         self.db = Pymysql()
 
@@ -49,6 +62,16 @@ class JenkinsMonitorTbl(object):
 
 
 class JenkinsMonitorTask(object):
+    '''
+    A common task for Jenkins jobs monitoring
+    A concrete task should inherit the task and implete the process method
+    Attributes:
+        url: Jenkins URL, such as 'http://1.1.1.1:8080"
+        user: Jenkins user
+        passwd: Jenkins password
+        impl: A bcakend, which should implete the methods of DataInterface
+    '''
+
     def __init__(self, url, user, passwd, job_name, impl):
         self.url = url
         self.job_name = job_name
@@ -66,6 +89,13 @@ class JenkinsMonitorTask(object):
 
 
 class JenkinsMonitorManager(object):
+    '''
+    A manager for jenkins jobs monitoring, it brings all monitoring tasks up.
+    It takes a simple thread mode, each task was ran on a thread, the manager 
+    will wait until all threads get done. If there are a lot of tasks, it's better 
+    using thread pool mode instead this mode.
+    '''
+
     def __init__(self, tasks):
         # init jenkins and jobs
         self.tasks = tasks
