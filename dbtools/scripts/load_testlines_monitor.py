@@ -10,11 +10,11 @@ import codecs
 import time
 
 from MYSQL import Pymysql
-from jenkins_monitor import JenkinsMonitorTask, DataInterface
+from jenkins_monitor import JenkinsMonitorManager, JenkinsMonitorTbl, JenkinsMonitorTask, DataInterface
 
 # require data type
-UNFINISHED_BUILD_ID = 'UNFINISHED_BUILD_ID'
-LATEST_BUILD_ID = 'LATEST_BUILD_ID'
+DB_UNFINISHED_BUILD_ID = 'DB_UNFINISHED_BUILD_ID'
+DB_LATEST_BUILD_ID = 'DB_LATEST_BUILD_ID'
 
 
 class FilteredBuildInfo(object):
@@ -60,16 +60,16 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
     # data should be builds id in array
     def process(self):
         data = []
-        builds = self.impl.require_data(
-            UNFINISHED_BUILD_ID, url=self.url, job=self.job_name)
+        builds = self.impl.require_data(DB_UNFINISHED_BUILD_ID,
+                                        url=self.url, job=self.job_name)
         for build_id in builds:
             build = self.jenkins.get_build(build_id)
             info = parse_build_data(build)
             data.append(info)
 
-        db_last_build_id = self.impl.require_data(
-            LATEST_BUILD_ID, url=self.url, job=self.job_name)
-        last_build_id = self.jenkins.get_first_buildnumber()
+        db_last_build_id = self.impl.require_data(DB_LATEST_BUILD_ID,
+                                                  url=self.url, job=self.job_name)
+        last_build_id = self.jenkins.get_last_buildnumber()
         build_id = int(db_last_build_id)
         while build_id < int(last_build_id):
             build_id += 1
@@ -87,13 +87,10 @@ class loadTestlinesTblCUID(DataInterface):
     def __init__(self):
         self.db = Pymysql()
 
-    def __del__(self):
-        self.db.close_DB()
-
     def require_data(self, type, **kwargs):
-        if type == UNFINISHED_BUILD_ID:
+        if type == DB_UNFINISHED_BUILD_ID:
             return self.unfinished_buildid
-        elif type == LATEST_BUILD_ID:
+        elif type == DB_LATEST_BUILD_ID:
             url = kwargs['url']
             job = kwargs['job']
             return self.latest_buildid(url, job)
@@ -106,27 +103,14 @@ class loadTestlinesTblCUID(DataInterface):
                 print("Unsupport date item {}.".format(item))
                 continue
 
-            if self._count_item(url, job, item.build_id):
-                self._insert_item(url, job, item)
-            else:
-                self._update_item(url, job, item)
-
-    def _count_item(self, url, job, build_id):
-        sql = "SELECT count(*) FROM crt_load_testline_status_page \
-               WHERE url = '{}' AND = '{}' AND = '{}'".format(url, job, build_id)
-        count = self.db.get_DB(sql)
-        return count
+            self._insert_item(url, job, item)
 
     def _insert_item(self, url, job, item):
-        sql = "INSERT INTO crt_load_testline_status_page(loadname, testline, btsid, url, job, build_id, build_status, build_time, build_url) \
+        sql = "REPLACE INTO crt_load_testline_status_page(loadname, testline, btsid, url, job, build_id, build_status, build_time, build_url) \
                VALUES({},{},{},{},{},{},{},{},{})".format(item.loadname, item.testline, item.btsid, url, job,
                                                           item.build_id, item.build_status, item.build_time, item.build_url)
         print(sql)
-        results = self.db.get_DB(sql)
-        print(results)
-
-    def _update_item(self, url, job, item):
-        pass
+        self.db.add_DB(sql)
 
     @property
     def unfinished_buildid(self):
@@ -153,8 +137,21 @@ class loadTestlinesTblCUID(DataInterface):
         return results
 
 
-def create_load_testlines_monitor_task():
-    pass
+def _create_load_testlines_tasks():
+    tasks = []
+    items = JenkinsMonitorTbl("LOAD_TESTLINE").items
+    for (url, user, passwd, job_name) in items:
+        task = JenkinsJobBuildMonitorTask(url=url, user=user, passwd=passwd,
+                                          job_name=job_name, impl=loadTestlinesTblCUID())
+        tasks.append(task)
+
+    return tasks
+
+
+def load_testlines_task_entry():
+    tasks = _create_load_testlines_tasks()
+    monitor = JenkinsMonitorManager(tasks)
+    monitor.run()
 
 
 if __name__ == '__main__':

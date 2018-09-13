@@ -194,7 +194,7 @@ class LoadTestlineStatus(models.Model):
 
     class Meta:
         db_table = "crt_load_testline_status_page"
-        unique_together = ("loadname", "btsid")
+        unique_together = ("loadname", "btsid", "url", "job", "build_id")
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.btsid)

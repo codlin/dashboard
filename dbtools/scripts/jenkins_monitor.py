@@ -32,8 +32,6 @@ class JenkinsMonitorTbl(object):
         # ((jenkins_id, jobs_id),)
         self.monitor_task = self._retrieve_data(task_name)
 
-        self.db.close_DB()
-
     def _retrieve_data(self, task_name):
         sql = "SELECT jenkins.url, jenkins.user, jenkins.passwd, job.job \
                FROM crt_jenkins_monitor AS m, crt_jenkins_info AS jenkins, crt_jenkins_job AS job \
@@ -46,7 +44,7 @@ class JenkinsMonitorTbl(object):
         return monitor_task
 
     @property
-    def task(self):
+    def items(self):
         return self.monitor_task
 
 
