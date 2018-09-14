@@ -9,6 +9,7 @@ sys.path.insert(0, root)
 from scripts.crt_loadstatus_page import main
 
 config = {
+    'name': 'load_status',
     'interval': 5  # minutes
 }
 
