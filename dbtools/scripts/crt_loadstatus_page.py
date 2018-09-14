@@ -228,6 +228,7 @@ def get_debug_result(loadname):
 
 
 def main():
+    mysqldb = Pymysql()
     crt_type = (parse_args().type)
     object = get_loadnames(crt_type)
     for name in object:
@@ -275,6 +276,7 @@ def main():
         '''
         logger.info('sql_str: %s', sql_str)
         mysqldb.update_DB(sql_str)
+    mysqldb.close_DB()
 
 
 if __name__ == "__main__":
@@ -282,9 +284,7 @@ if __name__ == "__main__":
     # urllib3.getproxies = lambda: {}  # 设置代理
     logger = set_log_level('INFO')
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    mysqldb = Pymysql()
     main()
-    mysqldb.close_DB()
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
     logger.info('The script run time is: %s sec' % (time))
