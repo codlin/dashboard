@@ -18,7 +18,8 @@ from pprint import pprint
 import requests
 import json
 import urllib3
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+logger = set_log_level('INFO')
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -30,7 +31,7 @@ def parse_args():
     return args
 
 
-def get_loadnames(mode):
+def get_loadnames(mode, mysqldb):
     """
     :param type: FZM FDD = FLF
                  FZM TDD = TLF
@@ -40,7 +41,7 @@ def get_loadnames(mode):
     example: get_loadname('TLF')
     """
     crt_type = mode + '%'
-    log.info('mode is: %s', mode)
+    logger.debug('mode is: %s', mode)
     sql_str = '''
     select enb_build
     from test_results 
@@ -66,9 +67,9 @@ def get_release(loadname):
     return result
 
 
-def get_testcase_total(loadname):
+def get_testcase_total(loadname, mysqldb):
     barnch = get_release(loadname)
-    logger.info('loadname branch is  %s' % get_release(loadname))
+    logger.debug('loadname branch is  %s' % get_release(loadname))
     sql_str = '''
         select count(*)
         from (select crt_testcase.casename
@@ -81,7 +82,7 @@ def get_testcase_total(loadname):
     return result
 
 
-def get_load_name_time(loadname):
+def get_load_name_time(loadname, mysqldb):
     sql_str = '''
     select FROM_UNIXTIME(min(time_epoch_start),'%Y-%m-%d %H:%i:%s') AS time 
     from test_results where enb_build="''' + loadname + '''" and crt_type='CRT1_DB' 
@@ -91,7 +92,7 @@ def get_load_name_time(loadname):
     return result
 
 
-def get_passed_count(loadname):
+def get_passed_count(loadname, mysqldb):
     sql_str = '''
         select count(*)
         from (select test_case_name     
@@ -107,7 +108,7 @@ def get_passed_count(loadname):
     return results
 
 
-def get_failed_count(loadname):
+def get_failed_count(loadname, mysqldb):
     sql_str = '''
         select count(*)
         from (select test_case_name
@@ -131,9 +132,9 @@ def get_failed_count(loadname):
     return results
 
 
-def get_unexecuted_count(loadname):
+def get_unexecuted_count(loadname, mysqldb):
     branch = get_release(loadname)
-    logger.info('branch is %s', branch)
+    logger.debug('branch is %s', branch)
     sql_str = '''
         select count(*)
         from (select *
@@ -153,7 +154,7 @@ def get_unexecuted_count(loadname):
     return results
 
 
-def get_passed_first_count(loadname):
+def get_passed_first_count(loadname, mysqldb):
     sql_str = '''
 select count(*)
 from (select enb_build,
@@ -189,19 +190,19 @@ from (select enb_build,
     return results
 
 
-def get_pass_rate(loadname, passed_count):
-    testcase_total = get_testcase_total(loadname)
-    logger.info('testcase_total: %s', testcase_total)
+def get_pass_rate(loadname, passed_count, mysqldb):
+    testcase_total = get_testcase_total(loadname, mysqldb)
+    logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
-    logger.info("pass_rate1: %s" % type(result))
+    logger.debug("pass_rate1: %s" % type(result))
     return result
 
 
-def get_first_pass_rate(loadname, passed_count):
-    testcase_total = get_testcase_total(loadname)
-    logger.info('testcase_total: %s', testcase_total)
+def get_first_pass_rate(loadname, passed_count, mysqldb):
+    testcase_total = get_testcase_total(loadname, mysqldb)
+    logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
-    logger.info("pass_rate2: %s" % result)
+    logger.debug("pass_rate2: %s" % result)
     return result
 
 
@@ -216,7 +217,7 @@ def get_debug_result(loadname):
     branch = loadname.split('_')
     if branch[0] == "FLF18A" and branch[2] == '9999':  # Trunk的包需要FLF18A替换成FLF00
         loadname = loadname.replace("FLF18A", "FLF00")
-    logger.info('loadname is  %s :', loadname)
+    logger.debug('loadname is  %s :', loadname)
     a = get_jenkins_data('https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + loadname + '')
 
     if branch[0] == "FLF17A" and branch[2] == '0000' or branch[0] == "FLF18":  # FLF17A和FLF18 crt排第二个
@@ -227,42 +228,49 @@ def get_debug_result(loadname):
     return debug_status
 
 
-def main():
+def main(crt_type):
+    t_start = datetime.now()  # 起x始时间
+
+    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     mysqldb = Pymysql()
-    crt_type = (parse_args().type)
-    object = get_loadnames(crt_type)
+
+    object = get_loadnames(crt_type, mysqldb)
     for name in object:
-        logger.info("loadname is %s" % name)
+        logger.debug("loadname is %s" % name)
 
-        load_start_time = str(get_load_name_time(name))
-        logger.info('load_start_time: %s', type(load_start_time))
+        load_start_time = str(get_load_name_time(name, mysqldb))
+        logger.debug('load_start_time: %s', type(load_start_time))
 
-        passed_count = get_passed_count(name)
-        logger.info('passed_count: %s', type(passed_count))
+        passed_count = get_passed_count(name, mysqldb)
+        logger.debug('passed_count: %s', type(passed_count))
 
-        passed_first_count = get_passed_first_count(name)
-        logger.info('passed_first_count: %s', type(passed_first_count))
+        passed_first_count = get_passed_first_count(name, mysqldb)
+        logger.debug('passed_first_count: %s', type(passed_first_count))
 
-        failed_count = str(get_failed_count(name))
-        logger.info('failed_count: %s', type(failed_count))
+        failed_count = str(get_failed_count(name, mysqldb))
+        logger.debug('failed_count: %s', type(failed_count))
 
-        unexecuted_count = str(get_unexecuted_count(name))
-        logger.info('unexecuted_count: %s', type(unexecuted_count))
+        unexecuted_count = str(get_unexecuted_count(name, mysqldb))
+        logger.debug('unexecuted_count: %s', type(unexecuted_count))
 
-        totle_count = str(get_testcase_total(name))
-        logger.info('totle_count: %s', type(totle_count))
+        totle_count = str(get_testcase_total(name, mysqldb))
+        logger.debug('totle_count: %s', type(totle_count))
 
-        pass_rate = str(get_pass_rate(name, passed_count))
-        logger.info('pass_rate: %s', type(pass_rate))
+        pass_rate = str(get_pass_rate(name, passed_count, mysqldb))
+        logger.debug('pass_rate: %s', type(pass_rate))
 
-        first_pass_rate = str(get_first_pass_rate(name, passed_first_count))
-        logger.info('first_pass_rate: %s', type(first_pass_rate))
+        first_pass_rate = str(get_first_pass_rate(name, passed_first_count, mysqldb))
+        logger.debug('first_pass_rate: %s', type(first_pass_rate))
 
         debug = get_debug_result(name)
+        if debug=='PASS':
+            debug='Yes'
+        else:
+            debug='No'
 
         item = '"' + load_start_time + '","' + str(name) + '","' + str(passed_count) + '","' + str(failed_count) + '","' \
                + unexecuted_count + '","' + totle_count + '","' + first_pass_rate + '","' + pass_rate + '","' + debug + '"'
-        logger.info('item: %s', item)
+        logger.debug('item: %s', item)
         sql_str = '''
             REPLACE INTO crt_loadstatus_page(start_time,
                                              loadname,
@@ -274,17 +282,26 @@ def main():
                                              passrate,
                                              debug) VALUES(''' + item + '''); 
         '''
-        logger.info('sql_str: %s', sql_str)
+        logger.debug('sql_str: %s', sql_str)
         mysqldb.update_DB(sql_str)
     mysqldb.close_DB()
-
-
-if __name__ == "__main__":
-    t_start = datetime.now()  # 起x始时间
-    # urllib3.getproxies = lambda: {}  # 设置代理
-    logger = set_log_level('INFO')
-    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    main()
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
     logger.info('The script run time is: %s sec' % (time))
+
+def FLF():
+    main('FLF')
+
+def TLF():
+    main('TLF')
+
+def FLC():
+    main('FLC')
+
+def TLC():
+    main('TLC')
+
+if __name__ == "__main__":
+    crt_type = (parse_args().type)
+    main(crt_type)
+

@@ -67,7 +67,7 @@ def get_release(loadname):
 
 def get_testcase_total(loadname):
     barnch = get_release(loadname)
-    logger.info('loadname branch is  %s' % get_release(loadname))
+    logger.debug('loadname branch is  %s' % get_release(loadname))
     sql_str = '''
         select count(*)
         from (select crt_testcase.casename
@@ -132,7 +132,7 @@ def get_failed_count(loadname):
 
 def get_unexecuted_count(loadname):
     branch = get_release(loadname)
-    logger.info('branch is %s', branch)
+    logger.debug('branch is %s', branch)
     sql_str = '''
         select count(*)
         from (select *
@@ -190,17 +190,17 @@ from (select enb_build,
 
 def get_pass_rate(loadname, passed_count):
     testcase_total = get_testcase_total(loadname)
-    logger.info('testcase_total: %s', testcase_total)
+    logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
-    logger.info("pass_rate1: %s" % type(result))
+    logger.debug("pass_rate1: %s" % type(result))
     return result
 
 
 def get_first_pass_rate(loadname, passed_count):
     testcase_total = get_testcase_total(loadname)
-    logger.info('testcase_total: %s', testcase_total)
+    logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
-    logger.info("pass_rate2: %s" % result)
+    logger.debug("pass_rate2: %s" % result)
     return result
 
 def get_jenkins_data(url):
@@ -213,7 +213,7 @@ def get_debug_result(loadname):
     branch = loadname.split('_')
     if branch[0]=="FLF18A" and branch[2]=='9999':  #Trunk的包需要FLF18A替换成FLF00
         loadname = loadname.replace("FLF18A", "FLF00")
-    logger.info('loadname is  %s :' ,loadname )
+    logger.debug('loadname is  %s :' ,loadname )
     a=get_jenkins_data('https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid='+loadname+'')
 
     if branch[0]=="FLF17A" and branch[2]=='0000' or branch[0]=="FLF18": # FLF17A和FLF18 crt排第二个
@@ -228,7 +228,7 @@ def main():
     crt_type = (parse_args().type)
     object = get_loadnames(crt_type)
     for name in object:
-        logger.info("loadname is %s" % name)
+        logger.debug("loadname is %s" % name)
 
         sql_str = '''
     select FROM_UNIXTIME(time_epoch_start,\"%Y-%m-%d %h:%i:%s\") AS time, 
@@ -239,7 +239,7 @@ def main():
     select test_case_name from test_results where enb_build="'''+name+ '''"  and crt_type='CRT1_DB' and record_valid=1  
     and test_status='Passed' group by test_case_name ) group by test_case_name order by robot_ip 
                 '''
-        # logger.info('sql_str: %s', sql_str)
+        # logger.debug('sql_str: %s', sql_str)
         data = mysqldb.get_DB(sql_str)
         item = data[0]
         pprint(data[0])
@@ -252,8 +252,8 @@ if __name__ == "__main__":
     t_start = datetime.now()  # 起x始时间
     # urllib3.getproxies = lambda: {}  # 设置代理
     logger = set_log_level('INFO')
-    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
+    logger.debug('%s Start running %s' % ('-' * 10, '-' * 10))
     main()
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.info('The script run time is: %s sec' % (time))
+    logger.debug('The script run time is: %s sec' % (time))
