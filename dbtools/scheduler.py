@@ -22,7 +22,7 @@ def load_tasks():
         file_path = os.path.join(path, f)
         logger.info('load module from: {}'.format(file_path))
         item = imp.load_source('task_entry', file_path)
-        tasks.append(item.task_entry)
+        tasks.append(item)
 
     return tasks
 
@@ -30,7 +30,8 @@ def load_tasks():
 if __name__ == "__main__":
     scheduler = BlockingScheduler()
     tasks = load_tasks()
-    for task_entry in tasks:
-        scheduler.add_job(task_entry, 'interval', minutes=10)
+    for task in tasks:
+        scheduler.add_job(task.task_entry, 'interval',
+                          minutes=task.config['interval'])
 
     scheduler.start()

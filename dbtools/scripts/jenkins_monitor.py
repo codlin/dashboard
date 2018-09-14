@@ -113,12 +113,15 @@ class JenkinsMonitorManager(object):
             self.thread_list.append(threading.Thread(target=task.run))
 
         # start all sub-threads terminate
+        logger.info("tasks began.")
         for td in self.thread_list:
             td.start()
 
         # wait all sub-threads terminate
         for td in self.thread_list:
             td.join()
+
+        logger.info("tasks done.")
 
 
 if __name__ == '__main__':

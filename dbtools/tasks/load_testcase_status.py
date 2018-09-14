@@ -6,7 +6,7 @@ import sys
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from scripts.crt_loadstatus_page import main
+from scripts.crt_load_testcase_status_page import main
 
 config = {
     'interval': 5  # minutes
@@ -14,6 +14,6 @@ config = {
 
 
 def task_entry():
-    print('load_status task is starting...')
+    print('load_testcase_status task is starting...')
     main()
-    print('load_status task is done.')
+    print('load_testcase_status task is done.')
