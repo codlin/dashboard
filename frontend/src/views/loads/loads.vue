@@ -54,15 +54,16 @@
             <td class="text-xs-left">
               <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
             </td>
+            <td class="text-xs-left">
+              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">LINK</router-link>
+            </td>
             <td class="text-xs-left">{{ props.item.passed_num }}</td>
             <td class="text-xs-left">{{ props.item.failed_num }}</td>
             <td class="text-xs-left">{{ props.item.norun_num }}</td>
             <td class="text-xs-left">{{ props.item.total_num }}</td>
             <td class="text-xs-left">{{ props.item.first_passrate }}</td>
             <td class="text-xs-left">{{ props.item.passrate }}</td>
-            <td class="text-xs-left">
-              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">LINK</router-link>
-            </td>
+            <td class="text-xs-left">{{ props.item.debug }}</td>
           </tr>
         </template>
         <v-alert slot="no-results"
@@ -103,13 +104,14 @@ export default {
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
         { text: 'Load', align: 'left', value: 'loadname' },
+        { text: 'Cases', align: 'left', value: 'cases' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
         { text: 'Failed', align: 'left', value: 'failed_num' },
         { text: 'NA', align: 'left', value: 'norun_num' },
         { text: 'Total', align: 'left', value: 'total_num' },
         { text: 'First PassRate (%)', align: 'left', value: 'first_passrate' },
         { text: 'PassRate (%)', align: 'left', value: 'passrate' },
-        { text: 'Cases', align: 'left', value: 'cases' }
+        { text: 'Debug', align: 'left', value: 'debug' }
       ],
 
       // vars from json data which will be used in the template

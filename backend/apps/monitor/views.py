@@ -52,6 +52,28 @@ class LoadStatusViewApi(viewsets.ModelViewSet):
         return Loads
 
 
+class LoadTestcaseStatusViewApi(viewsets.ModelViewSet):
+    serializer_class = LoadTestcaseStatusSerializer
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+        items = LoadTestcaseStatus.objects.filter(
+            loadname=name).order_by('casename')
+
+        return items
+
+
+class LoadTestlineStatusViewApi(viewsets.ModelViewSet):
+    serializer_class = LoadTestlineStatusSerializer
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+        items = LoadTestlineStatus.objects.filter(
+            loadname=name).order_by('testline')
+
+        return items
+
+
 class TestlineViewApi(viewsets.ModelViewSet):
     serializer_class = TestlineSerializer
 

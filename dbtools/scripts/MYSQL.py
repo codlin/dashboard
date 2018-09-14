@@ -16,6 +16,9 @@ class Pymysql(object):
     def __init__(self):
         self.conn_DB()
 
+    def __del__(self):
+        self.close_DB()
+
     # 连接数据库函数
     def conn_DB(self):
         try:

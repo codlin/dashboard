@@ -183,7 +183,7 @@ export default {
     // get loads list
     getLoadCases () {
       console.log('Enter getLoadCases: ', this.loadName)
-      this.$api.get('/api/loadcases', this.loadName,
+      this.$api.get('/api/loadcases', { name: this.loadName },
         res => {
           this.cases = res.data
         },

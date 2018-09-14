@@ -229,7 +229,7 @@ export default {
     // get loads list
     getLoadToTLs () {
       console.log('Enter getLoadToTLs: ', this.loadName)
-      this.$api.get('/api/loadtls', this.loadName,
+      this.$api.get('/api/loadtls', { name: this.loadName },
         res => {
           this.testlines = res.data
         },
