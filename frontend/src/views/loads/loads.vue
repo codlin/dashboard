@@ -61,8 +61,8 @@
             <td class="text-xs-left">{{ props.item.failed_num }}</td>
             <td class="text-xs-left">{{ props.item.norun_num }}</td>
             <td class="text-xs-left">{{ props.item.total_num }}</td>
-            <td class="text-xs-left">{{ props.item.first_passrate }}</td>
-            <td class="text-xs-left">{{ props.item.passrate }}</td>
+            <td class="text-xs-left">{{ props.item.first_passrate }}%</td>
+            <td class="text-xs-left">{{ props.item.passrate }}%</td>
             <td class="text-xs-left">{{ props.item.debug }}</td>
           </tr>
         </template>
@@ -144,7 +144,7 @@ export default {
 
         if (this.passrateChkBox !== null) {
           filteredData = filteredData.filter((item, i) => {
-            return (this.passrateChkBox === 'Passed') ? (item.passrate === 100) : (item.passrate <= 40)
+            return (this.passrateChkBox === 'Passed') ? (parseFloat(item.passrate) >= 100) : (parseFloat(item.passrate) < 50)
           })
         }
 

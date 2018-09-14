@@ -189,7 +189,7 @@ export default {
         },
         er => {
           console.error('getLoadCases: ', er)
-          this.cases = this.test_cases
+          // this.cases = this.test_cases
         })
     }
 

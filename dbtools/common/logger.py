@@ -29,8 +29,9 @@ def create_logger(name, level):
 def set_log_level(name, level):
     log_levels = ('ERROR', 'WARNING', 'INFO', 'DEBUG')
     if level not in log_levels:
-        raise ValueError("Invalid log level {}, should be in {}".format(
+        print("Invalid log level {}, should be in {}. set to default level[INFO]".format(
             level, log_levels))
+        level = 'INFO'
 
     logger = logging.getLogger(name)
     logger.setLevel(level)

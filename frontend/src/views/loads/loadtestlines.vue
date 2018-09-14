@@ -235,7 +235,7 @@ export default {
         },
         er => {
           console.error('getLoadToTLs: ', er)
-          this.testlines = this.test_testlines
+          // this.testlines = this.test_testlines
         })
     },
 
