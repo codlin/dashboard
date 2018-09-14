@@ -43,7 +43,7 @@ class Pymysql(object):
             logger.error(e)
             print(e)
 
-    def add_DB(self, sql_str):
+    def update_DB(self, sql_str):
         try:
             cursor = self.conn.cursor()  # 获取cursor
             cursor.execute(sql_str)  # 执行sql
