@@ -128,7 +128,7 @@ class LoadTestcaseStatus(models.Model):
 
     class Meta:
         db_table = "crt_load_testcase_status_page"
-        unique_together = ("loadname", "casename", "btsid")
+        unique_together = (("loadname", "casename", "btsid"),)
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.casename)
@@ -169,7 +169,7 @@ class JenkinsJobMonitor(models.Model):
 
     class Meta:
         db_table = "crt_jenkins_monitor"
-        unique_together = ("task", "jenkins", "job")
+        unique_together = (("task", "jenkins", "job"),)
 
     def __str__(self):
         return "{}_{}_{}".format(self.task, self.jenkins, self.job)
@@ -192,7 +192,7 @@ class LoadTestlineStatus(models.Model):
 
     class Meta:
         db_table = "crt_load_testline_status_page"
-        unique_together = ("loadname", "testline", "url", "job", "build_id")
+        unique_together = (("loadname", "testline", "url", "job", "build_id"),)
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.testline)

@@ -54,16 +54,6 @@ def parse_build_data(json_data, build_params=None):
                 info.btsid = value
                 logger.debug("btsid: {}".format(value))
 
-    display_name = json_data['displayName']
-    logger.debug(display_name)
-    if info.loadname == "":
-        info.loadname = display_name[-29:]
-        logger.debug("load name: {}".format(info.loadname))
-
-    if info.testline == "":
-        info.testline = display_name.split('_')[1].replace('"', '')
-        logger.debug("testline: {}".format(info.testline))
-
     info.build_id = json_data['id']
     logger.debug("testline: {}".format(info.build_id))
 
@@ -76,6 +66,21 @@ def parse_build_data(json_data, build_params=None):
     info.build_url = '{}console'.format(json_data['url'])
     logger.debug("build_url: {}".format(info.build_url))
 
+    if info.loadname == "" or info.testline == "":
+        display_name = json_data['displayName']
+        logger.debug(display_name)
+        items = display_name.split('_')
+        if len(items) < 7:
+            logger.error("Can't parse load name and testline, abandon this build {}, {}.".format(
+                info.build_id, info.build_url))
+            return None
+
+        info.loadname = "_".join(items[-5:])
+        logger.debug("load name: {}".format(info.loadname))
+
+        info.testline = items[1].replace('"', '')
+        logger.debug("testline: {}".format(info.testline))
+
     return info
 
 
@@ -83,6 +88,9 @@ def parse_builds_data(json_items):
     filteredItems = []
     for json_data in json_items:
         info = parse_build_data(json_data)
+        if info is None:
+            continue
+
         filteredItems.append(info)
 
     return filteredItems
@@ -111,8 +119,9 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
         db_last_build_id = self.impl.require_data(DB_LATEST_BUILD_ID,
                                                   url=self.url, job=self.job_name)
         last_build_id = self.jenkins.get_last_buildnumber()
-        logger.debug("db_last_build_id {}, jenkins last_build_id {}.".format(db_last_build_id,
-                                                                             last_build_id))
+        logger.info("{}-{}: db_last_build_id {}, jenkins last_build_id {}.".format(self.url, self.job_name,
+                                                                                   db_last_build_id,
+                                                                                   last_build_id))
         if db_last_build_id is None:
             filters = ['id', 'result', 'displayName', 'timestamp', 'url']
             json_data = self.jenkins.get_all_builds(filters)
@@ -163,14 +172,14 @@ class loadTestlinesTblCUID(DataInterface):
                VALUES('{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(item.loadname, item.testline, item.btsid, url, job,
                                                                             item.build_id, item.build_status, item.build_time, item.build_url)
         logger.debug(sql)
-        self.db.add_DB(sql)
+        self.db.update_DB(sql)
 
     def _update_item(self, url, job, item):
         sql = "UPDATE crt_load_testline_status_page set build_status='{}', build_time='{}' \
                WHERE loadname='{}' AND testline='{}' AND url='{}' AND job='{}' \
                AND build_id='{}'".format(item.build_status, item.build_time, item.loadname, item.testline, url, job, item.build_id)
         logger.debug(sql)
-        self.db.add_DB(sql)
+        self.db.update_DB(sql)
 
     def _count_item(self, url, job, item):
         sql = "SELECT COUNT(*) FROM crt_load_testline_status_page \
@@ -199,7 +208,7 @@ class loadTestlinesTblCUID(DataInterface):
 
     def _get_job_builds_id(self, url, job):
         sql = "SELECT build_id FROM crt_load_testline_status_page \
-               WHERE url = '{}' AND job = '{}' ORDER BY build_id DESC".format(url, job)
+               WHERE url = '{}' AND job = '{}' ORDER BY CAST(build_id as unsigned) DESC".format(url, job)
         logger.debug(sql)
         results = self.db.get_DB(sql)
         logger.debug(results)
