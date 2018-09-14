@@ -52,17 +52,17 @@
           <tr>
             <td>{{ props.item.start_time }}</td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
+              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
             </td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">LINK</router-link>
+              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">LINK</router-link>
             </td>
             <td class="text-xs-left">{{ props.item.passed_num }}</td>
             <td class="text-xs-left">{{ props.item.failed_num }}</td>
             <td class="text-xs-left">{{ props.item.norun_num }}</td>
             <td class="text-xs-left">{{ props.item.total_num }}</td>
-            <td class="text-xs-left">{{ props.item.first_passrate }}%</td>
-            <td class="text-xs-left">{{ props.item.passrate }}%</td>
+            <td class="text-xs-left">{{ props.item.first_passrate }}</td>
+            <td class="text-xs-left">{{ props.item.passrate }}</td>
             <td class="text-xs-left">{{ props.item.debug }}</td>
           </tr>
         </template>
@@ -104,7 +104,7 @@ export default {
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
         { text: 'Load', align: 'left', value: 'loadname' },
-        { text: 'Cases', align: 'left', value: 'cases' },
+        { text: 'Testline', align: 'left', value: 'testline' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
         { text: 'Failed', align: 'left', value: 'failed_num' },
         { text: 'NA', align: 'left', value: 'norun_num' },

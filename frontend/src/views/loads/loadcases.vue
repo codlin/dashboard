@@ -137,9 +137,9 @@ export default {
           if (this.resultChkbox.toUpperCase() === 'FAILED') {
             return item.result.toUpperCase() === 'FAILED'
           } else if (this.resultChkbox.toUpperCase() === 'NA') {
-            return item.result.toUpperCase() === 'NA'
+            return item.result.toUpperCase() === 'NOT ANALYZED'
           } else {
-            return item.result.toUpperCase() !== 'FAILED' && item.result.toUpperCase() !== 'NA'
+            return item.result.toUpperCase() !== 'FAILED' && item.result.toUpperCase() !== 'NOT ANALYZED'
           }
         })
       }

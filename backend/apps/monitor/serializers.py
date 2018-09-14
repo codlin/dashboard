@@ -46,7 +46,7 @@ class LoadTestcaseScheduleSerializer(serializers.ModelSerializer):
 
 class LoadTestcaseStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SysMenu
+        model = LoadTestcaseStatus
         fields = "__all__"
 
 
