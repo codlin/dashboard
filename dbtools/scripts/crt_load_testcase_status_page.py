@@ -224,6 +224,7 @@ def get_debug_result(loadname):
     return debug_status
 
 def main():
+    mysqldb = Pymysql()
     crt_type = (parse_args().type)
     object = get_loadnames(crt_type)
     for name in object:
@@ -245,15 +246,14 @@ def main():
 
 
         # mysqldb.update_DB(sql_str)
+    mysqldb.close_DB()
 
 if __name__ == "__main__":
     t_start = datetime.now()  # 起x始时间
     # urllib3.getproxies = lambda: {}  # 设置代理
     logger = set_log_level('INFO')
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    mysqldb = Pymysql()
     main()
-    mysqldb.close_DB()
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
     logger.info('The script run time is: %s sec' % (time))
