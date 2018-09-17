@@ -51,25 +51,23 @@ class Testline(models.Model):
                                                 self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
 
 
-class TesecasePath(models.Model):
-    path = models.CharField('Case path', max_length=255,
-                            unique=True, default="")
+class CasePath(models.Model):
+    casepath = models.CharField('Case path', max_length=255,
+                                unique=True, default="")
 
     class Meta:
-        db_table = "crt_testcasepath"
+        db_table = "crt_casepath"
 
     def __str__(self):
-        return self.path
+        return self.casepath
 
 
-class Testcase(models.Model):
+class CaseName(models.Model):
     casename = models.CharField(
         'Case name', max_length=255, unique=True, default="")
-    path = models.ForeignKey(
-        TesecasePath, on_delete=models.CASCADE, default="")
 
     class Meta:
-        db_table = "crt_testcase"
+        db_table = "crt_casename"
 
     def __str__(self):
         return self.casename
@@ -78,26 +76,15 @@ class Testcase(models.Model):
 class TestcaseRelease(models.Model):
     load_release = models.CharField(
         'Release', max_length=16, default="")
-    case = models.ForeignKey(Testcase, on_delete=models.CASCADE, default="")
+    case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
+    path = models.ForeignKey(CasePath, on_delete=models.CASCADE, default="")
 
     class Meta:
         db_table = "crt_testcase_release"
+        unique_together = (("load_release", "case", "path"),)
 
     def __str__(self):
-        return "{}_{}".format(self.load_release, self.case)
-
-
-class LoadTestcaseSchedule(models.Model):
-    loadname = models.CharField(
-        'Load Name', max_length=64, default="")
-    case = models.ForeignKey(Testcase, on_delete=models.DO_NOTHING, default="")
-    btsid = models.CharField('BTSID', max_length=8, default="")
-
-    class Meta:
-        db_table = "crt_load_testcase_schedule"
-
-    def __str__(self):
-        return "{}_{}_{}".format(self.loadname, self.btsid, self.case)
+        return "{}_{}_{}".format(self.load_release, self.case, self.path)
 
 
 class LoadTestcaseStatus(models.Model):
