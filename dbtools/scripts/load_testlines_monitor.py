@@ -48,7 +48,7 @@ def _parse_build_data(json_data, build_params=None):
                 info.loadname = value
                 logger.debug("load name: {}".format(value))
             elif 'sites' in key or 'nodes' in key:
-                info.testline = value
+                info.testline = value.replace('"', '')
                 logger.debug("testline: {}".format(value))
             elif 'btsid' in key:
                 info.btsid = value

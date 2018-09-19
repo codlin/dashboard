@@ -56,7 +56,7 @@ class CasePath(models.Model):
                                 unique=True, default="")
 
     class Meta:
-        db_table = "crt_casepath"
+        db_table = "crt_testcase_path"
 
     def __str__(self):
         return self.casepath
@@ -67,7 +67,7 @@ class CaseName(models.Model):
         'Case name', max_length=255, unique=True, default="")
 
     class Meta:
-        db_table = "crt_casename"
+        db_table = "crt_testcase_name"
 
     def __str__(self):
         return self.casename
@@ -167,6 +167,7 @@ class LoadTestlineStatus(models.Model):
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.testline)
+
 
 # <load> status
 

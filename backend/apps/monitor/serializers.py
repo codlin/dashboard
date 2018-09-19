@@ -44,13 +44,17 @@ class LoadTestcaseStatusSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class LoadTestlineStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoadTestlineStatus
-        fields = ('loadname', 'testline', 'btsid', 'ca',
-                  'checksite_time', 'checksite_status', 'checksite_url',
-                  'healthcheck_time', 'healthcheck_status', 'healthcheck_url',
-                  'upgrade_time', 'upgrade_status', 'upgrade_url')
+# class LoadTestlineStatusSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = LoadTestlineStatus
+#         fields = "__all__"
+
+class LoadTestlineStatusSerializer(serializers.Serializer):
+    loadname = serializers.CharField(max_length=64)
+    testline = serializers.CharField(max_length=64)
+    btsid = serializers.CharField(max_length=8)
+    url = serializers.CharField(max_length=128)
+    jobs = serializers.CharField(max_length=1024)
 
 
 class LoadStatusSerializer(serializers.ModelSerializer):
