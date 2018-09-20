@@ -232,10 +232,11 @@ export default {
       this.$api.get('/api/loadtls', { name: this.loadName },
         res => {
           this.testlines = res.data
+          console.info(res.data)
         },
         er => {
           console.error('getLoadToTLs: ', er)
-          this.testlines = this.test_testlines
+          // this.testlines = this.test_testlines
         })
     },
 

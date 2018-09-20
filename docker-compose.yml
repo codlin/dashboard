@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 
 services:
   django:
@@ -22,3 +22,7 @@ services:
       - django
     depends_on:
       - django
+  dbtools:
+    restart: always
+    build: ./dbtools
+    command: ['bash', 'startup.sh', 'INFO']

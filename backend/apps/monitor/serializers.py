@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, SysMenu, Testline, TesecasePath, Testcase, TestcaseRelease, LoadTestcaseSchedule, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .models import Product, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -20,15 +20,15 @@ class TestlineSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TesecasePathSerializer(serializers.ModelSerializer):
+class CasePathSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TesecasePath
+        model = CasePath
         fields = "__all__"
 
 
-class TestcaseSerializer(serializers.ModelSerializer):
+class CaseNameSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Testcase
+        model = CaseName
         fields = "__all__"
 
 
@@ -38,25 +38,23 @@ class TestcaseReleaseSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class LoadTestcaseScheduleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoadTestcaseSchedule
-        fields = "__all__"
-
-
 class LoadTestcaseStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SysMenu
+        model = LoadTestcaseStatus
         fields = "__all__"
 
 
-class LoadTestlineStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoadTestlineStatus
-        fields = ('loadname', 'testline', 'btsid', 'ca',
-                  'checksite_time', 'checksite_status', 'checksite_url',
-                  'healthcheck_time', 'healthcheck_status', 'healthcheck_url',
-                  'upgrade_time', 'upgrade_status', 'upgrade_url')
+# class LoadTestlineStatusSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = LoadTestlineStatus
+#         fields = "__all__"
+
+class LoadTestlineStatusSerializer(serializers.Serializer):
+    loadname = serializers.CharField(max_length=64)
+    testline = serializers.CharField(max_length=64)
+    btsid = serializers.CharField(max_length=8)
+    url = serializers.CharField(max_length=128)
+    jobs = serializers.CharField(max_length=1024)
 
 
 class LoadStatusSerializer(serializers.ModelSerializer):

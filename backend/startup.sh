@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/bin/bash
 # Don't collect static files
 #python manage.py collectstatic --noinput &&
 python manage.py makemigrations

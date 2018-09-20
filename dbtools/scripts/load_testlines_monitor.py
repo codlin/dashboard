@@ -38,7 +38,7 @@ class FilteredBuildInfo(object):
         self.build_url = ""
 
 
-def parse_build_data(json_data, build_params=None):
+def _parse_build_data(json_data, build_params=None):
     info = FilteredBuildInfo()
 
     if build_params:
@@ -48,7 +48,7 @@ def parse_build_data(json_data, build_params=None):
                 info.loadname = value
                 logger.debug("load name: {}".format(value))
             elif 'sites' in key or 'nodes' in key:
-                info.testline = value
+                info.testline = value.replace('"', '')
                 logger.debug("testline: {}".format(value))
             elif 'btsid' in key:
                 info.btsid = value
@@ -84,10 +84,10 @@ def parse_build_data(json_data, build_params=None):
     return info
 
 
-def parse_builds_data(json_items):
+def _parse_builds_data(json_items):
     filteredItems = []
     for json_data in json_items:
-        info = parse_build_data(json_data)
+        info = _parse_build_data(json_data)
         if info is None:
             continue
 
@@ -112,7 +112,7 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
         logger.debug(builds)
         for build_id in builds:
             build = self.jenkins.get_build(build_id)
-            info = parse_build_data(build.json_data, build.inner.get_params())
+            info = _parse_build_data(build.json_data, build.inner.get_params())
             logger.debug(info)
             data.append(info)
 
@@ -125,13 +125,13 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
         if db_last_build_id is None:
             filters = ['id', 'result', 'displayName', 'timestamp', 'url']
             json_data = self.jenkins.get_all_builds(filters)
-            return data + parse_builds_data(json_data)
+            return data + _parse_builds_data(json_data)
 
         build_id = int(db_last_build_id)
         while build_id < int(last_build_id):
             build_id += 1
             build = self.jenkins.get_build(build_id)
-            info = parse_build_data(build.json_data, build.inner.get_params())
+            info = _parse_build_data(build.json_data, build.inner.get_params())
             data.append(info)
 
         logger.debug(data)

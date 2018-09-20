@@ -1,10 +1,11 @@
 # pylint: disable=E1101
+import logging
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Product, SysMenu, Testline, TesecasePath, Testcase, TestcaseRelease, LoadTestcaseSchedule, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
-from .serializers import ProductSerializer, SysMenuSerializer, TestlineSerializer, TesecasePathSerializer, TestcaseSerializer, TestcaseReleaseSerializer, LoadTestcaseScheduleSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
+from .models import Product, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .serializers import ProductSerializer, SysMenuSerializer, TestlineSerializer, CaseNameSerializer, CasePathSerializer, TestcaseReleaseSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
 
 # Create your views here.
@@ -68,9 +69,17 @@ class LoadTestlineStatusViewApi(viewsets.ModelViewSet):
 
     def get_queryset(self):
         name = self.request.query_params.get('name')
-        items = LoadTestlineStatus.objects.filter(
-            loadname=name).order_by('testline')
+        query_sql = "SELECT id, loadname, testline, t.btsid, GROUP_CONCAT(CONCAT_WS(',', job, build_status, build_time, build_url)  ORDER BY t.order SEPARATOR ';' ) \
+                     FROM (SELECT a.id, loadname, testline, c.btsid, a.job, build_status, build_time, build_url, b.order \
+                            FROM crt_db.crt_load_testline_status_page a \
+                            LEFT JOIN crt_db.crt_jenkins_job b ON a.job = b.job \
+                            INNER JOIN crt_db.crt_testline c ON a.testline = c.node \
+                            WHERE loadname = '{}') t \
+                     GROUP BY loadname, testline ORDER BY loadname, testline;".format(name)
+        items = LoadTestlineStatus.objects.raw(query_sql)
 
+        # items = LoadTestlineStatus.objects.filter(
+        #     loadname=name).order_by('testline')
         return items
 
 

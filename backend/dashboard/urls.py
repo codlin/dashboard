@@ -36,6 +36,7 @@ urlpatterns = [
 
     # router的path路径
     re_path('^api/', include(router.urls)),
+    # re_path('^api/loadtls/', LoadTestlineStatusViewApi.as_view()),
 
     # url(r'^', TemplateView.as_view(template_name="index.html")),
 ]

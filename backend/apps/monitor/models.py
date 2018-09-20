@@ -1,13 +1,13 @@
 from django.db import models
 import djongo.models
 
-# <product id>
-# CRT product data, e.g.:
-# fzmfdd: 'FZM FDD'
-# cfzcfdd: 'CFZC TDD'
-
 
 class Product(models.Model):
+    '''
+    CRT product data, e.g.:
+    fzmfdd: 'FZM FDD'
+    cfzcfdd: 'CFZC TDD'
+    '''
     name = models.CharField('Product Name', max_length=16, default="")
     text = models.CharField('Product Text', max_length=16, default="")
 
@@ -16,8 +16,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
-# <system menu>
 
 
 class SysMenu(models.Model):
@@ -32,9 +30,6 @@ class SysMenu(models.Model):
 
     def __str__(self):
         return self.name
-
-#------------------testline table-----------------------#
-# <testline>
 
 
 class Testline(models.Model):
@@ -56,66 +51,40 @@ class Testline(models.Model):
                                                 self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
 
 
-#------------------case-related table-----------------------#
-# <case path>
-
-
-class TesecasePath(models.Model):
-    path = models.CharField('Case path', max_length=255,
-                            unique=True, default="")
+class CasePath(models.Model):
+    casepath = models.CharField('Case path', max_length=255,
+                                unique=True, default="")
 
     class Meta:
-        db_table = "crt_testcasepath"
+        db_table = "crt_testcase_path"
 
     def __str__(self):
-        return self.path
-
-# <testcase>
+        return self.casepath
 
 
-class Testcase(models.Model):
+class CaseName(models.Model):
     casename = models.CharField(
         'Case name', max_length=255, unique=True, default="")
-    path = models.ForeignKey(
-        TesecasePath, on_delete=models.CASCADE, default="")
 
     class Meta:
-        db_table = "crt_testcase"
+        db_table = "crt_testcase_name"
 
     def __str__(self):
         return self.casename
-
-# <release -- testcase>
 
 
 class TestcaseRelease(models.Model):
     load_release = models.CharField(
         'Release', max_length=16, default="")
-    case = models.ForeignKey(Testcase, on_delete=models.CASCADE, default="")
+    case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
+    path = models.ForeignKey(CasePath, on_delete=models.CASCADE, default="")
 
     class Meta:
         db_table = "crt_testcase_release"
+        unique_together = (("load_release", "case", "path"),)
 
     def __str__(self):
-        return "{}_{}".format(self.load_release, self.case)
-
-# <load--testcase--testline> scheduler
-
-
-class LoadTestcaseSchedule(models.Model):
-    loadname = models.CharField(
-        'Load Name', max_length=64, default="")
-    case = models.ForeignKey(Testcase, on_delete=models.DO_NOTHING, default="")
-    btsid = models.CharField('BTSID', max_length=8, default="")
-
-    class Meta:
-        db_table = "crt_load_testcase_schedule"
-
-    def __str__(self):
-        return "{}_{}_{}".format(self.loadname, self.btsid, self.case)
-
-#------------------run history table-----------------------#
-# <load--testcase status>
+        return "{}_{}_{}".format(self.load_release, self.case, self.path)
 
 
 class LoadTestcaseStatus(models.Model):
@@ -138,11 +107,13 @@ class JenkinsJobs(models.Model):
     job = models.CharField('Jenkins Job', max_length=255,
                            unique=True, default="")
 
+    order = models.PositiveSmallIntegerField('order', default=0)
+
     class Meta:
         db_table = "crt_jenkins_job"
 
     def __str__(self):
-        return self.job
+        return "{}_{}".format(self.job, self.order)
 
 
 class JenkinsInfo(models.Model):
@@ -196,6 +167,7 @@ class LoadTestlineStatus(models.Model):
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.testline)
+
 
 # <load> status
 

@@ -52,10 +52,10 @@
           <tr>
             <td>{{ props.item.start_time }}</td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
+              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
             </td>
             <td class="text-xs-left">
-              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">LINK</router-link>
+              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">LINK</router-link>
             </td>
             <td class="text-xs-left">{{ props.item.passed_num }}</td>
             <td class="text-xs-left">{{ props.item.failed_num }}</td>
@@ -104,7 +104,7 @@ export default {
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
         { text: 'Load', align: 'left', value: 'loadname' },
-        { text: 'Cases', align: 'left', value: 'cases' },
+        { text: 'Testline', align: 'left', value: 'testline' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
         { text: 'Failed', align: 'left', value: 'failed_num' },
         { text: 'NA', align: 'left', value: 'norun_num' },
@@ -144,7 +144,7 @@ export default {
 
         if (this.passrateChkBox !== null) {
           filteredData = filteredData.filter((item, i) => {
-            return (this.passrateChkBox === 'Passed') ? (item.passrate === 100) : (item.passrate <= 40)
+            return (this.passrateChkBox === 'Passed') ? (parseFloat(item.passrate) >= 100) : (parseFloat(item.passrate) < 50)
           })
         }
 

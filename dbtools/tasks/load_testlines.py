@@ -8,6 +8,7 @@ sys.path.insert(0, root)
 from scripts.load_testlines_monitor import load_testlines_task_entry
 
 config = {
+    'name': 'load_testlines',
     'interval': 5  # minutes
 }
 
