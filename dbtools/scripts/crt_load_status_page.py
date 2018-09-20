@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author: Ma xiaoquan
 # @Contact: xiaoquan.ma@nokia-sbell.com
-# @File: crt_loadstatus_page.py
+# @File: crt_load_status_page.py
 # @Time: 2018/9/6 11:08
 # @Desc:
 
@@ -18,8 +18,12 @@ from pprint import pprint
 import requests
 import json
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-logger = set_log_level('INFO')
+
+logger = set_log_level('DEBUG')
+mysqldb = Pymysql()
+
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -31,7 +35,7 @@ def parse_args():
     return args
 
 
-def get_loadnames(mode, mysqldb):
+def get_loadnames(mode):
     """
     :param type: FZM FDD = FLF
                  FZM TDD = TLF
@@ -67,14 +71,14 @@ def get_release(loadname):
     return result
 
 
-def get_testcase_total(loadname, mysqldb):
+def get_testcase_total(loadname):
     barnch = get_release(loadname)
     logger.debug('loadname branch is  %s' % get_release(loadname))
     sql_str = '''
         select count(*)
-        from (select crt_testcase.casename
-              from crt_testcase_release
-                     INNER JOIN crt_testcase on crt_testcase_release.case_id = crt_testcase.id
+        from (SELECT crt_testcase_name.casename
+              FROM crt_testcase_release
+                     INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
               where crt_testcase_release.load_release = "''' + barnch + '''") as t
     '''
     data = mysqldb.get_DB(sql_str)
@@ -82,7 +86,7 @@ def get_testcase_total(loadname, mysqldb):
     return result
 
 
-def get_load_name_time(loadname, mysqldb):
+def get_load_name_time(loadname):
     sql_str = '''
     select FROM_UNIXTIME(min(time_epoch_start),'%Y-%m-%d %H:%i:%s') AS time 
     from test_results where enb_build="''' + loadname + '''" and crt_type='CRT1_DB' 
@@ -92,7 +96,7 @@ def get_load_name_time(loadname, mysqldb):
     return result
 
 
-def get_passed_count(loadname, mysqldb):
+def get_passed_count(loadname):
     sql_str = '''
         select count(*)
         from (select test_case_name     
@@ -108,7 +112,7 @@ def get_passed_count(loadname, mysqldb):
     return results
 
 
-def get_failed_count(loadname, mysqldb):
+def get_failed_count(loadname):
     sql_str = '''
         select count(*)
         from (select test_case_name
@@ -132,29 +136,28 @@ def get_failed_count(loadname, mysqldb):
     return results
 
 
-def get_unexecuted_count(loadname, mysqldb):
+def get_unexecuted_count(loadname):
     branch = get_release(loadname)
     logger.debug('branch is %s', branch)
-    sql_str = '''
-        select count(*)
-        from (select *
-              from (select crt_testcase.casename
-                    from crt_testcase_release
-                           INNER JOIN crt_testcase on crt_testcase_release.case_id = crt_testcase.id
-                    where crt_testcase_release.load_release = "''' + branch + '''") as crt_testcase
-              where crt_testcase.casename not in
-                    (SELECT test_case_name
-                     from test_results
-                     where enb_build = "''' + loadname + '''"
-                       and record_valid = 1
-                       and crt_type = 'CRT1_DB')) as t2
+    sql_str = '''                
+        SELECT count(*)
+        FROM (SELECT *
+              FROM (SELECT crt_testcase_name.casename
+                    FROM crt_testcase_release
+                           INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
+                    WHERE crt_testcase_release.load_release = "''' + branch + '''") AS t1
+              WHERE t1.casename NOT IN (SELECT test_case_name
+                                        FROM test_results
+                                        WHERE enb_build = "''' + loadname + '''"
+                                          AND record_valid = 1
+                                          AND crt_type = 'CRT1_DB')) AS t2                             
      '''
     data = mysqldb.get_DB(sql_str)
     results = data[0][0]
     return results
 
 
-def get_passed_first_count(loadname, mysqldb):
+def get_passed_first_count(loadname):
     sql_str = '''
 select count(*)
 from (select enb_build,
@@ -190,16 +193,16 @@ from (select enb_build,
     return results
 
 
-def get_pass_rate(loadname, passed_count, mysqldb):
-    testcase_total = get_testcase_total(loadname, mysqldb)
+def get_pass_rate(loadname, passed_count):
+    testcase_total = get_testcase_total(loadname)
     logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
     logger.debug("pass_rate1: %s" % type(result))
     return result
 
 
-def get_first_pass_rate(loadname, passed_count, mysqldb):
-    testcase_total = get_testcase_total(loadname, mysqldb)
+def get_first_pass_rate(loadname, passed_count):
+    testcase_total = get_testcase_total(loadname)
     logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count / testcase_total * 100, 1)
     logger.debug("pass_rate2: %s" % result)
@@ -208,65 +211,130 @@ def get_first_pass_rate(loadname, passed_count, mysqldb):
 
 def get_jenkins_data(url):
     response = requests.get(url, verify=False)  # verify=False去掉鉴权
-    data = response.text
-    results = json.loads(data)
-    return results
+    if response.status_code == 200:
+        data = response.text
+        results = json.loads(data)
+        results = results[0]
+        return results
+    else:
+        raise Exception("Server returned status code '%s' with message '%s'" % (response.status_code, response.content))
+
+
+def get_target_value(key, dic, tmp_list):
+    """
+    :param key: 目标key值
+    :param dic: JSON数据
+    :param tmp_list: 用于存储获取的数据
+    :return: list
+    """
+    if not isinstance(dic, dict) or not isinstance(tmp_list, list):  # 对传入数据进行格式校验
+        return 'argv[1] not an dict or argv[-1] not an list '
+
+    if key in dic.keys():
+        tmp_list.append(dic[key])  # 传入数据存在则存入tmp_list
+    else:
+        for value in dic.values():  # 传入数据不符合则对其value值进行遍历
+            if isinstance(value, dict):
+                get_target_value(key, value, tmp_list)  # 传入数据的value值是字典，则直接调用自身
+            elif isinstance(value, (list, tuple)):
+                _get_value(key, value, tmp_list)  # 传入数据的value值是列表或者元组，则调用_get_value
+    return tmp_list
+
+
+def _get_value(key, val, tmp_list):
+    for val_ in val:
+        if isinstance(val_, dict):
+            get_target_value(key, val_, tmp_list)  # 传入数据的value值是字典，则调用get_target_value
+        elif isinstance(val_, (list, tuple)):
+            _get_value(key, val_, tmp_list)  # 传入数据的value值是列表或者元组，则调用自身
+
+
+def get_key_value(key, value, dict):
+    """
+    :param key:   目标key值
+    :param value: 目标key对应的value
+    :param dic: JSON数据
+    :return: list
+    """
+    for i in range(0, len(dict[0])):
+        key_value = dict[0][i][key]
+        # pprint("key_value: %s" % key_value)
+        result = dict[0][i]
+        if key_value == value:
+            return result
 
 
 def get_debug_result(loadname):
     branch = loadname.split('_')
     if branch[0] == "FLF18A" and branch[2] == '9999':  # Trunk的包需要FLF18A替换成FLF00
         loadname = loadname.replace("FLF18A", "FLF00")
-    logger.debug('loadname is  %s :', loadname)
-    a = get_jenkins_data('https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + loadname + '')
-
-    if branch[0] == "FLF17A" and branch[2] == '0000' or branch[0] == "FLF18":  # FLF17A和FLF18 crt排第二个
-        debug_status = a[0]['pci'][1]['children'][-1]['cases'][0]['result']
     else:
-        debug_status = a[0]['pci'][0]['children'][-1]['cases'][0]['result']
+        pass
+    if branch[0] == "TLF18A" and branch[2] == '9999':  # Trunk的包需要TLF18A替换成FLF00
+        loadname = loadname.replace("TLF18A", "TLF00")
+    else:
+        pass
+    if branch[0] == "FLC18A" and branch[2] == '9999':  # Trunk的包需要FLC18A替换成FLC00
+        loadname = loadname.replace("FLC18A", "FLC00")
+    else:
+        pass
+    if branch[0] == "TLC18A" and branch[2] == '9999':  # Trunk的包需要TLC18A替换成TLC00
+        loadname = loadname.replace("TLC18A", "TLC00")
+    else:
+        pass
 
+    logger.debug('loadname is  %s :', loadname)
+    str = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + loadname + ''
+    dic = get_jenkins_data(str)
+    list_temp = []
+    dic_pci = get_target_value('pci', dic, list_temp)
+    list_temp2 = []
+    dic_children = get_target_value('children', get_key_value('name', 'crt', dic_pci), list_temp2)
+    dic_debug = get_key_value('name', 'debug', dic_children)
+    dic_cases = dic_debug['cases'][0]
+
+    debug_status = dic_cases['result']
+    if debug_status=='PASS':
+        debug_status= 'Yes'
+    if debug_status=='FAIL':
+        debug_status = 'No'
     return debug_status
 
 
-def main(crt_type):
+def running(crt_type):
     t_start = datetime.now()  # 起x始时间
+    logger.debug('%s Start running %s' % ('-' * 10, '-' * 10))
 
-    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    mysqldb = Pymysql()
-
-    object = get_loadnames(crt_type, mysqldb)
+    object = get_loadnames(crt_type)
     for name in object:
         logger.debug("loadname is %s" % name)
 
-        load_start_time = str(get_load_name_time(name, mysqldb))
+        load_start_time = str(get_load_name_time(name))
         logger.debug('load_start_time: %s', type(load_start_time))
 
-        passed_count = get_passed_count(name, mysqldb)
+        passed_count = get_passed_count(name)
         logger.debug('passed_count: %s', type(passed_count))
 
-        passed_first_count = get_passed_first_count(name, mysqldb)
+        passed_first_count = get_passed_first_count(name)
         logger.debug('passed_first_count: %s', type(passed_first_count))
 
-        failed_count = str(get_failed_count(name, mysqldb))
+        failed_count = str(get_failed_count(name))
         logger.debug('failed_count: %s', type(failed_count))
 
-        unexecuted_count = str(get_unexecuted_count(name, mysqldb))
+        unexecuted_count = str(get_unexecuted_count(name))
         logger.debug('unexecuted_count: %s', type(unexecuted_count))
 
-        totle_count = str(get_testcase_total(name, mysqldb))
+        totle_count = str(get_testcase_total(name))
         logger.debug('totle_count: %s', type(totle_count))
 
-        pass_rate = str(get_pass_rate(name, passed_count, mysqldb))
+        pass_rate = str(get_pass_rate(name, passed_count))
         logger.debug('pass_rate: %s', type(pass_rate))
 
-        first_pass_rate = str(get_first_pass_rate(name, passed_first_count, mysqldb))
+        first_pass_rate = str(get_first_pass_rate(name, passed_first_count))
         logger.debug('first_pass_rate: %s', type(first_pass_rate))
 
         debug = get_debug_result(name)
-        if debug=='PASS':
-            debug='Yes'
-        else:
-            debug='No'
+        logger.debug('debug status is : %s', (debug))
 
         item = '"' + load_start_time + '","' + str(name) + '","' + str(passed_count) + '","' + str(failed_count) + '","' \
                + unexecuted_count + '","' + totle_count + '","' + first_pass_rate + '","' + pass_rate + '","' + debug + '"'
@@ -280,28 +348,21 @@ def main(crt_type):
                                              total_num,
                                              first_passrate,
                                              passrate,
-                                             debug) VALUES(''' + item + '''); 
+                                             debug) VALUES(''' + item + ''');
         '''
         logger.debug('sql_str: %s', sql_str)
         mysqldb.update_DB(sql_str)
-    mysqldb.close_DB()
+
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.info('The script run time is: %s sec' % (time))
+    logger.debug('The script run time is: %s sec' % (time))
 
-def FLF():
-    main('FLF')
-
-def TLF():
-    main('TLF')
-
-def FLC():
-    main('FLC')
-
-def TLC():
-    main('TLC')
+def main():
+    list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    for i in range(len(list_project)):
+        running(list_project[i])
 
 if __name__ == "__main__":
-    crt_type = (parse_args().type)
-    main(crt_type)
+    # crt_type = (parse_args().type)
+    main()
 
