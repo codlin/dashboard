@@ -17,7 +17,7 @@ from jenkins_monitor import JenkinsMonitorManager, JenkinsMonitorTbl, JenkinsMon
 # pylint: disable=E0401
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from common.logger import logger
+from common.logger import logger, set_log_level
 # logger = logging.getLogger(__name__)
 
 '''
@@ -109,9 +109,10 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
         data = []
         builds = self.impl.require_data(DB_UNFINISHED_BUILD_ID,
                                         url=self.url, job=self.job_name)
-        logger.debug(builds)
         for build_id in builds:
             build = self.jenkins.get_build(build_id)
+            if info is None:
+                continue
             info = _parse_build_data(build.json_data, build.inner.get_params())
             logger.debug(info)
             data.append(info)
@@ -148,7 +149,9 @@ class loadTestlinesTblCUID(DataInterface):
 
     def require_data(self, type, **kwargs):
         if type == DB_UNFINISHED_BUILD_ID:
-            return self.unfinished_buildid
+            url = kwargs['url']
+            job = kwargs['job']
+            return self.unfinished_buildid(url, job)
         elif type == DB_LATEST_BUILD_ID:
             url = kwargs['url']
             job = kwargs['job']
@@ -163,6 +166,8 @@ class loadTestlinesTblCUID(DataInterface):
                 continue
 
             if self._count_item(url, job, item) > 0:
+                logger.info(
+                    "update item: {}/job/{}, {}".format(url, job, item))
                 self._update_item(url, job, item)
             else:
                 self._insert_item(url, job, item)
@@ -190,15 +195,18 @@ class loadTestlinesTblCUID(DataInterface):
         logger.debug(count)
         return count[0][0]
 
-    @property
-    def unfinished_buildid(self):
-        sql = r"select build_id from crt_load_testline_status_page where build_status is null  or build_status = 'null' or build_status = ''"
+    def unfinished_buildid(self, url, job):
+        sql = "select build_id from crt_load_testline_status_page where url = '{}' \
+                AND job = '{}' AND (build_status is null  or build_status = 'null' \
+                or build_status = '' or build_status = 'None') ORDER BY CAST(build_id as unsigned) DESC".format(url, job)
         logger.debug(sql)
         results = self.db.get_DB(sql)
         logger.debug(results)
         builds = []
         for build in results:
             builds.append(build[0])
+
+        logger.info("Unfinished builds: {}".format(builds))
         return builds
 
     def latest_buildid(self, url, job):
@@ -237,6 +245,7 @@ def load_testlines_task_entry():
 
 
 if __name__ == '__main__':
+    set_log_level("DBTools", 'INFO')
     # test loadTestlinesTblCUID
     load_testlines_task_entry()
     # task = JenkinsJobBuildMonitorTask(url='http://135.242.139.122:8085', user='scpadm', passwd='scpadm',

@@ -76,8 +76,14 @@ class JenkinsJob(object):
         self._job = self.jenkins.get_job(job_name)
 
     def get_build(self, build_num):
-        logger.debug("get jenkins build, id: {}".format(build_num))
-        return JenkinsJobBuild(self._job.get_build(build_num))
+        logger.debug('get {}/job/{}/{}.'.format(
+            self.jenkins.baseurl, self.job_name, build_num))
+        try:
+            return JenkinsJobBuild(self._job.get_build(int(build_num)))
+        except:
+            logger.error('get {}/job/{}/{} failed.'.format(
+                self.jenkins.baseurl, self.job_name, build_num))
+            return None
 
     def get_all_builds(self, filters=[]):
         url = "{}/job/{}/api/json?tree=allBuilds[{}]".format(

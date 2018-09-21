@@ -98,7 +98,7 @@ export default {
       // table data
       items_search: '',
       // sorting by descending
-      pagination: { sortBy: 'casename', descending: false, rowsPerPage: -1 },
+      pagination: { sortBy: 'result', descending: false, rowsPerPage: -1 },
 
       // UI Components related
       resultChkbox: null,

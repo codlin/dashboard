@@ -83,11 +83,11 @@ class LoadTestlineStatusViewApi(viewsets.ViewSet):
             cursor.execute(query_sql)
             row_headers = [x[0] for x in cursor.description]
             items = cursor.fetchall()
-            logging.error(row_headers)
+            # logging.error(row_headers)
             json_data = []
             for item in items:
                 data = dict(zip(row_headers, item))
-                logging.error(data)
+                # logging.error(data)
                 json_data.append(data)
 
             return Response(json_data)
