@@ -32,6 +32,7 @@
           <tr>
             <th v-for="header in headers"
                 :key="header.key"
+                :hidden="HiddenHeaderItem(header)"
                 :colspan="header.colspan">
               {{ header.text }}
             </th>
@@ -40,6 +41,7 @@
           <tr>
             <th v-for="header in subHeaders"
                 :key="header.key"
+                :hidden="HiddenHeaderItem(header)"
                 :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
                 @click="changeSort(header)">
               {{ header.text }}
@@ -52,23 +54,25 @@
                   slot-scope="props">
           <tr>
             <td class="text-xs-left">
-              <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
+              <a :href="testline_url(props.item)"
                  target="_blank">{{ props.item.testline }}</a>
             </td>
             <td class="text-xs-left">{{ props.item.btsid }}</td>
-            <td class="text-xs-left">{{ props.item.ca }}</td>
+
             <td class="text-xs-left">
-              <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
+              <a :href="props.item.check_site_url"
                  target="_blank">{{ props.item.check_site_result }}</a>
             </td>
             <td class="text-xs-left">{{ props.item.check_site_timestamp }}</td>
+
             <td class="text-xs-left">
-              <a href="http://10.52.200.190/view/AICT_3_FDD/job/healthCheckup_AICT3_FDD/24854/console"
-                 target="_blank">{{ props.item.healthCheckup_result }}</a>
+              <a :href="props.item.health_checkup_url"
+                 target="_blank">{{ props.item.health_checkup_result }}</a>
             </td>
-            <td class="text-xs-left">{{ props.item.healthCheckup_timestamp }}</td>
+            <td class="text-xs-left">{{ props.item.health_checkup_timestamp }}</td>
+
             <td class="text-xs-left">
-              <a href="http://10.52.200.190/view/AICT_3_FDD/job/upgrade_FDD_AICT3/24065/console"
+              <a :href="props.item.upgrade_url"
                  target="_blank">{{ props.item.upgrade_result }}</a>
             </td>
             <td class="text-xs-left">{{ props.item.upgrade_timestamp }}</td>
@@ -107,23 +111,22 @@ export default {
 
       // header level I
       headers: [
-        { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '3' },
-        { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2' },
-        { key: 'healthcheckup', text: 'Health Checkup Job', value: 'healthcheckup', align: 'left', colspan: '2' },
-        { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2' }
+        { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '3', hidden: false },
+        { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2', hidden: false },
+        { key: 'healthcheckup', text: 'Health Checkup Job', value: 'healthcheckup', align: 'left', colspan: '2', hidden: false },
+        { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2', hidden: false }
       ],
 
       // header level II
       subHeaders: [
-        { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
-        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
-        { key: 'ca', text: 'CA', align: 'left', value: 'ca' },
-        { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result' },
-        { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp' },
-        { key: 'healthCheckup_result', text: 'result', align: 'left', value: 'healthCheckup_result' },
-        { key: 'healthCheckup_timestamp', text: 'timestamp', align: 'left', value: 'healthCheckup_timestamp' },
-        { key: 'upgrade_result', text: 'result', align: 'left', value: 'upgrade_result' },
-        { key: 'upgrade_timestamp', text: 'timestamp', align: 'left', value: 'upgrade_timestamp' }
+        { key: 'testline', text: 'Testline', align: 'left', value: 'testline', hidden: false },
+        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid', hidden: false },
+        { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result', hidden: false },
+        { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp', hidden: false },
+        { key: 'healthCheckup_result', text: 'result', align: 'left', value: 'healthCheckup_result', hidden: false },
+        { key: 'healthCheckup_timestamp', text: 'timestamp', align: 'left', value: 'healthCheckup_timestamp', hidden: false },
+        { key: 'upgrade_result', text: 'result', align: 'left', value: 'upgrade_result', hidden: false },
+        { key: 'upgrade_timestamp', text: 'timestamp', align: 'left', value: 'upgrade_timestamp', hidden: false }
       ],
 
       // vars from json data which will be used in the template
@@ -134,45 +137,7 @@ export default {
       pagination: { sortBy: 'testline', descending: false, rowsPerPage: -1 },
 
       // UI Components related
-      resultChkbox: null,
-
-      // test data
-      test_testlines: [
-        {
-          testline: '135.252.122.155',
-          btsid: '707',
-          ca: 'LTE3296',
-          check_site_result: 'SUCCESS',
-          check_site_timestamp: '2018-08-27 10:03:01',
-          healthCheckup_result: 'SUCCESS',
-          healthCheckup_timestamp: '2018-08-27 10:05:19',
-          upgrade_result: 'Failed',
-          upgrade_timestamp: '2018-08-27 10:14:55'
-        },
-        {
-          testline: '135.252.122.157',
-          btsid: '709',
-          ca: 'Uplane',
-          check_site_result: 'SUCCESS',
-          check_site_timestamp: '2018-08-27 10:03:01',
-          healthCheckup_result: 'Failed',
-          healthCheckup_timestamp: '2018-08-27 10:05:20',
-          upgrade_result: 'SUCCESS',
-          upgrade_timestamp: '2018-08-27 10:14:55'
-        },
-
-        {
-          testline: '135.252.122.159',
-          btsid: '720',
-          ca: 'Uplane',
-          check_site_result: 'SUCCESS',
-          check_site_timestamp: '2018-08-27 10:03:01',
-          healthCheckup_result: 'SUCCESS',
-          healthCheckup_timestamp: '2018-08-27 10:05:21',
-          upgrade_result: 'SUCCESS',
-          upgrade_timestamp: '2018-08-27 10:14:55'
-        }
-      ]
+      resultChkbox: null
     }
   },
 
@@ -183,15 +148,17 @@ export default {
       if (this.resultChkbox !== null) {
         filteredData = filteredData.filter((item, i) => {
           if (this.resultChkbox.toUpperCase() === 'FAILED') {
-            return (item.check_site_result.toUpperCase() === 'FAILED') ||
-              (item.healthCheckup_result.toUpperCase() === 'FAILED') ||
-              (item.upgrade_result.toUpperCase() === 'FAILED')
+            let items = this.builds(item.jobs)
+            for (let info in items) {
+              return (this.build_status(info).toUpperCase() === 'FAILED')
+            }
           }
         })
       }
 
       return filteredData
     }
+
   },
 
   watch: {
@@ -226,18 +193,77 @@ export default {
       ])
     },
 
-    // get loads list
+    HiddenHeaderItem (item) {
+      if (this.loadName.indexOf('LC') > -1) {
+        if (item.key.indexOf('healthcheckup') > -1) {
+          return true
+        }
+      }
+      return false
+    },
+
+    testline_url (item) {
+      return item.url + '/computer/' + item.testline
+    },
+
+    // get loads testlines
     getLoadToTLs () {
       console.log('Enter getLoadToTLs: ', this.loadName)
       this.$api.get('/api/loadtls', { name: this.loadName },
         res => {
-          this.testlines = res.data
           console.info(res.data)
+          this.convertData(res.data)
+          this.testlines = res.data
+          console.info('load testlines: ', this.testlines)
         },
         er => {
           console.error('getLoadToTLs: ', er)
-          // this.testlines = this.test_testlines
         })
+    },
+
+    convertData (data) {
+      // console.log(data)
+      data.forEach(testline => {
+        // console.log('testline: ', testline)
+        testline['check_site_job'] = ''
+        testline['check_site_result'] = ''
+        testline['check_site_timestamp'] = ''
+        testline['check_site_url'] = ''
+
+        testline['health_checkup_job'] = ''
+        testline['health_checkup_result'] = ''
+        testline['health_checkup_timestamp'] = ''
+        testline['health_checkup_url'] = ''
+
+        testline['upgrade_job'] = ''
+        testline['upgrade_result'] = ''
+        testline['upgrade_timestamp'] = ''
+        testline['upgrade_url'] = ''
+
+        let jobs = testline.jobs.split(';')
+        // console.log('jobs: ', jobs)
+        jobs.forEach(job => {
+          // console.log('job: ', job)
+          let items = job.split(',')
+          // console.log('items: ', items)
+          if (items[0].indexOf('check_site') > -1) {
+            testline.check_site_job = items[0]
+            testline.check_site_result = items[1]
+            testline.check_site_timestamp = items[2]
+            testline.check_site_url = items[3]
+          } else if (items[0].indexOf('healthCheckup') > -1) {
+            testline.health_checkup_job = items[0]
+            testline.health_checkup_result = items[1]
+            testline.health_checkup_timestamp = items[2]
+            testline.health_checkup_url = items[3]
+          } else if (items[0].indexOf('upgrade') > -1) {
+            testline.upgrade_job = items[0]
+            testline.upgrade_result = items[1]
+            testline.upgrade_timestamp = items[2]
+            testline.upgrade_url = items[3]
+          }
+        })
+      })
     },
 
     // UI releated

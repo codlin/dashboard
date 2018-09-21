@@ -4,25 +4,27 @@
       <v-toolbar flat
                  color="white">
         <v-toolbar-title>Details</v-toolbar-title>
+        <v-divider class="mx-2"
+                   inset
+                   vertical></v-divider>
+
         <v-spacer></v-spacer>
         <v-content>
           <v-layout align-center
-                    justify-start>
+                    justify-center>
             <v-checkbox hide-details
                         v-model="resultChkbox"
                         value="failed"
                         label="FAILED"></v-checkbox>
             <v-checkbox hide-details
                         v-model="resultChkbox"
-                        value="na"
-                        label="NA"></v-checkbox>
-            <v-checkbox hide-details
-                        v-model="resultChkbox"
                         value="exception"
-                        label="EXCEPTION"></v-checkbox>
-
+                        label="NULL"></v-checkbox>
+            <h4 align-center
+                justify-center>Case Count: {{ filteredCaseNum }}</h4>
           </v-layout>
         </v-content>
+        <v-spacer></v-spacer>
         <v-text-field v-model="items_search"
                       append-icon="search"
                       label="Search"
@@ -130,21 +132,11 @@ export default {
 
   computed: {
     filteredItems () {
-      let filteredData = this.cases
+      return this.filterItems()
+    },
 
-      if (this.resultChkbox !== null) {
-        filteredData = filteredData.filter((item, i) => {
-          if (this.resultChkbox.toUpperCase() === 'FAILED') {
-            return item.result.toUpperCase() === 'FAILED'
-          } else if (this.resultChkbox.toUpperCase() === 'NA') {
-            return item.result.toUpperCase() === 'NOT ANALYZED'
-          } else {
-            return item.result.toUpperCase() !== 'FAILED' && item.result.toUpperCase() !== 'NOT ANALYZED'
-          }
-        })
-      }
-
-      return filteredData
+    filteredCaseNum: function () {
+      return this.filterItems().length
     }
   },
 
@@ -191,9 +183,24 @@ export default {
           console.error('getLoadCases: ', er)
           // this.cases = this.test_cases
         })
-    }
+    },
 
     // UI Components related
+    filterItems () {
+      let filteredData = this.cases
+
+      if (this.resultChkbox !== null) {
+        filteredData = filteredData.filter((item, i) => {
+          if (this.resultChkbox.toUpperCase() === 'FAILED') {
+            return item.result.toUpperCase() === 'FAILED' || item.result.toUpperCase() === 'NOT ANALYZED'
+          } else if (this.resultChkbox.toUpperCase() === 'EXCEPTION') {
+            return item.result.toUpperCase() === 'NULL'
+          }
+        })
+      }
+
+      return filteredData
+    }
   }
 }
 </script>
