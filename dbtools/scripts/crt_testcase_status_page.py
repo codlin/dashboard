@@ -173,6 +173,7 @@ def running(crt_type):
 
 
 def main():
+    logger.info('load testcases status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])

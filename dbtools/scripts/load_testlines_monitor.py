@@ -165,9 +165,11 @@ class loadTestlinesTblCUID(DataInterface):
                 logger.error("Unsupport date item {}.".format(item))
                 continue
 
+            logger.info("update item: {}/job/{}, testline: {}, btsid: {} build_id: {}, build_time: {}, build_result: {}\
+                        ".format(url, job, item.testline, item.btsid,
+                                 item.build_id, item.build_time, item.build_status))
+
             if self._count_item(url, job, item) > 0:
-                logger.info(
-                    "update item: {}/job/{}, {}".format(url, job, item))
                 self._update_item(url, job, item)
             else:
                 self._insert_item(url, job, item)

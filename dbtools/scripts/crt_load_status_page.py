@@ -361,6 +361,7 @@ def running(crt_type):
     logger.debug('The script run time is: %s sec' % (time))
 
 def main():
+    logger.info('load status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
