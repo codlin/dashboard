@@ -1,5 +1,7 @@
 # pylint: disable=E1101
 import logging
+import json
+from django.db import connection
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -60,27 +62,35 @@ class LoadTestcaseStatusViewApi(viewsets.ModelViewSet):
         name = self.request.query_params.get('name')
         items = LoadTestcaseStatus.objects.filter(
             loadname=name).order_by('casename')
-
         return items
 
 
-class LoadTestlineStatusViewApi(viewsets.ModelViewSet):
-    serializer_class = LoadTestlineStatusSerializer
+class LoadTestlineStatusViewApi(viewsets.ViewSet):
+    # serializer_class = LoadTestlineStatusSerializer
 
-    def get_queryset(self):
-        name = self.request.query_params.get('name')
-        query_sql = "SELECT id, loadname, testline, t.btsid, GROUP_CONCAT(CONCAT_WS(',', job, build_status, build_time, build_url)  ORDER BY t.order SEPARATOR ';' ) \
-                     FROM (SELECT a.id, loadname, testline, c.btsid, a.job, build_status, build_time, build_url, b.order \
+    def list(self, request):
+        name = request.query_params.get('name')
+        query_sql = "SELECT id, loadname, testline, t.btsid, url, GROUP_CONCAT(CONCAT_WS(',', job, build_status, build_time, build_url)  ORDER BY t.order SEPARATOR ';' ) as jobs \
+                     FROM (SELECT a.id, loadname, testline, c.btsid, url, a.job, build_status, build_time, build_url, b.order \
                             FROM crt_db.crt_load_testline_status_page a \
                             LEFT JOIN crt_db.crt_jenkins_job b ON a.job = b.job \
                             INNER JOIN crt_db.crt_testline c ON a.testline = c.node \
                             WHERE loadname = '{}') t \
                      GROUP BY loadname, testline ORDER BY loadname, testline;".format(name)
-        items = LoadTestlineStatus.objects.raw(query_sql)
 
-        # items = LoadTestlineStatus.objects.filter(
-        #     loadname=name).order_by('testline')
-        return items
+        items = None
+        with connection.cursor() as cursor:
+            cursor.execute(query_sql)
+            row_headers = [x[0] for x in cursor.description]
+            items = cursor.fetchall()
+            logging.error(row_headers)
+            json_data = []
+            for item in items:
+                data = dict(zip(row_headers, item))
+                logging.error(data)
+                json_data.append(data)
+
+            return Response(json_data)
 
 
 class TestlineViewApi(viewsets.ModelViewSet):
