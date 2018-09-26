@@ -12,7 +12,6 @@ import pymysql
 import pandas as pd
 from datetime import datetime
 from MYSQL import Pymysql
-from function import *
 import argparse
 from pprint import pprint
 import requests
