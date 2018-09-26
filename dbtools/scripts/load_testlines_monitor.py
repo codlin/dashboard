@@ -111,7 +111,7 @@ class JenkinsJobBuildMonitorTask(JenkinsMonitorTask):
                                         url=self.url, job=self.job_name)
         for build_id in builds:
             build = self.jenkins.get_build(build_id)
-            if info is None:
+            if build is None:
                 continue
             info = _parse_build_data(build.json_data, build.inner.get_params())
             logger.debug(info)
@@ -180,16 +180,16 @@ class loadTestlinesTblCUID(DataInterface):
         self.db.update_DB(sql)
 
     def _update_item(self, url, job, item):
-        sql = "UPDATE crt_load_testline_status_page set build_status='{}', build_time='{}' \
-               WHERE loadname='{}' AND testline='{}' AND url='{}' AND job='{}' \
-               AND build_id='{}'".format(item.build_status, item.build_time, item.loadname, item.testline, url, job, item.build_id)
+        sql = "UPDATE crt_load_testline_status_page set build_id='{}', build_status='{}', build_time='{}' \
+               WHERE loadname='{}' AND testline='{}' AND url='{}' AND job='{}' AND build_status!='SUCCESS' \
+               ".format(item.build_id, item.build_status, item.build_time, item.loadname, item.testline, url, job)
         logger.debug(sql)
         self.db.update_DB(sql)
 
     def _count_item(self, url, job, item):
         sql = "SELECT COUNT(*) FROM crt_load_testline_status_page \
                WHERE loadname='{}' AND testline='{}' AND url='{}' \
-               AND job='{}' AND build_id='{}'".format(item.loadname, item.testline, url, job, item.build_id)
+               AND job='{}'".format(item.loadname, item.testline, url, job)
 
         count = self.db.get_DB(sql)
         logger.debug(count)

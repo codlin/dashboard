@@ -37,6 +37,13 @@
                         value="debugged"
                         label="Debugged"></v-checkbox>
 
+            <v-checkbox hide-details
+                        v-model="releaseChkBox"
+                        v-for="rel in Releases"
+                        :key="rel"
+                        :value="rel"
+                        :label="rel"></v-checkbox>
+
           </v-layout>
         </v-content>
         <v-text-field v-model="load_search"
@@ -128,7 +135,9 @@ export default {
       // UI Components related
       dateChkbox: null,
       passrateChkBox: null,
-      isDebugged: null
+      isDebugged: null,
+      releaseChkBox: null,
+      releases: new Set()
     }
   },
 
@@ -163,7 +172,19 @@ export default {
         })
       }
 
+      if (this.releaseChkBox !== null) {
+        filteredData = filteredData.filter((item, i) => {
+          let rel = item.loadname.split('_')[0]
+          return rel.toUpperCase() === this.releaseChkBox
+        })
+      }
       return filteredData
+    },
+
+    Releases () {
+      console.log('Releases set:', this.releases)
+      console.log('Releases:', [...this.releases])
+      return []
     }
   },
 
@@ -212,6 +233,7 @@ export default {
             console.log(res.data)
             Vue.set(this.loads, this.productId, res.data)
             console.log('getLoadList: data ', this.loads[this.productId])
+            this.groupRelease(res.data)
           },
           er => {
             console.error('getLoadList: ', er)
@@ -229,6 +251,7 @@ export default {
           console.log('data:', r.data)
           if (r.data.length > 0) {
             this.loads[this.productId].unshift(r.data)
+            this.groupRelease(r.data)
           }
         },
         r => {
@@ -236,6 +259,19 @@ export default {
         })
 
       console.log('Leave getLoadList')
+    },
+
+    refreshData () {
+      console.log(this.dateChkbox)
+      this.increGetLoadList()
+    },
+
+    groupRelease (data) {
+      data.forEach(item => {
+        let rel = item.loadname.split('_')[0]
+        this.releases.add(rel)
+        // console.log(this.releases)
+      })
     },
 
     // UI releated
@@ -246,11 +282,6 @@ export default {
       } else if (item.passrate < 50) {
         return '#FBE9E7'
       }
-    },
-
-    refreshData () {
-      console.log(this.dateChkbox)
-      this.increGetLoadList()
     }
 
     // for testing
