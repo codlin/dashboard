@@ -21,7 +21,10 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-logger = set_log_level('DEBUG')
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, root)
+from common.logger import logger, set_log_level
+
 mysqldb = Pymysql()
 
 
@@ -30,9 +33,11 @@ def parse_args():
         description='Request CRT data of project from mysql database',
         usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)"
     )
-    p.add_argument('-t', '--type', action='store', default='FLF', help="Get the project type of CRT")
+    p.add_argument('-t', '--type', action='store', default='FLF',
+                   help="Get the project type of CRT")
     args = p.parse_args()
     return args
+
 
 def get_loadnames(mode):
     """
@@ -60,6 +65,7 @@ def get_loadnames(mode):
         results.append(loadname)
     return results
 
+
 def get_release(loadname):
     branch = loadname.split('_')
     if branch[0] == "FLF17A" and branch[2] == '1000':
@@ -67,6 +73,7 @@ def get_release(loadname):
     else:
         result = branch[0]
     return result
+
 
 def get_load_name_time(loadname):
     sql_str = '''
@@ -76,6 +83,7 @@ def get_load_name_time(loadname):
     data = mysqldb.get_DB(sql_str)
     result = data[0][0]
     return result
+
 
 def get_failed(loadname):
     sql_str = '''
@@ -88,6 +96,7 @@ def get_failed(loadname):
     '''
     results = mysqldb.get_DB(sql_str)
     return results
+
 
 def get_unexecuted(loadname):
     branch = get_release(loadname)
@@ -109,6 +118,7 @@ def get_unexecuted(loadname):
     results = mysqldb.get_DB(sql_str)
     return results
 
+
 def list_to_str(list):
     str = ''
     for i in range(0, len(list)):
@@ -116,6 +126,7 @@ def list_to_str(list):
         str = str + item
     result = str[:-1]
     return result
+
 
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
@@ -130,8 +141,8 @@ def running(crt_type):
         # 更新未执行的用例
         data_unexecuted = get_unexecuted(name)
 
-        #循环输出failed的testcase，更新入数据库
-        for i in range(0,len(data_failed)):
+        # 循环输出failed的testcase，更新入数据库
+        for i in range(0, len(data_failed)):
             item = data_failed[i]
             item = list(item)
             logger.debug('item is: %s', item)
@@ -160,10 +171,12 @@ def running(crt_type):
     time = (t_end - t_start).total_seconds()
     logger.debug('The script run time is: %s sec' % (time))
 
+
 def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+
 
 if __name__ == "__main__":
     # crt_type = (parse_args().type)

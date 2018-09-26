@@ -21,7 +21,10 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-logger = set_log_level('DEBUG')
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, root)
+from common.logger import logger, set_log_level
+
 mysqldb = Pymysql()
 
 
