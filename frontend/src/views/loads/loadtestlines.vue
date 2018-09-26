@@ -65,11 +65,13 @@
             </td>
             <td class="text-xs-left">{{ props.item.check_site_timestamp }}</td>
 
-            <td class="text-xs-left">
+            <td class="text-xs-left"
+                :hidden="tdHidden">
               <a :href="props.item.health_checkup_url"
                  target="_blank">{{ props.item.health_checkup_result }}</a>
             </td>
-            <td class="text-xs-left">{{ props.item.health_checkup_timestamp }}</td>
+            <td class="text-xs-left"
+                :hidden="tdHidden">{{ props.item.health_checkup_timestamp }}</td>
 
             <td class="text-xs-left">
               <a :href="props.item.upgrade_url"
@@ -99,6 +101,10 @@ export default {
   },
 
   created () {
+    // fix loadname
+    if (this.loadName.indexOf('LC') > -1) {
+      this.loadName = this.loadName.replace('18A', '00')
+    }
     // get data from server
     this.getLoadToTLs()
     this.createBreadcrums()
@@ -106,27 +112,30 @@ export default {
 
   data () {
     return {
+      // origin loadname
+      origLoadName: this.loadName,
+
       // json data retrieved from server
       testlines: [],
 
       // header level I
       headers: [
-        { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '3', hidden: false },
-        { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2', hidden: false },
-        { key: 'healthcheckup', text: 'Health Checkup Job', value: 'healthcheckup', align: 'left', colspan: '2', hidden: false },
-        { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2', hidden: false }
+        { key: 'loadsummary', text: 'Load Summary', value: 'loadsummary', align: 'left', colspan: '2' },
+        { key: 'checksite', text: 'Check Site Job', value: 'checksite', align: 'left', colspan: '2' },
+        { key: 'health_checkup', text: 'Health Checkup Job', value: 'health_checkup', align: 'left', colspan: '2' },
+        { key: 'upgrade', text: 'Upgrading Job', value: 'upgrade', align: 'left', colspan: '2' }
       ],
 
       // header level II
       subHeaders: [
-        { key: 'testline', text: 'Testline', align: 'left', value: 'testline', hidden: false },
-        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid', hidden: false },
-        { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result', hidden: false },
-        { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp', hidden: false },
-        { key: 'healthCheckup_result', text: 'result', align: 'left', value: 'healthCheckup_result', hidden: false },
-        { key: 'healthCheckup_timestamp', text: 'timestamp', align: 'left', value: 'healthCheckup_timestamp', hidden: false },
-        { key: 'upgrade_result', text: 'result', align: 'left', value: 'upgrade_result', hidden: false },
-        { key: 'upgrade_timestamp', text: 'timestamp', align: 'left', value: 'upgrade_timestamp', hidden: false }
+        { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
+        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
+        { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result' },
+        { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp' },
+        { key: 'health_checkup_result', text: 'result', align: 'left', value: 'health_checkup_result' },
+        { key: 'health_checkup_timestamp', text: 'timestamp', align: 'left', value: 'health_checkup_timestamp' },
+        { key: 'upgrade_result', text: 'result', align: 'left', value: 'upgrade_result' },
+        { key: 'upgrade_timestamp', text: 'timestamp', align: 'left', value: 'upgrade_timestamp' }
       ],
 
       // vars from json data which will be used in the template
@@ -137,7 +146,8 @@ export default {
       pagination: { sortBy: 'testline', descending: false, rowsPerPage: -1 },
 
       // UI Components related
-      resultChkbox: null
+      resultChkbox: null,
+      tdHidden: (this.loadName.indexOf('LC') > -1)
     }
   },
 
@@ -148,10 +158,9 @@ export default {
       if (this.resultChkbox !== null) {
         filteredData = filteredData.filter((item, i) => {
           if (this.resultChkbox.toUpperCase() === 'FAILED') {
-            let items = this.builds(item.jobs)
-            for (let info in items) {
-              return (this.build_status(info).toUpperCase() === 'FAILED')
-            }
+            return (item.check_site_result.toUpperCase() === 'FAILURE') ||
+              (item.health_checkup_result.toUpperCase() === 'FAILURE') ||
+              (item.upgrade_result.toUpperCase() === 'FAILURE')
           }
         })
       }
@@ -179,8 +188,8 @@ export default {
       this.$store.dispatch('pushBreadcrumbs',
         {
           disabled: false,
-          text: this.loadName,
-          path: '/loads/index/' + this.loadName + '/tls'
+          text: this.origLoadName,
+          path: '/loads/index/' + this.origLoadName + '/tls'
         }
       )
 
@@ -188,16 +197,25 @@ export default {
       this.$store.dispatch('setRelatedChips', [
         {
           text: 'cases',
-          path: '/loads/index/' + this.loadName + '/cases'
+          path: '/loads/index/' + this.origLoadName + '/cases'
         }
       ])
     },
 
     HiddenHeaderItem (item) {
+      console.log('HiddenHeaderItem:', this.loadName.indexOf('LC'))
       if (this.loadName.indexOf('LC') > -1) {
-        if (item.key.indexOf('healthcheckup') > -1) {
+        if (item.key.indexOf('health_checkup') > -1) {
           return true
         }
+      }
+      return false
+    },
+
+    HiddenItem () {
+      console.log('HiddenItem:', this.loadName.indexOf('LC'))
+      if (this.loadName.indexOf('LC') > -1) {
+        return true
       }
       return false
     },

@@ -32,6 +32,10 @@
                         v-model="passrateChkBox"
                         value="Failed"
                         label="Failed"></v-checkbox>
+            <v-checkbox hide-details
+                        v-model="isDebugged"
+                        value="debugged"
+                        label="Debugged"></v-checkbox>
 
           </v-layout>
         </v-content>
@@ -123,7 +127,8 @@ export default {
 
       // UI Components related
       dateChkbox: null,
-      passrateChkBox: null
+      passrateChkBox: null,
+      isDebugged: null
     }
   },
 
@@ -147,8 +152,15 @@ export default {
             return (this.passrateChkBox === 'Passed') ? (parseFloat(item.passrate) >= 100) : (parseFloat(item.passrate) < 50)
           })
         }
-
         console.log(filteredData)
+      }
+
+      console.log('this.isDebugged: ', this.isDebugged)
+      if (this.isDebugged !== null) {
+        filteredData = filteredData.filter((item, i) => {
+          console.log('item.debug: ', item.debug)
+          return item.debug.toUpperCase() === 'YES'
+        })
       }
 
       return filteredData

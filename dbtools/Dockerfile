@@ -20,10 +20,10 @@ ADD requirements.txt /dbtools
 # Using pip:
 RUN python -m pip install --no-cache-dir -r requirements.txt \
     && rm -rf requirements.txt \
-    && apt-get purge -y --auto-remove $buildDeps \
-    && chmod +x startup.sh
+    && apt-get purge -y --auto-remove $buildDeps
 
 ADD . /dbtools
+RUN chmod +x startup.sh
 
 ENV http_proxy ""
 ENV https_proxy ""
