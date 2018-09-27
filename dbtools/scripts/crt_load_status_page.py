@@ -202,6 +202,8 @@ def get_pass_rate(loadname, passed_count):
 
 def get_first_pass_rate(loadname, passed_count):
     testcase_total = get_testcase_total(loadname)
+
+
     logger.debug('testcase_total: %s', testcase_total)
     result = round(passed_count* 100 / testcase_total , 1)
     logger.debug("pass_rate2: %s" % type(result))
