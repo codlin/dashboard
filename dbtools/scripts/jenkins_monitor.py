@@ -13,7 +13,7 @@ import time
 import threading
 from abc import abstractmethod
 
-from MYSQL import Pymysql
+from mysql import Pymysql
 from jenkins_common import JenkinsJob
 # pylint: disable=E0401
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')

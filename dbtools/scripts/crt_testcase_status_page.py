@@ -171,6 +171,8 @@ def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+    
+    logger.info('load testcases status task down.')
 
 
 if __name__ == "__main__":

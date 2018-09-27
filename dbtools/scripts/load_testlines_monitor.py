@@ -11,7 +11,7 @@ import codecs
 import time
 import logging
 
-from MYSQL import Pymysql
+from mysql import Pymysql
 from jenkins_common import convertToDateTime
 from jenkins_monitor import JenkinsMonitorManager, JenkinsMonitorTbl, JenkinsMonitorTask, DataInterface
 # pylint: disable=E0401
@@ -165,7 +165,7 @@ class loadTestlinesTblCUID(DataInterface):
                 logger.error("Unsupport date item {}.".format(item))
                 continue
 
-            logger.info("update item: {}/job/{}, testline: {}, btsid: {} build_id: {}, build_time: {}, build_result: {}\
+            logger.debug("update item: {}/job/{}, testline: {}, btsid: {} build_id: {}, build_time: {}, build_result: {}\
                         ".format(url, job, item.testline, item.btsid,
                                  item.build_id, item.build_time, item.build_status))
 
