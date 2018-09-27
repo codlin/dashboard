@@ -6,7 +6,7 @@ import sys
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from scripts.crt_load_testcase_status_page import main
+from scripts.crt_testcase_status_page import main
 
 config = {
     'name': 'load_testcase_status',
