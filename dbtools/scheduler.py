@@ -36,8 +36,8 @@ if __name__ == "__main__":
     scheduler = BlockingScheduler()
     tasks = load_tasks()
     for task in tasks:
-        logger.info('add job: {}, interval[{}] minutes.'.format(
-            task.config['name'], task.config['interval']))
+        logger.info('add job: {}, interval[{}] minutes, func: {}.'.format(
+            task.config['name'], task.config['interval'], task.task_entry))
         scheduler.add_job(task.task_entry, 'interval',
                           minutes=task.config['interval'])
 

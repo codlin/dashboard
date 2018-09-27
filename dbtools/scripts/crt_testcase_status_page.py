@@ -22,6 +22,7 @@ from common.logger import logger, set_log_level
 from scripts.mysql import Pymysql
 mysqldb = Pymysql()
 
+
 def parse_args():
     p = argparse.ArgumentParser(
         description='Request CRT data of project from mysql database',
@@ -171,6 +172,8 @@ def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+
+    logger.info('load testcases status task done.')
 
 
 if __name__ == "__main__":

@@ -24,12 +24,14 @@ from common.logger import logger, set_log_level
 from scripts.mysql import Pymysql
 mysqldb = Pymysql()
 
+
 def parse_args():
     p = argparse.ArgumentParser(
         description='Request CRT data of project from mysql database',
         usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)"
     )
-    p.add_argument('-t', '--type', action='store', default='FLF', help="Get the project type of CRT")
+    p.add_argument('-t', '--type', action='store', default='FLF',
+                   help="Get the project type of CRT")
     args = p.parse_args()
     return args
 
@@ -218,7 +220,8 @@ def get_jenkins_data(url):
         results = results[0]
         return results
     else:
-        raise Exception("Server returned status code '%s' with message '%s'" % (response.status_code, response.content))
+        raise Exception("Server returned status code '%s' with message '%s'" % (
+            response.status_code, response.content))
 
 
 def get_target_value(key, dic, tmp_list):
@@ -236,16 +239,19 @@ def get_target_value(key, dic, tmp_list):
     else:
         for value in dic.values():  # 传入数据不符合则对其value值进行遍历
             if isinstance(value, dict):
-                get_target_value(key, value, tmp_list)  # 传入数据的value值是字典，则直接调用自身
+                # 传入数据的value值是字典，则直接调用自身
+                get_target_value(key, value, tmp_list)
             elif isinstance(value, (list, tuple)):
-                _get_value(key, value, tmp_list)  # 传入数据的value值是列表或者元组，则调用_get_value
+                # 传入数据的value值是列表或者元组，则调用_get_value
+                _get_value(key, value, tmp_list)
     return tmp_list
 
 
 def _get_value(key, val, tmp_list):
     for val_ in val:
         if isinstance(val_, dict):
-            get_target_value(key, val_, tmp_list)  # 传入数据的value值是字典，则调用get_target_value
+            # 传入数据的value值是字典，则调用get_target_value
+            get_target_value(key, val_, tmp_list)
         elif isinstance(val_, (list, tuple)):
             _get_value(key, val_, tmp_list)  # 传入数据的value值是列表或者元组，则调用自身
 
@@ -290,7 +296,8 @@ def get_debug_result(loadname):
     list_temp = []
     dic_pci = get_target_value('pci', dic, list_temp)
     list_temp2 = []
-    dic_children = get_target_value('children', get_key_value('name', 'crt', dic_pci), list_temp2)
+    dic_children = get_target_value(
+        'children', get_key_value('name', 'crt', dic_pci), list_temp2)
     dic_debug = get_key_value('name', 'debug', dic_children)
     if (dic_debug.get('cases')):
         dic_cases = dic_debug['cases'][0]
@@ -342,7 +349,8 @@ def running(crt_type):
         logger.debug('debug status is : %s', (debug))
 
         item = '"' + load_start_time + '","' + str(name) + '","' + str(passed_count) + '","' + str(failed_count) + '","' \
-               + unexecuted_count + '","' + totle_count + '","' + first_pass_rate + '","' + pass_rate + '","' + debug + '"'
+               + unexecuted_count + '","' + totle_count + '","' + \
+            first_pass_rate + '","' + pass_rate + '","' + debug + '"'
         logger.debug('item: %s', item)
         sql_str = '''
             REPLACE INTO crt_loadstatus_page(start_time,
@@ -368,6 +376,8 @@ def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+
+    logger.info('load status task done.')
 
 
 if __name__ == "__main__":
