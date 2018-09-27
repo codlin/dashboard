@@ -12,7 +12,6 @@ import pymysql
 import pandas as pd
 from datetime import datetime
 from MYSQL import Pymysql
-from function import *
 import argparse
 from pprint import pprint
 import requests
@@ -21,7 +20,10 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-logger = set_log_level('DEBUG')
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, root)
+from common.logger import logger, set_log_level
+
 mysqldb = Pymysql()
 
 
@@ -362,6 +364,7 @@ def running(crt_type):
 
 
 def main():
+    logger.info('load status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
