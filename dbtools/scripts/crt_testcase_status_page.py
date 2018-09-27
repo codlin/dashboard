@@ -51,7 +51,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 30
+    order by time_epoch_start desc limit 10
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -161,9 +161,13 @@ def running(crt_type):
     logger.debug('The script run time is: %s sec' % (time))
 
 def main():
+    t_start = datetime.now()  # 起x始时间
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+    t_end = datetime.now()  # 关闭时间
+    time = (t_end - t_start).total_seconds()
+    logger.debug('The script run time is: %s sec' % (time))
 
 if __name__ == "__main__":
     # crt_type = (parse_args().type)

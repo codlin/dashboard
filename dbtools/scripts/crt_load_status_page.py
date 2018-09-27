@@ -52,7 +52,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 30
+    order by time_epoch_start desc limit 10
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -291,14 +291,17 @@ def get_debug_result(loadname):
     list_temp2 = []
     dic_children = get_target_value('children', get_key_value('name', 'crt', dic_pci), list_temp2)
     dic_debug = get_key_value('name', 'debug', dic_children)
-    dic_cases = dic_debug['cases'][0]
-
-    debug_status = dic_cases['result']
-    if debug_status=='PASS':
-        debug_status= 'Yes'
-    if debug_status=='FAIL':
-        debug_status = 'No'
-    return debug_status
+    if (dic_debug.get('cases')):
+        dic_cases = dic_debug['cases'][0]
+        debug_status = dic_cases['result']
+        if debug_status == 'PASS':
+            debug_status = 'Yes'
+        if debug_status == 'FAIL':
+            debug_status = 'No'
+        return debug_status
+    else:
+        debug_status = 'NULL'
+        return debug_status
 
 
 def running(crt_type):
@@ -357,12 +360,13 @@ def running(crt_type):
     time = (t_end - t_start).total_seconds()
     logger.debug('The script run time is: %s sec' % (time))
 
+
 def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
 
+
 if __name__ == "__main__":
     # crt_type = (parse_args().type)
     main()
-
