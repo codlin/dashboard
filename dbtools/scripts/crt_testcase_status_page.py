@@ -50,7 +50,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 1
+    order by time_epoch_start desc limit 5
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
