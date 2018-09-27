@@ -195,7 +195,7 @@ from (select enb_build,
 def get_pass_rate(loadname, passed_count):
     testcase_total = get_testcase_total(loadname)
     logger.debug('testcase_total: %s', testcase_total)
-    result = round(passed_count / testcase_total * 100, 1)
+    result = round(passed_count * 100 / testcase_total,1)
     logger.debug("pass_rate1: %s" % type(result))
     return result
 
@@ -203,8 +203,8 @@ def get_pass_rate(loadname, passed_count):
 def get_first_pass_rate(loadname, passed_count):
     testcase_total = get_testcase_total(loadname)
     logger.debug('testcase_total: %s', testcase_total)
-    result = round(passed_count / testcase_total * 100, 1)
-    logger.debug("pass_rate2: %s" % result)
+    result = round(passed_count* 100 / testcase_total , 1)
+    logger.debug("pass_rate2: %s" % type(result))
     return result
 
 
@@ -308,6 +308,7 @@ def running(crt_type):
     logger.debug('%s Start running %s' % ('-' * 10, '-' * 10))
 
     object = get_loadnames(crt_type)
+    # object = ['FLF18A_ENB_9999_180921_001290']
     for name in object:
         logger.debug("loadname is %s" % name)
 
@@ -330,10 +331,10 @@ def running(crt_type):
         logger.debug('totle_count: %s', type(totle_count))
 
         pass_rate = str(get_pass_rate(name, passed_count))
-        logger.debug('pass_rate: %s', type(pass_rate))
+        logger.debug('pass_rate: %s', pass_rate)
 
         first_pass_rate = str(get_first_pass_rate(name, passed_first_count))
-        logger.debug('first_pass_rate: %s', type(first_pass_rate))
+        logger.debug('first_pass_rate: %s', first_pass_rate)
 
         debug = get_debug_result(name)
         logger.debug('debug status is : %s', (debug))
