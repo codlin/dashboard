@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Author: Ma xiaoquan
 # @Contact: xiaoquan.ma@nokia-sbell.com
-# @File: MYSQL.py
+# @File: mysql.py
 # @Time: 2018/9/6 16:00
 # @Desc:
 

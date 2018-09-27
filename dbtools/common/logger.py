@@ -37,7 +37,7 @@ def set_log_level(name, level):
     logger.setLevel(level)
 
 
-logger = create_logger("DBTools", 'INFO')
+logger = create_logger("DBTools", 'DEBUG')
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:

@@ -8,24 +8,21 @@
 
 import sys
 import os
-import pymysql
-import pandas as pd
 from datetime import datetime
-from MYSQL import Pymysql
 import argparse
+import urllib3
+from common.logger import logger, set_log_level
+from scripts.mysql import Pymysql
 from pprint import pprint
 import requests
 import json
-import urllib3
+import pandas as pd
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
-from common.logger import logger, set_log_level
 
 mysqldb = Pymysql()
-
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -55,7 +52,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 30
+    order by time_epoch_start desc limit 10
     '''
     data = mysqldb.get_DB(sql_str)
     results = []

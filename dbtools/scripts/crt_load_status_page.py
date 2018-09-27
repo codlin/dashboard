@@ -8,15 +8,15 @@
 
 import sys
 import os
-import pymysql
-import pandas as pd
 from datetime import datetime
-from MYSQL import Pymysql
+from scripts.mysql import Pymysql
 import argparse
-from pprint import pprint
 import requests
 import json
 import urllib3
+import pymysql
+import pandas as pd
+from pprint import pprint
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -25,7 +25,6 @@ sys.path.insert(0, root)
 from common.logger import logger, set_log_level
 
 mysqldb = Pymysql()
-
 
 def parse_args():
     p = argparse.ArgumentParser(
