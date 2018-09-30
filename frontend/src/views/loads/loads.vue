@@ -73,7 +73,8 @@
             <td class="text-xs-left">{{ props.item.norun_num }}</td>
             <td class="text-xs-left">{{ props.item.total_num }}</td>
             <td class="text-xs-left">{{ props.item.first_passrate }}</td>
-            <td class="text-xs-left">{{ props.item.passrate }}</td>
+            <td class="text-xs-left"
+                :bgcolor="tableCellColor(props.item)">{{ props.item.passrate }}</td>
             <td class="text-xs-left">{{ props.item.debug }}</td>
           </tr>
         </template>
@@ -90,7 +91,7 @@
 
 <script>
 import Vue from 'vue'
-import { daysBetween, getCurrentDate } from '../../../static/js/utils.js'
+import { daysBetween, getCurrentDate, getDuration } from '../../../static/js/utils.js'
 
 export default {
   props: {
@@ -144,6 +145,9 @@ export default {
   computed: {
     filteredItems () {
       let filteredData = this.loads[this.productId]
+      if (filteredData == null) {
+        return
+      }
 
       if (this.dateChkbox !== null || this.passrateChkBox !== null) {
         if (this.dateChkbox !== null) {
@@ -223,47 +227,25 @@ export default {
 
     // get loads list
     getLoadList () {
-      if (this.loads[this.productId] == null) {
-        this.$api.get('/api/loads', { productid: this.productId },
-          res => {
-            /** Due to limitations in JavaScript, Vue cannot detect the following changes to an array:
-             * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
-             * 2. When you modify the length of the array, e.g. vm.items.length = newLength
-             * **/
-            console.log(res.data)
-            Vue.set(this.loads, this.productId, res.data)
-            console.log('getLoadList: data ', this.loads[this.productId])
-            this.groupRelease(res.data)
-          },
-          er => {
-            console.error('getLoadList: ', er)
-          })
-      } else {
-        this.increGetLoadList()
-      }
-    },
-
-    // incremental get loads
-    increGetLoadList () {
-      let params = this.loads[this.productId].length === 0 ? { productid: this.productId } : { productid: this.productId, from: this.loads[this.productId][0].start_time }
-      this.$api.get('/api/loads', params,
-        r => {
-          console.log('data:', r.data)
-          if (r.data.length > 0) {
-            this.loads[this.productId].unshift(r.data)
-            this.groupRelease(r.data)
-          }
+      this.$api.get('/api/loads', { productid: this.productId },
+        res => {
+          /** Due to limitations in JavaScript, Vue cannot detect the following changes to an array:
+           * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
+           * 2. When you modify the length of the array, e.g. vm.items.length = newLength
+           * **/
+          console.log(res.data)
+          Vue.set(this.loads, this.productId, res.data)
+          console.log('getLoadList: data ', this.loads[this.productId])
+          this.groupRelease(res.data)
         },
-        r => {
-          console.log('getLoadList: mock data')
+        er => {
+          console.error('getLoadList: ', er)
         })
-
-      console.log('Leave getLoadList')
     },
 
     refreshData () {
       console.log(this.dateChkbox)
-      this.increGetLoadList()
+      this.getLoadList()
     },
 
     groupRelease (data) {
@@ -275,9 +257,9 @@ export default {
     },
 
     // UI releated
-    tableRowColor (item) {
+    tableCellColor (item) {
       console.log(item)
-      if (item.passrate === 100) {
+      if (item.passrate >= 100) {
         return '#E8F5E9'
       } else if (item.passrate < 50) {
         return '#FBE9E7'

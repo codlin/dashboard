@@ -39,6 +39,28 @@ export const getCurrentDate = () => {
 }
 
 // +---------------------------------------------------
+// | date format: YYYY-MM-dd HH:MM:SS
+// +---------------------------------------------------
+export const getDuration = (startTime, endTime) => {
+  // convert time format xxxx-xx-xx to xxxx/xx/xx
+  startTime = startTime.replace(/-/g, '/')
+  endTime = endTime.replace(/-/g, '/')
+
+  var start = new Date(startTime)
+  var end = new Date(endTime)
+  let duration = end.getTime() - start.getTime() // seconds
+
+  var days = Math.floor(duration / (24 * 3600 * 1000))
+  var leave1 = duration % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
+  var hours = Math.floor(leave1 / (3600 * 1000)) // 计算相差小时数
+  var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
+  var minutes = Math.floor(leave2 / (60 * 1000)) // 计算相差分钟数
+  var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
+  var seconds = Math.round(leave3 / 1000) // 计算分钟数后剩余的秒数
+  return [days, hours, minutes, seconds]
+}
+
+// +---------------------------------------------------
 // | compute days between tow dates format: 'YYYY-MM-dd'
 // +---------------------------------------------------
 export const daysBetween = (DateOne, DateTwo) => {

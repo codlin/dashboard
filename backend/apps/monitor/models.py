@@ -36,7 +36,7 @@ class Testline(models.Model):
     mode = models.CharField('Mode', max_length=8, default="")
     sitetype = models.CharField('Site Type', max_length=16, default="")
     node = models.CharField('Jenkins Node', max_length=64, default="")
-    btsid = models.CharField('BTSID', max_length=8,
+    btsid = models.CharField('BTSID', max_length=64,
                              primary_key=True, default="")
     ca = models.CharField('CA', max_length=64, default="")
     jenkinsjob = models.CharField('Jenkins Job', max_length=255, default="")

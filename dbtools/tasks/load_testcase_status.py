@@ -10,7 +10,7 @@ from scripts.crt_testcase_status_page import main
 
 config = {
     'name': 'load_testcase_status',
-    'interval': 5  # minutes
+    'interval': 10  # minutes
 }
 
 
