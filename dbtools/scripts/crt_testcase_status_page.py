@@ -51,7 +51,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 5
+    order by time_epoch_start desc limit 30
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -92,6 +92,15 @@ def get_failed(loadname):
     results = mysqldb.get_DB(sql_str)
     return results
 
+def get_passwd(loadname):
+    sql_str='''
+    select  enb_build, test_case_name, test_line_id, robot_ip, test_status, test_suite from test_results  
+    where enb_build="''' + loadname + '''" 
+    and crt_type='CRT1_DB' and test_status='passed' and record_valid=1  group by test_case_name  
+    '''
+    results = mysqldb.get_DB(sql_str)
+    return results
+
 
 def get_unexecuted(loadname):
     branch = get_release(loadname)
@@ -126,15 +135,32 @@ def list_to_str(list):
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
     # urllib3.getproxies = lambda: {}  # 设置代理
-    logger.debug('%s Start running %s' % ('-' * 10, '-' * 10))
+    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     object = get_loadnames(crt_type)
     for name in object:
         logger.debug("loadname is %s" % name)
+        # 更新成功的用例
+        data_passwd = get_passwd(name)
+
         # 更新失败的用例
         data_failed = get_failed(name)
 
         # 更新未执行的用例
         data_unexecuted = get_unexecuted(name)
+
+
+        # 循环输出passwd的testcase，更新入数据库
+        for i in range(0, len(data_passwd)):
+            item = data_passwd[i]
+            item = list(item)
+            logger.debug('item is: %s', item)
+            item = list_to_str(item)
+            sql_str = '''
+                REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
+            '''
+            logger.debug('sql_str: %s', sql_str)
+            mysqldb.update_DB(sql_str)
+
 
         # 循环输出failed的testcase，更新入数据库
         for i in range(0, len(data_failed)):
@@ -164,7 +190,7 @@ def running(crt_type):
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.debug('The script run time is: %s sec' % (time))
+    logger.info('The script run time is: %s sec' % (time))
 
 
 def main():
@@ -172,6 +198,7 @@ def main():
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     for i in range(len(list_project)):
         running(list_project[i])
+
 
     logger.info('load testcases status task done.')
 

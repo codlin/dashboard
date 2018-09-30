@@ -313,7 +313,7 @@ def get_debug_result(loadname):
 
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
-    logger.debug('%s Start running %s' % ('-' * 10, '-' * 10))
+    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
 
     object = get_loadnames(crt_type)
     # object = ['FLF18A_ENB_9999_180921_001290']
@@ -367,7 +367,7 @@ def running(crt_type):
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.debug('The script run time is: %s sec' % (time))
+    logger.info('The script run time is: %s sec' % (time))
 
 
 def main():
