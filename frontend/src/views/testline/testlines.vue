@@ -337,7 +337,7 @@ export default {
 
       if (confirm('Are you sure you want to delete this item?')) {
         // delete an exist testline
-        this.$api.delete('/api/testlines/', { btsid: this.editedItem.btsid },
+        this.$api.delete('/api/testlines/', { id: this.editedItem.id },
           r => {
             console.log('Delete data successfully.')
             this.testlines.splice(index, 1)

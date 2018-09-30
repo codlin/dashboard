@@ -99,5 +99,11 @@ class TestlineViewApi(viewsets.ModelViewSet):
     def get_queryset(self):
         return Testline.objects.all()
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def create(self, request):
+        return super().create(request)
+
+    def update(self, request, pk=None):
+        return super().update(request, pk)
+
+    def destroy(self, request, pk=None):
+        return super().destroy(request, pk)
