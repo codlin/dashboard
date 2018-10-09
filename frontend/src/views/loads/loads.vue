@@ -118,6 +118,8 @@ export default {
     return {
       // json data retrieved from server
       loads: [],
+      releases: new Set(),
+
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
         { text: 'Duration (HH:MM:SS)', align: 'left', value: 'duration' },
@@ -132,8 +134,6 @@ export default {
         { text: 'Debug', align: 'left', value: 'debug' }
       ],
 
-      // vars from json data which will be used in the template
-
       // table data
       load_search: '',
       // sorting by descending
@@ -143,8 +143,6 @@ export default {
       dateChkbox: null,
       passrateChkBox: null,
       isDebugged: null,
-      releaseChkBox: null,
-      releases: new Set(),
       selectedRelease: []
     }
   },
@@ -180,13 +178,6 @@ export default {
         filteredData = filteredData.filter((item, i) => {
           // console.log('item.debug: ', item.debug)
           return item.debug.toUpperCase() === 'YES'
-        })
-      }
-
-      if (this.releaseChkBox !== null) {
-        filteredData = filteredData.filter((item, i) => {
-          let rel = item.loadname.split('_')[0]
-          return rel.toUpperCase() === this.releaseChkBox
         })
       }
 
@@ -291,6 +282,9 @@ export default {
     },
 
     reInitVars () {
+      this.dateChkbox = null
+      this.passrateChkBox = null
+      this.isDebugged = null
       this.selectedRelease = []
     },
 
