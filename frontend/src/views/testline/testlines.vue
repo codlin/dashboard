@@ -263,7 +263,7 @@ export default {
         })
       }
 
-      console.log('filter data: ', filteredData)
+      // console.log('filter data: ', filteredData)
       return filteredData
     },
 
@@ -313,7 +313,7 @@ export default {
       this.$api.get('/api/testlines', null,
         r => {
           this.testlines = r.data
-          console.log('getTestlines: ', this.testlines)
+          // console.log('getTestlines: ', this.testlines)
         },
         r => {
           console.log('Failed: ', r)
@@ -326,9 +326,9 @@ export default {
 
     editItem (item) {
       this.editedIndex = this.testlines.indexOf(item)
-      console.log('index:', this.editedIndex)
+      // console.log('index:', this.editedIndex)
       this.editedItem = Object.assign({}, item)
-      console.log('editedItem:', this.editedItem)
+      // console.log('editedItem:', this.editedItem)
       this.dialog = true
     },
 

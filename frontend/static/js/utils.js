@@ -48,16 +48,15 @@ export const getDuration = (startTime, endTime) => {
 
   var start = new Date(startTime)
   var end = new Date(endTime)
-  let duration = end.getTime() - start.getTime() // seconds
+  let duration = Math.floor((end.getTime() - start.getTime()) / 1000) // seconds
+  // console.log('duration ' + duration)
 
-  var days = Math.floor(duration / (24 * 3600 * 1000))
-  var leave1 = duration % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
-  var hours = Math.floor(leave1 / (3600 * 1000)) // 计算相差小时数
-  var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
-  var minutes = Math.floor(leave2 / (60 * 1000)) // 计算相差分钟数
-  var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
-  var seconds = Math.round(leave3 / 1000) // 计算分钟数后剩余的秒数
-  return [days, hours, minutes, seconds]
+  var hours = Math.floor(duration / 3600) // 计算相差小时数
+  // console.log('hours ' + hours)
+  var leave1 = duration % 3600 // 计算小时数后剩余的秒数
+  var minutes = Math.floor(leave1 / 60) // 计算相差分钟数
+  var seconds = Math.round(leave1 % 60) // 计算分钟数后剩余的秒数
+  return hours.toString() + ':' + minutes.toString() + ':' + seconds.toString()
 }
 
 // +---------------------------------------------------

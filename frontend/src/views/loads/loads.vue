@@ -62,6 +62,7 @@
                   slot-scope="props">
           <tr>
             <td>{{ props.item.start_time }}</td>
+            <td>{{ props.item.duration }}</td>
             <td class="text-xs-left">
               <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
             </td>
@@ -115,6 +116,7 @@ export default {
       loads: [],
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
+        { text: 'Duration', align: 'left', value: 'duration' },
         { text: 'Load', align: 'left', value: 'loadname' },
         { text: 'Testline', align: 'left', value: 'testline' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
@@ -165,13 +167,13 @@ export default {
             return (this.passrateChkBox === 'Passed') ? (parseFloat(item.passrate) >= 100) : (parseFloat(item.passrate) < 50)
           })
         }
-        console.log(filteredData)
+        // console.log(filteredData)
       }
 
       console.log('this.isDebugged: ', this.isDebugged)
       if (this.isDebugged !== null) {
         filteredData = filteredData.filter((item, i) => {
-          console.log('item.debug: ', item.debug)
+          // console.log('item.debug: ', item.debug)
           return item.debug.toUpperCase() === 'YES'
         })
       }
@@ -233,9 +235,11 @@ export default {
            * 1. When you directly set an item with the index, e.g. vm.items[indexOfItem] = newValue
            * 2. When you modify the length of the array, e.g. vm.items.length = newLength
            * **/
+          // console.log(res.data)
+          this.convertData(res.data)
           console.log(res.data)
           Vue.set(this.loads, this.productId, res.data)
-          console.log('getLoadList: data ', this.loads[this.productId])
+          // console.log('getLoadList: data ', this.loads[this.productId])
           this.groupRelease(res.data)
         },
         er => {
@@ -248,6 +252,18 @@ export default {
       this.getLoadList()
     },
 
+    convertData (data) {
+      let len = data.length
+      data.forEach((item, i) => {
+        let j = i + 1
+        if (j < len) {
+          item.duration = getDuration(data[j].start_time, item.start_time)
+        } else {
+          item.duration = 'NA'
+        }
+      })
+    },
+
     groupRelease (data) {
       data.forEach(item => {
         let rel = item.loadname.split('_')[0]
@@ -258,7 +274,7 @@ export default {
 
     // UI releated
     tableCellColor (item) {
-      console.log(item)
+      // console.log(item)
       if (item.passrate >= 100) {
         return '#E8F5E9'
       } else if (item.passrate < 50) {
