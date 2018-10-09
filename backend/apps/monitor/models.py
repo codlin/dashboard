@@ -97,7 +97,7 @@ class LoadTestcaseStatus(models.Model):
 
     class Meta:
         db_table = "crt_load_testcase_status_page"
-        # unique_together = (("loadname", "casename", "btsid"),)
+        unique_together = (("loadname", "casename"),)
 
     def __str__(self):
         return "{}_{}".format(self.loadname, self.casename)
