@@ -218,6 +218,7 @@ export default {
      * So we should watch $route for reacting URLs' changing
      **/
     $route () {
+      this.reInitVars()
       this.getLoadList()
       this.createBreadcrums()
     }
@@ -287,6 +288,10 @@ export default {
       })
       this.releases = releaseSet
       console.log(this.releases)
+    },
+
+    reInitVars () {
+      this.selectedRelease = []
     },
 
     // UI releated
