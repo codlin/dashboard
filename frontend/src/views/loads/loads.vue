@@ -116,7 +116,7 @@ export default {
       loads: [],
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
-        { text: 'Duration', align: 'left', value: 'duration' },
+        { text: 'Duration (HH:MM:SS)', align: 'left', value: 'duration' },
         { text: 'Load', align: 'left', value: 'loadname' },
         { text: 'Testline', align: 'left', value: 'testline' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
