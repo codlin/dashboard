@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-card flat>
+
       <v-toolbar flat
                  color="white">
         <v-toolbar-title>Details</v-toolbar-title>
@@ -14,16 +15,15 @@
 
         <v-spacer></v-spacer>
         <v-content>
-          <v-layout align-center
-                    justify-start>
+          <v-layout>
             <v-checkbox hide-details
                         v-model="dateChkbox"
-                        label="7 Days"
-                        value="theweek"></v-checkbox>
+                        label="1 Week"
+                        value="oneweek"></v-checkbox>
             <v-checkbox hide-details
                         v-model="dateChkbox"
-                        label="24-hour"
-                        value="24hour"></v-checkbox>
+                        label="2 Weeks"
+                        value="twoweek"></v-checkbox>
             <v-checkbox hide-details
                         v-model="passrateChkBox"
                         value="Passed"
@@ -36,21 +36,25 @@
                         v-model="isDebugged"
                         value="debugged"
                         label="Debugged"></v-checkbox>
-
-            <v-checkbox hide-details
-                        v-model="releaseChkBox"
-                        v-for="rel in Releases"
-                        :key="rel"
-                        :value="rel"
-                        :label="rel"></v-checkbox>
-
           </v-layout>
         </v-content>
-        <v-text-field v-model="load_search"
-                      append-icon="search"
-                      label="Search"
-                      single-line
-                      hide-details></v-text-field>
+        <v-content>
+          <v-layout>
+            <v-select flat
+                      v-model="selectedRelease"
+                      :items="Releases"
+                      attach
+                      small-chips
+                      placeholder="Release"
+                      multiple></v-select>
+
+            <v-text-field v-model="load_search"
+                          append-icon="search"
+                          label="Search"
+                          single-line
+                          hide-details></v-text-field>
+          </v-layout>
+        </v-content>
       </v-toolbar>
 
       <v-data-table :pagination.sync="pagination"
@@ -140,7 +144,8 @@ export default {
       passrateChkBox: null,
       isDebugged: null,
       releaseChkBox: null,
-      releases: new Set()
+      releases: new Set(),
+      selectedRelease: []
     }
   },
 
@@ -154,7 +159,7 @@ export default {
       if (this.dateChkbox !== null || this.passrateChkBox !== null) {
         if (this.dateChkbox !== null) {
           let today = getCurrentDate()
-          let days = (this.dateChkbox === 'theweek') ? 7 : 1
+          let days = (this.dateChkbox === 'oneweek') ? 7 : 14
           filteredData = filteredData.filter((item, i) => {
             let starTime = item.start_time
             let date = starTime.substring(0, starTime.indexOf(' ')).trim()
@@ -184,13 +189,23 @@ export default {
           return rel.toUpperCase() === this.releaseChkBox
         })
       }
+
+      // for releases
+      console.log('selected release: ' + this.selectedRelease)
+      if (this.selectedRelease != null && this.selectedRelease.length > 0) {
+        filteredData = filteredData.filter((item, i) => {
+          let rel = item.loadname.split('_')[0]
+          return this.selectedRelease.indexOf(rel) >= 0
+        })
+      }
+
       return filteredData
     },
 
     Releases () {
       console.log('Releases set:', this.releases)
       console.log('Releases:', [...this.releases])
-      return []
+      return [...this.releases]
     }
   },
 
@@ -237,7 +252,7 @@ export default {
            * **/
           // console.log(res.data)
           this.convertData(res.data)
-          console.log(res.data)
+          // console.log(res.data)
           Vue.set(this.loads, this.productId, res.data)
           // console.log('getLoadList: data ', this.loads[this.productId])
           this.groupRelease(res.data)
@@ -265,11 +280,13 @@ export default {
     },
 
     groupRelease (data) {
+      let releaseSet = new Set()
       data.forEach(item => {
         let rel = item.loadname.split('_')[0]
-        this.releases.add(rel)
-        // console.log(this.releases)
+        releaseSet.add(rel)
       })
+      this.releases = releaseSet
+      console.log(this.releases)
     },
 
     // UI releated
