@@ -14,12 +14,16 @@
                     justify-center>
             <v-checkbox hide-details
                         v-model="resultChkbox"
+                        value="passed"
+                        label="PASSED"></v-checkbox>
+            <v-checkbox hide-details
+                        v-model="resultChkbox"
                         value="failed"
                         label="FAILED"></v-checkbox>
             <v-checkbox hide-details
                         v-model="resultChkbox"
-                        value="exception"
-                        label="NULL"></v-checkbox>
+                        value="norun"
+                        label="NORUN"></v-checkbox>
             <h4 align-center
                 justify-center>Case Count: {{ filteredCaseNum }}</h4>
           </v-layout>
@@ -101,32 +105,7 @@ export default {
       pagination: { sortBy: 'result', descending: false, rowsPerPage: -1 },
 
       // UI Components related
-      resultChkbox: null,
-
-      // test data
-      test_cases: [
-        {
-          casename: 'Configuration_File_Same_File_Is_Downloaded',
-          btsid: '708',
-          node: '135.252.122.156',
-          result: 'Failed',
-          suite: 'BTSOM'
-        },
-        {
-          casename: 'LTE3397_5_Object_locking_required_param_in_delta_commission',
-          btsid: '706',
-          node: '135.252.122.154',
-          result: 'NA',
-          suite: 'BTSOM'
-        },
-        {
-          casename: 'FZM_Testability_SysLog_UDP_IP_Configuration',
-          btsid: '11804',
-          node: '135.252.122.171',
-          result: 'NULL',
-          suite: 'Testability'
-        }
-      ]
+      resultChkbox: null
     }
   },
 
@@ -181,7 +160,6 @@ export default {
         },
         er => {
           console.error('getLoadCases: ', er)
-          // this.cases = this.test_cases
         })
     },
 
@@ -193,7 +171,9 @@ export default {
         filteredData = filteredData.filter((item, i) => {
           if (this.resultChkbox.toUpperCase() === 'FAILED') {
             return item.result.toUpperCase() === 'FAILED' || item.result.toUpperCase() === 'NOT ANALYZED'
-          } else if (this.resultChkbox.toUpperCase() === 'EXCEPTION') {
+          } else if (this.resultChkbox.toUpperCase() === 'PASSED') {
+            return item.result.toUpperCase() === 'PASSED'
+          } else if (this.resultChkbox.toUpperCase() === 'NORUN') {
             return item.result.toUpperCase() === 'NULL'
           }
         })
