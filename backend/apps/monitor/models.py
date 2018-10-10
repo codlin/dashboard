@@ -37,8 +37,7 @@ class Testline(models.Model):
     mode = models.CharField('Mode', max_length=8, default="")
     sitetype = models.CharField('Site Type', max_length=16, default="")
     node = models.CharField('Jenkins Node', max_length=64, default="")
-    cfgid = models.CharField('Configration ID', max_length=64,
-                             unique=True, default="")
+    cfgid = models.CharField('Configration ID', max_length=64, default="")
     ca = models.CharField('CA', max_length=64, default="")
     jenkinsjob = models.CharField('Jenkins Job', max_length=255, default="")
     mbtsid = models.CharField('Mobility BTSID', max_length=8, default="NA")
@@ -46,6 +45,7 @@ class Testline(models.Model):
 
     class Meta:
         db_table = "crt_testline"
+        unique_together = (("product", "cfgid"),)
 
     def __str__(self):
         return "{}_{}_{}_{}_{}_{}_{}_{}_{}".format(self.product, self.mode, self.sitetype, self.node, self.cfgid,
