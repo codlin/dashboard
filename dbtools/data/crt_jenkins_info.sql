@@ -1,10 +1,10 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 135.242.139.122
+ Source Server         : 10.66.11.20
  Source Server Type    : MySQL
  Source Server Version : 50720
- Source Host           : 135.242.139.122:33306
+ Source Host           : 10.66.11.20:33306
  Source Schema         : crt_db
 
  Target Server Type    : MySQL
@@ -34,9 +34,9 @@ CREATE TABLE `crt_jenkins_info`  (
 -- Records of crt_jenkins_info
 -- ----------------------------
 INSERT INTO `crt_jenkins_info` VALUES (1, 'http://10.52.200.190', 'scpadm', 'scpadm');
-INSERT INTO `crt_jenkins_info` VALUES (2, 'http://135.242.139.122:8085', 'scpadm', 'scpadm');
-INSERT INTO `crt_jenkins_info` VALUES (3, 'http://135.242.139.122:8086', 'scpadm', 'scpadm');
-INSERT INTO `crt_jenkins_info` VALUES (4, 'http://135.242.139.122:8087', 'scpadm', 'scpadm');
-INSERT INTO `crt_jenkins_info` VALUES (5, 'http://135.242.139.122:8088', 'scpadm', 'scpadm');
+INSERT INTO `crt_jenkins_info` VALUES (2, 'http://10.66.11.20:8085', 'scpadm', 'scpadm');
+INSERT INTO `crt_jenkins_info` VALUES (3, 'http://10.66.11.20:8086', 'scpadm', 'scpadm');
+INSERT INTO `crt_jenkins_info` VALUES (4, 'http://10.66.11.20:8087', 'scpadm', 'scpadm');
+INSERT INTO `crt_jenkins_info` VALUES (5, 'http://10.66.11.20:8088', 'scpadm', 'scpadm');
 
 SET FOREIGN_KEY_CHECKS = 1;
