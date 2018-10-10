@@ -250,7 +250,7 @@ if __name__ == '__main__':
     set_log_level("DBTools", 'INFO')
     # test loadTestlinesTblCUID
     load_testlines_task_entry()
-    # task = JenkinsJobBuildMonitorTask(url='http://135.242.139.122:8085', user='scpadm', passwd='scpadm',
+    # task = JenkinsJobBuildMonitorTask(url='http://10.66.11.20:8085', user='scpadm', passwd='scpadm',
     #                                   job_name='check_site_state_FDD_AICT3', impl=loadTestlinesTblCUID())
 
     # task.run()

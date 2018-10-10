@@ -1,10 +1,10 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 135.242.139.122
+ Source Server         : 10.66.11.20
  Source Server Type    : MySQL
  Source Server Version : 50720
- Source Host           : 135.242.139.122:33306
+ Source Host           : 10.66.11.20:33306
  Source Schema         : crt_db
 
  Target Server Type    : MySQL

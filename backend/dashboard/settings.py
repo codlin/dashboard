@@ -89,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'crt_db',
-        'HOST': '135.242.139.122',
+        'HOST': '10.66.11.20',
         'PORT': 33306,
         'USER': 'root',
         'PASSWORD': '123456',
