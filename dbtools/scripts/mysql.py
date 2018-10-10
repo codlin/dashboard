@@ -22,7 +22,7 @@ class Pymysql(object):
     # 连接数据库函数
     def conn_DB(self):
         try:
-            self.conn = pymysql.connect(host='135.242.139.122', port=33306, user='root', passwd='123456', db='crt_db',
+            self.conn = pymysql.connect(host='10.66.11.20', port=33306, user='root', passwd='123456', db='crt_db',
                                         charset='utf8')
             cur = self.conn.cursor()
             logger.info("mysql connect success.")
