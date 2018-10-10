@@ -152,7 +152,7 @@ def running(crt_type):
 
         # 循环输出passwd的testcase，更新入数据库
         for i in range(0, len(data_passwd)):
-            logger.debug('data_passwd length is :', len(data_passwd))
+            logger.debug('data_passwd length is %s:', len(data_passwd))
             item = data_passwd[i]
             item = list(item)
             logger.debug('item is: %s', item)
@@ -162,7 +162,7 @@ def running(crt_type):
             '''
             logger.debug('sql_str: %s', sql_str)
             mysqldb.update_DB(sql_str)
-            logger.debug(i)
+            logger.debug('i: %s:', i)
 
         # 循环输出failed的testcase，更新入数据库
         for i in range(0, len(data_failed)):
