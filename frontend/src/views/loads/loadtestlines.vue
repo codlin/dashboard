@@ -57,7 +57,7 @@
               <a :href="testline_url(props.item)"
                  target="_blank">{{ props.item.testline }}</a>
             </td>
-            <td class="text-xs-left">{{ props.item.btsid }}</td>
+            <td class="text-xs-left">{{ props.item.cfgid }}</td>
 
             <td class="text-xs-left">
               <a :href="props.item.check_site_url"
@@ -129,7 +129,7 @@ export default {
       // header level II
       subHeaders: [
         { key: 'testline', text: 'Testline', align: 'left', value: 'testline' },
-        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
+        { key: 'cfgid', text: 'BTSID', align: 'left', value: 'cfgid' },
         { key: 'check_site_result', text: 'result', align: 'left', value: 'check_site_result' },
         { key: 'check_site_timestamp', text: 'timestamp', align: 'left', value: 'check_site_timestamp' },
         { key: 'health_checkup_result', text: 'result', align: 'left', value: 'health_checkup_result' },

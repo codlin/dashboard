@@ -70,7 +70,7 @@ class LoadTestlineStatusViewApi(viewsets.ViewSet):
 
     def list(self, request):
         name = request.query_params.get('name')
-        query_sql = "SELECT id, loadname, testline, t.btsid, url, GROUP_CONCAT(CONCAT_WS(',', job, build_status, build_time, build_url)  ORDER BY t.order SEPARATOR ';' ) as jobs \
+        query_sql = "SELECT id, loadname, testline, t.cfgid, url, GROUP_CONCAT(CONCAT_WS(',', job, build_status, build_time, build_url)  ORDER BY t.order SEPARATOR ';' ) as jobs \
                      FROM (SELECT a.id, loadname, testline, c.cfgid, url, a.job, build_status, build_time, build_url, b.order \
                             FROM crt_db.crt_load_testline_status_page a \
                             LEFT JOIN crt_db.crt_jenkins_job b ON a.job = b.job \

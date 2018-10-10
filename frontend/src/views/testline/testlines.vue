@@ -84,13 +84,13 @@
                     <v-flex xs12
                             sm6
                             md4>
-                      <v-text-field v-model="editedItem.btsid"
+                      <v-text-field v-model="editedItem.cfgid"
                                     required
-                                    data-vv-name="btsid"
-                                    label="BTSID"
+                                    data-vv-name="cfgid"
+                                    label="ID"
                                     v-validate="'required|max_value:12345678'"
                                     :counter="8"
-                                    :error-messages="errors.collect('btsid')"></v-text-field>
+                                    :error-messages="errors.collect('cfgid')"></v-text-field>
                     </v-flex>
                     <v-flex xs12
                             sm6
@@ -162,10 +162,11 @@
           <template slot="items"
                     slot-scope="props">
             <tr>
-              <td>{{ props.item.mode }}</td>
+              <td>{{ getProductText(props.item.product) }}</td>
+              <!-- <td>{{ props.item.mode }}</td> -->
               <td>{{ props.item.sitetype }}</td>
               <td>{{ props.item.node }}</td>
-              <td>{{ props.item.btsid }}</td>
+              <td>{{ props.item.cfgid }}</td>
               <td>{{ props.item.ca }}</td>
               <td>{{ props.item.jenkinsjob }}</td>
               <td>{{ props.item.mbtsid }}</td>
@@ -212,10 +213,11 @@ export default {
       /* UI Components related */
       // table data
       tblHeaders: [
-        { text: 'Mode', align: 'left', value: 'mode' },
+        { text: 'Product', align: 'left', value: 'product' },
+        // { text: 'Mode', align: 'left', value: 'mode' },
         { text: 'Site Type', align: 'left', value: 'sitetype' },
         { text: 'Jenkins Node', align: 'left', value: 'node' },
-        { text: 'BTSID', align: 'left', value: 'btsid' },
+        { text: 'ID', align: 'left', value: 'cfgid' },
         { text: 'CA', align: 'left', value: 'ca' },
         { text: 'Jenkins Job', align: 'left', value: 'jenkinsjob' },
         { text: 'Mobility BTSID', align: 'left', value: 'mbtsid' },
@@ -229,7 +231,7 @@ export default {
       productChkbox: null,
 
       // sorting by descending
-      pagination: { sortBy: 'mode', descending: false, rowsPerPage: -1 },
+      pagination: { sortBy: 'product', descending: false, rowsPerPage: -1 },
 
       // New testline template
       dialog: false,
@@ -237,10 +239,11 @@ export default {
       editedIndex: -1,
       // edited item
       editedItem: {
+        product: '',
         mode: '',
         sitetype: '',
         node: '',
-        btsid: '',
+        cfgid: '',
         ca: '',
         jenkinsjob: '',
         mbtsid: '',
@@ -259,7 +262,7 @@ export default {
       if (this.productChkbox !== null) {
         filteredData = filteredData.filter((item, i) => {
           let mode = item.mode
-          return (this.productChkbox.indexOf(mode) !== -1)
+          return this.productChkbox.indexOf(mode) !== -1
         })
       }
 
@@ -274,10 +277,10 @@ export default {
 
   watch: {
     /** Watch route changing, beacuse the current view was bound by many URLs, but the created() function
-     * only be executed once when it loaded. In the Vue documnet: "...the same component instance will be
+     * only be executed once when it loaded. In the Vue documnet: '...the same component instance will be
      * reused. Since both routes render the same component, this is more efficient than destroying the old
      * instance and then creating a new one. However, this also means that the lifecycle hooks of the component
-     * will not be called."
+     * will not be called.'
      * So we should watch $route for reacting URLs' changing
      **/
     $route () {
@@ -297,27 +300,44 @@ export default {
         return
       }
 
-      this.$api.get('/api/products', null,
+      this.$api.get(
+        '/api/products',
+        null,
         r => {
           this.products = r.data
           console.log('getProducts: get result', this.products)
         },
         r => {
           console.log('Failed: ', r)
-        })
+        }
+      )
 
       console.log('Leave getProducts')
     },
 
     getTestlines () {
-      this.$api.get('/api/testlines', null,
+      this.$api.get(
+        '/api/testlines',
+        null,
         r => {
           this.testlines = r.data
           // console.log('getTestlines: ', this.testlines)
         },
         r => {
           console.log('Failed: ', r)
-        })
+        }
+      )
+    },
+
+    getProductText (productID) {
+      for (let i = 0, len = this.products.length; i < len; i++) {
+        let item = this.products[i]
+        if (item.id === productID) {
+          console.log('item.text: ', item.text)
+          return item.text
+        }
+      }
+      return '-'
     },
 
     refreshData () {
@@ -337,14 +357,17 @@ export default {
 
       if (confirm('Are you sure you want to delete this item?')) {
         // delete an exist testline
-        this.$api.delete('/api/testlines/', { id: this.editedItem.id },
+        this.$api.delete(
+          '/api/testlines/',
+          { id: this.editedItem.id },
           r => {
             console.log('Delete data successfully.')
             this.testlines.splice(index, 1)
           },
           r => {
             console.log('Error: ', r)
-          })
+          }
+        )
       }
     },
 
@@ -367,14 +390,24 @@ export default {
             console.log('old data:', this.testlines[this.editedIndex])
             console.log('new data:', this.editedItem)
             // if testline is no change, close it.
-            if (isObjectValueEqual(this.testlines[this.editedIndex], this.editedItem)) {
+            if (
+              isObjectValueEqual(
+                this.testlines[this.editedIndex],
+                this.editedItem
+              )
+            ) {
               this.close()
             } else {
               // update an exist testline
-              this.$api.put('/api/testlines/', this.editedItem,
+              this.$api.put(
+                '/api/testlines/',
+                this.editedItem,
                 r => {
                   console.log('Update data successfully.')
-                  Object.assign(this.testlines[this.editedIndex], this.editedItem)
+                  Object.assign(
+                    this.testlines[this.editedIndex],
+                    this.editedItem
+                  )
                   this.success_alert()
                   setTimeout(() => {
                     this.close()
@@ -383,11 +416,14 @@ export default {
                 r => {
                   console.log('Error: ', r)
                   this.fail_alert(r)
-                })
+                }
+              )
             }
           } else {
             // create a new testline
-            this.$api.post('/api/testlines/', this.editedItem,
+            this.$api.post(
+              '/api/testlines/',
+              this.editedItem,
               r => {
                 console.log('Push data successfully.')
                 this.testlines.push(this.editedItem)
@@ -399,16 +435,22 @@ export default {
               r => {
                 console.log('Error: ', r)
                 this.fail_alert(r)
-              })
+              }
+            )
           }
         }
       })
     },
 
     getCookie (name) {
-      let value = '; ' + document.cookie
-      let parts = value.split('; ' + name + '=')
-      if (parts.length === 2) return parts.pop().split(';').shift()
+      let value = ' ' + document.cookie
+      let parts = value.split(' ' + name + '=')
+      if (parts.length === 2) {
+        return parts
+          .pop()
+          .split('')
+          .shift()
+      }
     },
 
     clear_alert () {
@@ -429,9 +471,9 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 // .v-tabs__div {
-//   text-transform: none;
-//   font-size: 12px;
+//   text-transform: none
+//   font-size: 12px
 // }
 </style>
