@@ -33,7 +33,8 @@ class SysMenu(models.Model):
 
 
 class Testline(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, default="")
+    product = models.ForeignKey(
+        Product, on_delete=models.DO_NOTHING, default="")
     mode = models.CharField('Mode', max_length=8, default="")
     sitetype = models.CharField('Site Type', max_length=16, default="")
     node = models.CharField('Jenkins Node', max_length=64, default="")
