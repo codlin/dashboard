@@ -48,8 +48,8 @@ class Testline(models.Model):
         db_table = "crt_testline"
 
     def __str__(self):
-        return "{}_{}_{}_{}_{}_{}_{}_{}".format(self.mode, self.sitetype, self.node, self.btsid,
-                                                self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
+        return "{}_{}_{}_{}_{}_{}_{}_{}_{}".format(self.product, self.mode, self.sitetype, self.node, self.cfgid,
+                                                   self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
 
 
 class CasePath(models.Model):
