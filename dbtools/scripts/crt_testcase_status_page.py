@@ -34,6 +34,7 @@ def parse_args():
     args = p.parse_args()
     return args
 
+
 def get_loadnames(mode):
     """
     :param type: FZM FDD = FLF
@@ -60,6 +61,7 @@ def get_loadnames(mode):
         results.append(loadname)
     return results
 
+
 def get_release(loadname):
     branch = loadname.split('_')
     if branch[0] == "FLF17A" and branch[2] == '1000':
@@ -67,6 +69,7 @@ def get_release(loadname):
     else:
         result = branch[0]
     return result
+
 
 def get_load_name_time(loadname):
     sql_str = '''
@@ -76,6 +79,7 @@ def get_load_name_time(loadname):
     data = mysqldb.get_DB(sql_str)
     result = data[0][0]
     return result
+
 
 def get_failed(loadname):
     sql_str = '''
@@ -89,14 +93,16 @@ def get_failed(loadname):
     results = mysqldb.get_DB(sql_str)
     return results
 
+
 def get_passwd(loadname):
-    sql_str='''
+    sql_str = '''
     select  enb_build, test_case_name, test_line_id, robot_ip, test_status, test_suite from test_results  
     where enb_build="''' + loadname + '''" 
     and crt_type='CRT1_DB' and test_status='passed' and record_valid=1  group by test_case_name  
     '''
     results = mysqldb.get_DB(sql_str)
     return results
+
 
 def get_unexecuted(loadname):
     branch = get_release(loadname)
@@ -118,6 +124,7 @@ def get_unexecuted(loadname):
     results = mysqldb.get_DB(sql_str)
     return results
 
+
 def list_to_str(list):
     str = ''
     for i in range(0, len(list)):
@@ -125,6 +132,7 @@ def list_to_str(list):
         str = str + item
     result = str[:-1]
     return result
+
 
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
@@ -144,7 +152,7 @@ def running(crt_type):
 
         # 循环输出passwd的testcase，更新入数据库
         for i in range(0, len(data_passwd)):
-            print ('data_passwd length is :', len(data_passwd))
+            logger.debug('data_passwd length is :', len(data_passwd))
             item = data_passwd[i]
             item = list(item)
             logger.debug('item is: %s', item)
@@ -154,8 +162,7 @@ def running(crt_type):
             '''
             logger.debug('sql_str: %s', sql_str)
             mysqldb.update_DB(sql_str)
-            print (i)
-
+            logger.debug(i)
 
         # 循环输出failed的testcase，更新入数据库
         for i in range(0, len(data_failed)):
@@ -194,7 +201,6 @@ def main():
     # running('FLF')
     for i in range(len(list_project)):
         running(list_project[i])
-
 
     logger.info('load testcases status task done.')
 
