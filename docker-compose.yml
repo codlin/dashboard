@@ -4,11 +4,9 @@ services:
   django:
     restart: always
     build: ./backend
-    image: dashboard_django
+    image: 10.66.11.20:5000/dashboard_django
     expose:
       - '8000'
-    volumes:
-      - ./backend:/app
     command: ['bash', 'startup.sh']
     deploy:
       replicas: 1
@@ -20,12 +18,10 @@ services:
   nginx:
     restart: always
     build: .
-    image: dashboard_nginx
+    image: 10.66.11.20:5000/dashboard_nginx
     ports:
       - '80:80'
       - '443:443'
-    volumes:
-      - ./backend:/usr/share/nginx/html/app:ro
     command: ['nginx', '-g', 'daemon off;']
     links:
       - django
@@ -41,7 +37,7 @@ services:
   dbtools:
     restart: always
     build: ./dbtools
-    image: dashboard_dbtools
+    image: 10.66.11.20:5000/dashboard_dbtools
     command: ['bash', 'startup.sh', 'INFO']
     deploy:
       replicas: 1

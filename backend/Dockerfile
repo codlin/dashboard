@@ -26,3 +26,5 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt \
 ENV http_proxy ""
 ENV https_proxy ""
 
+ADD . /app
+

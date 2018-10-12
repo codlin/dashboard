@@ -2,28 +2,22 @@
   <v-toolbar dark
              dense
              flat
-             color="primary"
-             extended>
-    <v-toolbar-side-icon></v-toolbar-side-icon>
+             color="primary">
+    <v-icon>apps</v-icon>
     <v-toolbar-title>CRT Dashboard</v-toolbar-title>
-    <v-spacer></v-spacer>
+    <v-divider class="mx-2"
+               inset
+               vertical></v-divider>
     <v-toolbar-items>
-      <v-btn flat>Login</v-btn>
+      <v-btn flat
+             v-for="item in sysMenuItems"
+             :key="item.name"
+             @click="toPage(item)">
+        {{ item.text }}
+      </v-btn>
     </v-toolbar-items>
-    <v-toolbar dark
-               dense
-               flat
-               color="primary"
-               slot="extension">
-      <v-toolbar-items>
-        <v-btn flat
-               v-for="item in sysMenuItems"
-               :key="item.name"
-               @click="toPage(item)">
-          {{ item.text }}
-        </v-btn>
-      </v-toolbar-items>
-    </v-toolbar>
+    <v-spacer></v-spacer>
+    <v-btn flat>Login</v-btn>
   </v-toolbar>
 </template>
 
