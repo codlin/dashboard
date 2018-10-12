@@ -45,17 +45,25 @@
         <template slot="items"
                   slot-scope="props">
           <tr>
-            <td>
-              <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
-                 target="_blank">{{ props.item.casename }}</a>
-            </td>
-            <td>{{ props.item.btsid }}</td>
-            <td>
-              <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
-                 target="_blank">{{ props.item.node }}</a>
-            </td>
-            <td>{{ props.item.result }}</td>
-            <td>{{ props.item.suite }}</td>
+            <v-flex d-flex
+                    md2>
+              <td>
+                <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
+                   target="_blank">{{ props.item.casename }}</a>
+              </td>
+            </v-flex>
+            <v-flex d-flex
+                    md2>
+              <td>{{ props.item.btsid }}</td>
+            </v-flex>
+            <v-flex d-flex
+                    md2>
+              <td>
+                <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
+                   target="_blank">{{ props.item.node }}</a>
+              </td>
+              <td>{{ props.item.result }}</td>
+              <td>{{ props.item.suite }}</td>
           </tr>
         </template>
 
@@ -92,11 +100,11 @@ export default {
 
       // header
       tblHeaders: [
-        { key: 'casename', text: 'Case Name', align: 'left', value: 'casename' },
-        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid' },
-        { key: 'node', text: 'Jenkins Node', align: 'left', value: 'node' },
-        { key: 'result', text: 'RESULT', align: 'left', value: 'result' },
-        { key: 'suite', text: 'SUITE', align: 'left', value: 'suite' }
+        { key: 'casename', text: 'Case Name', align: 'left', value: 'casename', width: '1%' },
+        { key: 'btsid', text: 'BTSID', align: 'left', value: 'btsid', width: '1%' },
+        { key: 'node', text: 'Jenkins Node', align: 'left', value: 'node', width: '1%' },
+        { key: 'result', text: 'RESULT', align: 'left', value: 'result', width: '1%' },
+        { key: 'suite', text: 'SUITE', align: 'left', value: 'suite', width: '1%' }
       ],
 
       // table data

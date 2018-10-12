@@ -4,8 +4,8 @@ FROM node:8.11.3
 LABEL Name=dashboard-frontend Version=0.0.1
 
 ENV REFRESHED_AT 2018-08-06
-ENV http_proxy http://135.245.48.34:8000
-ENV https_proxy http://135.245.48.34:8000
+ENV http_proxy http://93.183.14.14:8080
+ENV https_proxy http://93.183.14.14:8080
 
 ENV NODE_ENV development
 
