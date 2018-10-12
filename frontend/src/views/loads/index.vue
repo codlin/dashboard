@@ -2,8 +2,7 @@
   <v-layout id="loads"
             fill-height>
     <v-content>
-      <v-flex d-flex
-              md12>
+      <v-flex>
         <v-toolbar dense
                    flat>
           <v-toolbar-items>
@@ -16,15 +15,13 @@
           </v-toolbar-items>
         </v-toolbar>
       </v-flex>
-      <v-flex d-flex
-              md12>
+      <v-flex>
         <v-card flat>
           <breadcrumbs>
           </breadcrumbs>
         </v-card>
       </v-flex>
-      <v-flex d-flex
-              md12>
+      <v-flex>
         <router-view></router-view>
       </v-flex>
     </v-content>

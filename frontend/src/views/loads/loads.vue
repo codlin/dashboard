@@ -57,42 +57,38 @@
         </v-content>
       </v-toolbar>
 
-      <v-layout>
-        <v-content>
-          <v-data-table :pagination.sync="pagination"
-                        :headers="loadTblHeaders"
-                        :items="filteredItems"
-                        :search="load_search"
-                        hide-actions>
-            <template slot="items"
-                      slot-scope="props">
-              <tr class="text-xs-left">
-                <td>{{ props.item.start_time }}</td>
-                <td>{{ props.item.duration }}</td>
-                <td>
-                  <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
-                </td>
-                <td>
-                  <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">LINK</router-link>
-                </td>
-                <td>{{ props.item.passed_num }}</td>
-                <td>{{ props.item.failed_num }}</td>
-                <td>{{ props.item.norun_num }}</td>
-                <td>{{ props.item.total_num }}</td>
-                <td>{{ props.item.first_passrate }}</td>
-                <td :bgcolor="tableCellColor(props.item)">{{ props.item.passrate }}</td>
-                <td>{{ props.item.debug }}</td>
-              </tr>
-            </template>
-            <v-alert slot="no-results"
-                     :value="true"
-                     color="error"
-                     icon="warning">
-              Your search for "{{ load_search }}" found no results.
-            </v-alert>
-          </v-data-table>
-        </v-content>
-      </v-layout>
+      <v-data-table :pagination.sync="pagination"
+                    :headers="loadTblHeaders"
+                    :items="filteredItems"
+                    :search="load_search"
+                    hide-actions>
+        <template slot="items"
+                  slot-scope="props">
+          <tr class="text-xs-left">
+            <td>{{ props.item.start_time }}</td>
+            <td>{{ props.item.duration }}</td>
+            <td>
+              <router-link :to="{ name: 'loadcases', params: { loadName: props.item.loadname } }">{{ props.item.loadname }}</router-link>
+            </td>
+            <td>
+              <router-link :to="{ name: 'loadtls', params: { loadName: props.item.loadname } }">LINK</router-link>
+            </td>
+            <td>{{ props.item.passed_num }}</td>
+            <td>{{ props.item.failed_num }}</td>
+            <td>{{ props.item.norun_num }}</td>
+            <td>{{ props.item.total_num }}</td>
+            <td>{{ props.item.first_passrate }}</td>
+            <td :bgcolor="tableCellColor(props.item)">{{ props.item.passrate }}</td>
+            <td>{{ props.item.debug }}</td>
+          </tr>
+        </template>
+        <v-alert slot="no-results"
+                 :value="true"
+                 color="error"
+                 icon="warning">
+          Your search for "{{ load_search }}" found no results.
+        </v-alert>
+      </v-data-table>
     </v-card>
   </div>
 </template>
