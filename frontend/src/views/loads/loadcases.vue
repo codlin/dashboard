@@ -45,25 +45,17 @@
         <template slot="items"
                   slot-scope="props">
           <tr>
-            <v-flex d-flex
-                    md2>
-              <td>
-                <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
-                   target="_blank">{{ props.item.casename }}</a>
-              </td>
-            </v-flex>
-            <v-flex d-flex
-                    md2>
-              <td>{{ props.item.btsid }}</td>
-            </v-flex>
-            <v-flex d-flex
-                    md2>
-              <td>
-                <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
-                   target="_blank">{{ props.item.node }}</a>
-              </td>
-              <td>{{ props.item.result }}</td>
-              <td>{{ props.item.suite }}</td>
+            <td>
+              <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
+                 target="_blank">{{ props.item.casename }}</a>
+            </td>
+            <td>{{ props.item.btsid }}</td>
+            <td>
+              <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
+                 target="_blank">{{ props.item.node }}</a>
+            </td>
+            <td>{{ props.item.result }}</td>
+            <td>{{ props.item.suite }}</td>
           </tr>
         </template>
 
