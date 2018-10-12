@@ -4,14 +4,23 @@ services:
   django:
     restart: always
     build: ./backend
+    image: dashboard_django
     expose:
       - '8000'
     volumes:
       - ./backend:/app
     command: ['bash', 'startup.sh']
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
   nginx:
     restart: always
     build: .
+    image: dashboard_nginx
     ports:
       - '80:80'
       - '443:443'
@@ -22,7 +31,22 @@ services:
       - django
     depends_on:
       - django
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
   dbtools:
     restart: always
     build: ./dbtools
+    image: dashboard_dbtools
     command: ['bash', 'startup.sh', 'INFO']
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure

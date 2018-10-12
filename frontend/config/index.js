@@ -12,7 +12,7 @@ module.exports = {
     proxyTable: {
       // proxy all requests starting with /api to cunstom host
       '/api': {
-        target: 'http://135.251.123.212/api',
+        target: 'http://10.66.11.123/api',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

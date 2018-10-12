@@ -99,7 +99,7 @@ DATABASES = {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,
         'NAME': 'crtdashboard',
-        'HOST': '135.251.123.212',
+        'HOST': '10.66.11.123',
         'PORT': 27017,
         'USER': 'root',
         'PASSWORD': 'Nokia#1234',
