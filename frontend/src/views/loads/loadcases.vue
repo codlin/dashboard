@@ -44,7 +44,7 @@
         <template slot="items"
                   slot-scope="props">
           <td>
-            <a href="http://10.52.200.190/job/FDD_Portswap_Promoted_Load_BTSOM"
+            <a :href="getCaseUrl(props.item)"
                target="_blank">{{ props.item.casename }}</a>
           </td>
           <td>{{ props.item.btsid }}</td>
@@ -158,6 +158,10 @@ export default {
         er => {
           console.error('getLoadCases: ', er)
         })
+    },
+
+    getCaseUrl (item) {
+      return 'https://'
     },
 
     // UI Components related
