@@ -121,15 +121,15 @@ export default {
 
       loadTblHeaders: [
         { text: 'Start Time', align: 'left', value: 'start_time' },
-        { text: 'Duration (HH:MM:SS)', align: 'left', value: 'duration' },
+        { text: 'Duration', align: 'left', value: 'duration' },
         { text: 'Load', align: 'left', value: 'loadname' },
         { text: 'Testline', align: 'left', value: 'testline' },
         { text: 'Passed', align: 'left', value: 'passed_num' },
         { text: 'Failed', align: 'left', value: 'failed_num' },
         { text: 'NA', align: 'left', value: 'norun_num' },
         { text: 'Total', align: 'left', value: 'total_num' },
-        { text: 'First PassRate (%)', align: 'left', value: 'first_passrate' },
-        { text: 'PassRate (%)', align: 'left', value: 'passrate' },
+        { text: '1st PR (%)', align: 'left', value: 'first_passrate' },
+        { text: 'PR (%)', align: 'left', value: 'passrate' },
         { text: 'Debug', align: 'left', value: 'debug' }
       ],
 

@@ -1,0 +1,56 @@
+version: '3.3'
+
+services:
+  django:
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
+    image: dashboard_django
+    expose:
+      - '8000'
+    volumes:
+      - ./backend:/app
+    command: ['bash', 'startup.sh']
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  nginx:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    image: dashboard_nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./backend:/usr/share/nginx/html/app:ro
+    command: ['nginx', '-g', 'daemon off;']
+    links:
+      - django
+    depends_on:
+      - django
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  dbtools:
+    restart: always
+    build: ./dbtools
+    image: dashboard_dbtools
+    command: ['bash', 'startup.sh', 'INFO']
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure

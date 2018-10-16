@@ -5,7 +5,6 @@
       <router-view name="head"></router-view>
     </v-container>
     <v-container fluid
-                 align-space-between
                  pa-0
                  row
                  fill-height>
