@@ -49,8 +49,7 @@ class Testline(models.Model):
         unique_together = (("product", "cfgid"),)
 
     def __str__(self):
-        return "{}_{}_{}_{}_{}_{}_{}_{}_{}".format(self.product, self.mode, self.sitetype, self.node, self.cfgid,
-                                                   self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
+        return "{}_{}_{}".format(self.product, self.node, self.cfgid)
 
 
 class CasePath(models.Model):
