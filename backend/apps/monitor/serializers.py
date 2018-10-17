@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Product, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .models import Product, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadStatus, \
+    CaseSchedule
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,6 +24,12 @@ class TestlineSerializer(serializers.ModelSerializer):
 class CasePathSerializer(serializers.ModelSerializer):
     class Meta:
         model = CasePath
+        fields = "__all__"
+
+
+class CaseScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CaseSchedule
         fields = "__all__"
 
 

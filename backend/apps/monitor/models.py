@@ -75,6 +75,18 @@ class CaseName(models.Model):
         return self.casename
 
 
+class CaseSchedule(models.Model):
+    case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
+    testline = models.ForeignKey(Testline, on_delete=models.CASCADE, default="")
+
+    class Meta:
+        db_table = "crt_testcase_schedule"
+        unique_together = (("case", "testline"),)
+
+    def __str__(self):
+        return "{}_{}".format(self.case, self.testline)
+
+
 class TestcaseRelease(models.Model):
     load_release = models.CharField(
         'Release', max_length=16, default="")
@@ -147,11 +159,11 @@ class JenkinsJobMonitor(models.Model):
     def __str__(self):
         return "{}_{}_{}".format(self.task, self.jenkins, self.job)
 
+
 # <load--testline status>
 
-
 class LoadTestlineStatus(models.Model):
-    loadname = models.CharField('Load name',  max_length=64, default="")
+    loadname = models.CharField('Load name', max_length=64, default="")
     testline = models.CharField('Testline', max_length=64, default="")
     btsid = models.CharField(
         'BTSID', null=True, blank=True, max_length=8, default="")
@@ -172,7 +184,6 @@ class LoadTestlineStatus(models.Model):
 
 
 # <load> status
-
 
 class LoadStatus(models.Model):
     start_time = models.CharField('Start Time', max_length=32, default="")

@@ -44,12 +44,12 @@
         <template slot="items"
                   slot-scope="props">
           <td>
-            <a :href="getCaseUrl(props.item)"
+            <a :href="getFailedCaseUrl(props.item)"
                target="_blank">{{ props.item.casename }}</a>
           </td>
           <td>{{ props.item.btsid }}</td>
           <td>
-            <a href="http://10.52.200.190/view/AICT_3_FDD/job/check_site_state_FDD_AICT3/25512/console"
+            <a :href="getFailedCaseUrl(props.item)"
                target="_blank">{{ props.item.node }}</a>
           </td>
           <td>{{ props.item.result }}</td>
@@ -160,8 +160,37 @@ export default {
         })
     },
 
-    getCaseUrl (item) {
-      return 'https://'
+    getFailedCaseUrl (item) {
+      var release = this.loadName
+      release = release.substring(0, 3)
+      var jenkins = ''
+      var ip = item.node
+      var falg = ip.indexOf('10.52') !== -1
+      // console.log(ip.indexOf('10.52') !== -1)
+      switch (release) {
+        case 'FLF':
+          if (falg === true) {
+            jenkins = 'http://10.52.200.190'
+          } else {
+            jenkins = 'http://10.66.11.20:8085'
+          }
+          break
+        case 'TLF':
+          if (falg === true) {
+            jenkins = 'http://10.52.200.190'
+          } else {
+            jenkins = 'http://10.66.11.20:8086'
+          }
+          break
+        case 'FLC':
+          jenkins = 'http://10.66.11.20:8087'
+          break
+        case 'TLC':
+          jenkins = 'http://10.66.11.20:8088'
+          break
+      }
+      var url = jenkins + '/computer/' + item.node
+      return url
     },
 
     // UI Components related
