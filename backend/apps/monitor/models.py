@@ -49,8 +49,7 @@ class Testline(models.Model):
         unique_together = (("product", "cfgid"),)
 
     def __str__(self):
-        return "{}_{}_{}_{}_{}_{}_{}_{}_{}".format(self.product, self.mode, self.sitetype, self.node, self.cfgid,
-                                                   self.ca, self.jenkinsjob, self.mbtsid, self.mnode)
+        return "{}_{}_{}".format(self.product, self.node, self.cfgid)
 
 
 class CasePath(models.Model):
@@ -77,7 +76,8 @@ class CaseName(models.Model):
 
 class CaseSchedule(models.Model):
     case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
-    testline = models.ForeignKey(Testline, on_delete=models.CASCADE, default="")
+    testline = models.ForeignKey(
+        Testline, on_delete=models.CASCADE, default="")
 
     class Meta:
         db_table = "crt_testcase_schedule"
@@ -160,8 +160,6 @@ class JenkinsJobMonitor(models.Model):
         return "{}_{}_{}".format(self.task, self.jenkins, self.job)
 
 
-# <load--testline status>
-
 class LoadTestlineStatus(models.Model):
     loadname = models.CharField('Load name', max_length=64, default="")
     testline = models.CharField('Testline', max_length=64, default="")
@@ -183,8 +181,6 @@ class LoadTestlineStatus(models.Model):
         return "{}_{}".format(self.loadname, self.testline)
 
 
-# <load> status
-
 class LoadStatus(models.Model):
     start_time = models.CharField('Start Time', max_length=32, default="")
     loadname = models.CharField('Load', max_length=32, unique=True, default="")
@@ -202,3 +198,25 @@ class LoadStatus(models.Model):
 
     def __str__(self):
         return self.loadname
+
+
+class TestlineStableLoad(models.Model):
+    testline = models.ForeignKey(
+        Testline, on_delete=models.CASCADE, default="")
+
+    # release got from loadname_on_server
+    load_release = models.CharField(
+        'Release', max_length=16, default="")
+
+    loadname_on_server = models.CharField(
+        'Load name on load server', max_length=64, default="")
+
+    loadname_on_enb = models.CharField(
+        'Load name on eNB', max_length=64, default="")
+
+    class Meta:
+        db_table = "crt_testline_stableload"
+        unique_together = (("testline", "load_release"),)
+
+    def __str__(self):
+        return "{}_{}".format(self.testline, self.load_release)
