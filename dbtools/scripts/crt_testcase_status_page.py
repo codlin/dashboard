@@ -133,6 +133,20 @@ def list_to_str(list):
     result = str[:-1]
     return result
 
+# 根据testcase name 来获取全部平台信息
+def get_testline_info(tc_name):
+    str='''
+        select * from 
+        (SELECT crt_testcase_name.id, crt_testcase_name.casename, crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id,
+        crt_testline.`mode`,crt_testline.sitetype, crt_testline.node,crt_testline.ca,crt_testline.jenkinsjob,crt_testline.mbtsid,
+        crt_testline.mnode,crt_testline.cfgid,crt_testline.product_id
+        FROM crt_testcase_name 
+        left JOIN crt_testcase_schedule ON crt_testcase_name.id = crt_testcase_schedule.case_id 
+        left JOIN crt_testline ON crt_testcase_schedule.testline_id= crt_testline.id) as testpage
+        where casename="''' + tc_name +'''"
+    '''
+    results = mysqldb.get_DB(str)
+    return results
 
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
@@ -182,7 +196,19 @@ def running(crt_type):
             item = list(item)
             item = list_to_str(item)
 
-            item = '"' + name + '"' + ',' + item + ',' + '"",' + '"",' + '"NULL"' + ',""'
+            # 根据用例名字获取平台信息
+            # print(item)
+            testcase_name= item.strip('"')
+            testline_info_list = get_testline_info(testcase_name)
+            btsid = testline_info_list[0][11]
+            jenkinsjob= testline_info_list[0][6]
+            print ('jenkinsjob is :',jenkinsjob)
+            suite = testline_info_list[0][7]
+            # print("btsid",btsid)
+            # item = '"' + name + '"' + ',' + item + ',' + '"",' + '"",' + '"NULL"' + ',""'
+
+            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","NULL",' + '"'+ suite + '"'
+            print('NULL item is :',item)
             logger.debug('item is: %s', item)
             sql_str = '''
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
