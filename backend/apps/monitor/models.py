@@ -47,6 +47,7 @@ class Testline(models.Model):
     class Meta:
         db_table = "crt_testline"
         unique_together = (("product", "cfgid"),)
+        ordering = ['product', 'node']
 
     def __str__(self):
         return "{}_{}_{}".format(self.product, self.node, self.cfgid)
@@ -69,6 +70,7 @@ class CaseName(models.Model):
 
     class Meta:
         db_table = "crt_testcase_name"
+        ordering = ['casename']
 
     def __str__(self):
         return self.casename
@@ -82,6 +84,7 @@ class CaseSchedule(models.Model):
     class Meta:
         db_table = "crt_testcase_schedule"
         unique_together = (("case", "testline"),)
+        ordering = ['case', 'testline']
 
     def __str__(self):
         return "{}_{}".format(self.case, self.testline)
