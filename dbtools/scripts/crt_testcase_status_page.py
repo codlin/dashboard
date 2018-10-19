@@ -52,7 +52,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 30
+    order by time_epoch_start desc limit 100
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -128,6 +128,8 @@ def get_unexecuted(loadname):
 def list_to_str(list):
     str = ''
     for i in range(0, len(list)):
+        if  list[i] is None :
+            list[i]='NA'
         item = '"' + list[i] + '",'
         str = str + item
     result = str[:-1]
@@ -175,7 +177,10 @@ def running(crt_type):
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
             '''
             logger.debug('sql_str: %s', sql_str)
-            mysqldb.update_DB(sql_str)
+            try :
+                mysqldb.update_DB(sql_str)
+            except Exception as e:
+                print('update data failed is :',e)
             logger.debug('i: %s:', i)
 
         # 循环输出failed的testcase，更新入数据库
@@ -188,7 +193,10 @@ def running(crt_type):
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
             '''
             logger.debug('sql_str: %s', sql_str)
-            mysqldb.update_DB(sql_str)
+            try :
+                mysqldb.update_DB(sql_str)
+            except Exception as e:
+                print('update data failed is :',e)
 
         # 循环输出unexecuted的testcase，更新入数据库
         for i in range(0, len(data_unexecuted)):
@@ -202,19 +210,19 @@ def running(crt_type):
             testline_info_list = get_testline_info(testcase_name)
             btsid = testline_info_list[0][11]
             jenkinsjob= testline_info_list[0][6]
-            print ('jenkinsjob is :',jenkinsjob)
             suite = testline_info_list[0][7]
-            # print("btsid",btsid)
-            # item = '"' + name + '"' + ',' + item + ',' + '"",' + '"",' + '"NULL"' + ',""'
-
-            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","NULL",' + '"'+ suite + '"'
+            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","k",' + '"'+ suite + '"'
+            print('Null testcase_name is :', testcase_name )
             print('NULL item is :',item)
             logger.debug('item is: %s', item)
             sql_str = '''
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
             '''
             logger.debug('sql_str: %s', sql_str)
-            mysqldb.update_DB(sql_str)
+            try :
+                mysqldb.update_DB(sql_str)
+            except Exception as e:
+                print('update data failed is :',e)
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
