@@ -18,7 +18,7 @@ def load_tasks():
     i = 0
     for f in files:
         i += 1
-        if f.endswith('__init__.py') or f.endswith('.pyc'):
+        if f.endswith('__init__.py') or not f.endswith('.py'):
             continue
 
         file_path = os.path.join(path, f)
