@@ -52,7 +52,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 30
+    order by time_epoch_start desc limit 100
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -211,7 +211,7 @@ def running(crt_type):
             btsid = testline_info_list[0][11]
             jenkinsjob= testline_info_list[0][6]
             suite = testline_info_list[0][7]
-            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","NULL",' + '"'+ suite + '"'
+            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","k",' + '"'+ suite + '"'
             print('Null testcase_name is :', testcase_name )
             print('NULL item is :',item)
             logger.debug('item is: %s', item)
