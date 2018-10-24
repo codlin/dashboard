@@ -65,10 +65,7 @@ def get_loadnames(mode):
 
 def get_release(loadname):
     branch = loadname.split('_')
-    if branch[0] == "FLF17A" and branch[2] == '1000':
-        result = "FLF17ASP"
-    else:
-        result = branch[0]
+    result = branch[0] + '_' + branch[1] + '_' + branch[2]
     return result
 
 
@@ -216,8 +213,12 @@ def get_jenkins_data(url):
     if response.status_code == 200:
         data = response.text
         results = json.loads(data)
-        results = results[0]
-        return results
+        print(type(results))
+        print(results)
+        if results:
+            print('is ok')
+            results = results[0]
+            return results
     else:
         raise Exception("Server returned status code '%s' with message '%s'" % (
             response.status_code, response.content))
@@ -291,24 +292,28 @@ def get_debug_result(loadname):
 
     logger.debug('loadname is  %s :', loadname)
     str = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + loadname + ''
+
     dic = get_jenkins_data(str)
-    list_temp = []
-    dic_pci = get_target_value('pci', dic, list_temp)
-    list_temp2 = []
-    dic_children = get_target_value(
-        'children', get_key_value('name', 'crt', dic_pci), list_temp2)
-    dic_debug = get_key_value('name', 'debug', dic_children)
-    if (dic_debug.get('cases')):
-        dic_cases = dic_debug['cases'][0]
-        debug_status = dic_cases['result']
-        if debug_status == 'PASS':
-            debug_status = 'Yes'
-        if debug_status == 'FAIL':
-            debug_status = 'No'
-        return debug_status
+    if dic:
+        list_temp = []
+        dic_pci = get_target_value('pci', dic, list_temp)
+        list_temp2 = []
+        dic_children = get_target_value(
+            'children', get_key_value('name', 'crt', dic_pci), list_temp2)
+        dic_debug = get_key_value('name', 'debug', dic_children)
+        if (dic_debug.get('cases')):
+            dic_cases = dic_debug['cases'][0]
+            debug_status = dic_cases['result']
+            if debug_status == 'PASS':
+                debug_status = 'Yes'
+            if debug_status == 'FAIL':
+                debug_status = 'No'
+            return debug_status
+        else:
+            debug_status = 'NULL'
     else:
-        debug_status = 'NULL'
-        return debug_status
+        debug_status='NULL'
+    return debug_status
 
 
 def running(crt_type):
@@ -373,6 +378,7 @@ def running(crt_type):
 def main():
     logger.info('load status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    # list_project = ['TLC']
     for i in range(len(list_project)):
         running(list_project[i])
 

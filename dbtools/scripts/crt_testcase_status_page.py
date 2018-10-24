@@ -16,6 +16,7 @@ import requests
 import json
 import pandas as pd
 
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
@@ -52,7 +53,7 @@ def get_loadnames(mode):
     where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
     and enb_release like("''' + crt_type + '''")
     GROUP BY enb_build 
-    order by time_epoch_start desc limit 100
+    order by time_epoch_start desc limit 30
     '''
     data = mysqldb.get_DB(sql_str)
     results = []
@@ -64,10 +65,7 @@ def get_loadnames(mode):
 
 def get_release(loadname):
     branch = loadname.split('_')
-    if branch[0] == "FLF17A" and branch[2] == '1000':
-        result = "FLF17ASP"
-    else:
-        result = branch[0]
+    result = branch[0] + '_' + branch[1] + '_' + branch[2]
     return result
 
 
@@ -94,7 +92,7 @@ def get_failed(loadname):
     return results
 
 
-def get_passwd(loadname):
+def get_passed(loadname):
     sql_str = '''
     select  enb_build, test_case_name, test_line_id, robot_ip, test_status, test_suite from test_results  
     where enb_build="''' + loadname + '''" 
@@ -128,7 +126,7 @@ def get_unexecuted(loadname):
 def list_to_str(list):
     str = ''
     for i in range(0, len(list)):
-        if  list[i] is None :
+        if list[i] is None :
             list[i]='NA'
         item = '"' + list[i] + '",'
         str = str + item
@@ -158,7 +156,7 @@ def running(crt_type):
     for name in object:
         logger.debug("loadname is %s" % name)
         # 更新成功的用例
-        data_passwd = get_passwd(name)
+        data_passed = get_passed(name)
 
         # 更新失败的用例
         data_failed = get_failed(name)
@@ -167,9 +165,9 @@ def running(crt_type):
         data_unexecuted = get_unexecuted(name)
 
         # 循环输出passwd的testcase，更新入数据库
-        for i in range(0, len(data_passwd)):
-            logger.debug('data_passwd length is %s:', len(data_passwd))
-            item = data_passwd[i]
+        for i in range(0, len(data_passed)):
+            logger.debug('data_passwd length is %s:', len(data_passed))
+            item = data_passed[i]
             item = list(item)
             logger.debug('item is: %s', item)
             item = list_to_str(item)
@@ -211,14 +209,20 @@ def running(crt_type):
             btsid = testline_info_list[0][11]
             jenkinsjob= testline_info_list[0][6]
             suite = testline_info_list[0][7]
-            item = '"' + name + '","' + testcase_name + '","' + btsid + '","' + jenkinsjob + '","k",' + '"'+ suite + '"'
-            print('Null testcase_name is :', testcase_name )
-            print('NULL item is :',item)
-            logger.debug('item is: %s', item)
+            print('NULL name is:',name)
+            print('Null testcase_name is:', testcase_name)
+            print('NULL btsid is:', btsid)
+            print('NULL jenkinsjob is:', jenkinsjob)
+            print('NULL suite is:', suite)
+
+            item = '"' + str(name) + '","' + str(testcase_name) + '","' + str(btsid) + '","' + str(jenkinsjob) + '","NUll",' + '"'+ str(suite) + '"'
+            # logger.debug('item is:', item)
+
             sql_str = '''
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
             '''
-            logger.debug('sql_str: %s', sql_str)
+            # logger.debug('sql_str:', sql_str)
+
             try :
                 mysqldb.update_DB(sql_str)
             except Exception as e:
@@ -232,6 +236,7 @@ def running(crt_type):
 def main():
     logger.info('load testcases status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    # list_project = ['TLC']
     # running('FLF')
     for i in range(len(list_project)):
         running(list_project[i])

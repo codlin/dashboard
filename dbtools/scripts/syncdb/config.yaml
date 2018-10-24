@@ -1,0 +1,19 @@
+parameters:
+  batchmax: 2000000
+  source:
+    host: "10.83.200.51"
+    user: "crt"
+    pass: "crt123"
+    schema: "fzm_iv_results"
+    port: 3306
+  destination:
+    host: "10.66.11.20"
+    user: "root"
+    pass: "123456"
+    schema: "crt_db"
+    port: 33306
+tables:
+  test_results:
+    updated-field: id
+  test_results:
+    updated-field: id
