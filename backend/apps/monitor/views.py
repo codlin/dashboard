@@ -6,8 +6,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Product, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
-from .serializers import ProductSerializer, SysMenuSerializer, TestlineSerializer, CaseNameSerializer, CasePathSerializer, TestcaseReleaseSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
+from .models import Product, ProductRelease, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
+from .serializers import ProductSerializer, ProductReleaseSerializer, SysMenuSerializer, TestlineSerializer, CaseNameSerializer, CasePathSerializer, TestcaseReleaseSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
 
 # Create your views here.
@@ -18,6 +18,13 @@ class ProductApi(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Product.objects.all()
+
+
+class ProductReleaseApi(viewsets.ModelViewSet):
+    serializer_class = ProductReleaseSerializer
+
+    def get_queryset(self):
+        return ProductRelease.objects.all()
 
 
 class SysMenuApi(viewsets.ModelViewSet):

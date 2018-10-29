@@ -20,12 +20,14 @@ from django.views.generic import TemplateView
 
 from rest_framework.routers import DefaultRouter
 
-from apps.monitor.views import LoadStatusViewApi, ProductApi, SysMenuApi, TestlineViewApi, LoadTestcaseStatusViewApi, LoadTestlineStatusViewApi
+from apps.monitor.views import LoadStatusViewApi, ProductApi, ProductReleaseApi, SysMenuApi, TestlineViewApi, LoadTestcaseStatusViewApi, LoadTestlineStatusViewApi
 
 router = DefaultRouter()
 
 router.register(r'menu', SysMenuApi, base_name="menu")
 router.register(r'products', ProductApi, base_name="products")
+router.register(r'productrelease', ProductReleaseApi,
+                base_name="productrelease")
 router.register(r'loads', LoadStatusViewApi, base_name="loads")
 router.register(r'loadcases', LoadTestcaseStatusViewApi, base_name="loadcases")
 router.register(r'loadtls', LoadTestlineStatusViewApi, base_name="loadtls")

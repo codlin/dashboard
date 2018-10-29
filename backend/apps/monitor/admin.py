@@ -5,6 +5,7 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Product)
+admin.site.register(ProductRelease)
 admin.site.register(SysMenu)
 admin.site.register(Testline)
 admin.site.register(CaseName)

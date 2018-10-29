@@ -18,6 +18,18 @@ class Product(models.Model):
         return self.name
 
 
+class ProductRelease(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                default="")
+    release = models.CharField('Release', max_length=16, default="")
+
+    class Meta:
+        db_table = "crt_productrelease"
+
+    def __str__(self):
+        return "{}_{}".format(self.product, self.release)
+
+
 class SysMenu(models.Model):
     index = models.PositiveSmallIntegerField('Index', default=0)
     level = models.PositiveSmallIntegerField('Level', default=0)
@@ -33,8 +45,8 @@ class SysMenu(models.Model):
 
 
 class Testline(models.Model):
-    product = models.ForeignKey(
-        Product, on_delete=models.DO_NOTHING, default="")
+    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING,
+                                default="")
     mode = models.CharField('Mode', max_length=8, default="")
     sitetype = models.CharField('Site Type', max_length=16, default="")
     node = models.CharField('Jenkins Node', max_length=64, default="")
@@ -93,6 +105,8 @@ class CaseSchedule(models.Model):
 class TestcaseRelease(models.Model):
     load_release = models.CharField(
         'Release', max_length=16, default="")
+    release = models.ForeignKey(ProductRelease, on_delete=models.DO_NOTHING,
+                                default="")
     case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
     path = models.ForeignKey(CasePath, on_delete=models.CASCADE, default="")
 
