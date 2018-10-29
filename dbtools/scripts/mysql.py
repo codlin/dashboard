@@ -3,11 +3,12 @@
 # @Author: Ma xiaoquan
 # @Contact: xiaoquan.ma@nokia-sbell.com
 # @File: mysql.py
-# @Time: 2018/9/6 16:00
+# @Time: 2018/10/6 16:00
 # @Desc:
 
-import pymysql
 import logging
+
+import pymysql
 
 logger = logging.getLogger()
 

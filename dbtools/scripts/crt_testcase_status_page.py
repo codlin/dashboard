@@ -3,7 +3,7 @@
 # @Author: Ma xiaoquan
 # @Contact: xiaoquan.ma@nokia-sbell.com
 # @File: crt_testcase_status_page.py
-# @Time: 2018/9/12 11:08
+# @Time: 2018/10/12 11:08
 # @Desc:
 
 import sys
@@ -209,15 +209,9 @@ def running(crt_type):
             btsid = testline_info_list[0][11]
             jenkinsjob= testline_info_list[0][6]
             suite = testline_info_list[0][7]
-            print('NULL name is:',name)
-            print('Null testcase_name is:', testcase_name)
-            print('NULL btsid is:', btsid)
-            print('NULL jenkinsjob is:', jenkinsjob)
-            print('NULL suite is:', suite)
 
             item = '"' + str(name) + '","' + str(testcase_name) + '","' + str(btsid) + '","' + str(jenkinsjob) + '","NUll",' + '"'+ str(suite) + '"'
             # logger.debug('item is:', item)
-
             sql_str = '''
                 REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
             '''
@@ -246,5 +240,5 @@ def main():
 
 if __name__ == "__main__":
     # crt_type = (parse_args().type)
-    set_log_level("DBTools", 'DEBUG')
+    set_log_level("DBTools", 'INOF')
     main()

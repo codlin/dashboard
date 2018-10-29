@@ -3,25 +3,24 @@
 # @Author: Ma xiaoquan
 # @Contact: xiaoquan.ma@nokia-sbell.com
 # @File: crt_load_status_page.py
-# @Time: 2018/9/6 11:08
+# @Time: 2018/10/6 11:08
 # @Desc:
 
-import sys
-import os
-from datetime import datetime
 import argparse
-import requests
 import json
+import os
+import sys
+from datetime import datetime
+
+import requests
 import urllib3
-import pymysql
-import pandas as pd
-from pprint import pprint
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
 from common.logger import logger, set_log_level
 from scripts.mysql import Pymysql
+
 mysqldb = Pymysql()
 
 
@@ -213,10 +212,10 @@ def get_jenkins_data(url):
     if response.status_code == 200:
         data = response.text
         results = json.loads(data)
-        print(type(results))
-        print(results)
+        # print(type(results))
+        # print(results)
         if results:
-            print('is ok')
+            # print('is ok')
             results = results[0]
             return results
     else:
@@ -312,7 +311,7 @@ def get_debug_result(loadname):
         else:
             debug_status = 'NULL'
     else:
-        debug_status='NULL'
+        debug_status = 'NULL'
     return debug_status
 
 
@@ -354,7 +353,7 @@ def running(crt_type):
 
         item = '"' + load_start_time + '","' + str(name) + '","' + str(passed_count) + '","' + str(failed_count) + '","' \
                + unexecuted_count + '","' + totle_count + '","' + \
-            first_pass_rate + '","' + pass_rate + '","' + debug + '"'
+               first_pass_rate + '","' + pass_rate + '","' + debug + '"'
         logger.debug('item: %s', item)
         sql_str = '''
             REPLACE INTO crt_loadstatus_page(start_time,
@@ -368,7 +367,10 @@ def running(crt_type):
                                              debug) VALUES(''' + item + ''');
         '''
         logger.debug('sql_str: %s', sql_str)
-        mysqldb.update_DB(sql_str)
+        try :
+            mysqldb.update_DB(sql_str)
+        except Exception as e:
+            print('update data failed is :',e)
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
@@ -386,6 +388,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # crt_type = (parse_args().type)
-    set_log_level("DBTools", 'DEBUG')
+    set_log_level("DBTools", 'INFO')
     main()
