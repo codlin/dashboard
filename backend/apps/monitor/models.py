@@ -25,6 +25,7 @@ class ProductRelease(models.Model):
 
     class Meta:
         db_table = "crt_productrelease"
+        unique_together = (("product", "release"),)
 
     def __str__(self):
         return "{}_{}".format(self.product, self.release)
