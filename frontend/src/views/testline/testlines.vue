@@ -51,6 +51,17 @@
                     <v-flex xs12
                             sm6
                             md4>
+                      <v-autocomplete ref="product"
+                                      :rules="[() => !!editedItem.product || 'This field is required']"
+                                      :items="products"
+                                      v-model="editedItem.product"
+                                      label="Product"
+                                      placeholder="Select..."
+                                      required></v-autocomplete>
+                    </v-flex>
+                    <v-flex xs12
+                            sm6
+                            md4>
                       <v-text-field v-model="editedItem.mode"
                                     required
                                     data-vv-name="mode"
@@ -343,8 +354,19 @@ export default {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
         if (item.id === productID) {
-          console.log('item.text: ', item.name)
+          console.log('item.name: ', item.name)
           return item.name
+        }
+      }
+      return '-'
+    },
+
+    getProductID (productName) {
+      for (let i = 0, len = this.products.length; i < len; i++) {
+        let item = this.products[i]
+        if (item.name === productName) {
+          console.log('item.id: ', item.id)
+          return item.id
         }
       }
       return '-'
@@ -355,9 +377,14 @@ export default {
     },
 
     editItem (item) {
+      console.log('editItem: ' + item.product)
+
       this.editedIndex = this.testlines.indexOf(item)
-      // console.log('index:', this.editedIndex)
-      this.editedItem = Object.assign({}, item)
+      console.log('index:', this.editedIndex)
+
+      let itemTemp = item
+      itemTemp.product = this.getProductText(item.product)
+      this.editedItem = Object.assign({}, itemTemp)
       // console.log('editedItem:', this.editedItem)
       this.dialog = true
     },
