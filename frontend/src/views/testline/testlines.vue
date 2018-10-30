@@ -231,7 +231,7 @@ export default {
       productChkbox: null,
 
       // sorting by descending
-      pagination: { sortBy: 'product', descending: false, rowsPerPage: -1 },
+      pagination: { sortBy: 'sitetype', descending: false, rowsPerPage: -1 },
 
       // New testline template
       dialog: false,
@@ -261,8 +261,7 @@ export default {
       let filteredData = this.testlines
       if (this.productChkbox !== null) {
         filteredData = filteredData.filter((item, i) => {
-          let mode = item.mode
-          return this.productChkbox.indexOf(mode) !== -1
+          return this.getProductName(item.product).toUpperCase() === this.productChkbox.toUpperCase()
         })
       }
 
@@ -335,6 +334,17 @@ export default {
         if (item.id === productID) {
           console.log('item.text: ', item.text)
           return item.text
+        }
+      }
+      return '-'
+    },
+
+    getProductName (productID) {
+      for (let i = 0, len = this.products.length; i < len; i++) {
+        let item = this.products[i]
+        if (item.id === productID) {
+          console.log('item.text: ', item.name)
+          return item.name
         }
       }
       return '-'
