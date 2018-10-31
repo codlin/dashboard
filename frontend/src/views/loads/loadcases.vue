@@ -7,6 +7,10 @@
         <v-divider class="mx-2"
                    inset
                    vertical></v-divider>
+        <v-btn icon
+               @click="refreshData">
+          <v-icon>refresh</v-icon>
+        </v-btn>
 
         <v-spacer></v-spacer>
         <v-content>
@@ -158,6 +162,10 @@ export default {
         er => {
           console.error('getLoadCases: ', er)
         })
+    },
+
+    refreshData () {
+      this.getLoadCases()
     },
 
     getFailedCaseUrl (item) {

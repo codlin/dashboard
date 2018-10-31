@@ -4,6 +4,13 @@
       <v-toolbar flat
                  color="white">
         <v-toolbar-title>Details</v-toolbar-title>
+        <v-divider class="mx-2"
+                   inset
+                   vertical></v-divider>
+        <v-btn icon
+               @click="refreshData">
+          <v-icon>refresh</v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
         <v-content>
           <v-layout align-center
@@ -237,6 +244,10 @@ export default {
         er => {
           console.error('getLoadToTLs: ', er)
         })
+    },
+
+    refreshData () {
+      this.getLoadToTLs()
     },
 
     convertData (data) {
