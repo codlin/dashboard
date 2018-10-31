@@ -99,8 +99,8 @@
                                     required
                                     data-vv-name="cfgid"
                                     label="ID"
-                                    v-validate="'required|max_value:12345678'"
-                                    :counter="8"
+                                    v-validate="'required|max:64'"
+                                    :counter="64"
                                     :error-messages="errors.collect('cfgid')"></v-text-field>
                     </v-flex>
                     <v-flex xs12
@@ -132,8 +132,8 @@
                                     required
                                     data-vv-name="mbtsid"
                                     label="Mobility BTSID"
-                                    v-validate="'max_value:12345678'"
-                                    :counter="8"
+                                    v-validate="'max:64'"
+                                    :counter="64"
                                     :error-messages="errors.collect('mbtsid')"></v-text-field>
                     </v-flex>
                     <v-flex xs12
@@ -339,6 +339,10 @@ export default {
       )
     },
 
+    refreshData () {
+      this.getTestlines()
+    },
+
     getProductText (productID) {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
@@ -361,10 +365,10 @@ export default {
       return '-'
     },
 
-    getProductID (productName) {
+    getProductID (productText) {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
-        if (item.name === productName) {
+        if (item.text === productText) {
           console.log('item.id: ', item.id)
           return item.id
         }
@@ -372,17 +376,13 @@ export default {
       return '-'
     },
 
-    refreshData () {
-      this.getTestlines()
-    },
-
     editItem (item) {
       console.log('editItem: ' + item.product)
 
       this.editedIndex = this.testlines.indexOf(item)
-      console.log('index:', this.editedIndex)
+      // console.log('index:', this.editedIndex)
 
-      let itemTemp = item
+      let itemTemp = Object.assign({}, item)
       itemTemp.product = this.getProductText(item.product)
       this.editedItem = Object.assign({}, itemTemp)
       // console.log('editedItem:', this.editedItem)
@@ -422,28 +422,26 @@ export default {
       this.$validator.validate().then(result => {
         if (result) {
           console.log('editedIndex:', this.editedIndex)
+          let editedItemTemp = this.editedItem
+          editedItemTemp.product = this.getProductID(this.editedItem.product)
+
           // testline exist
           if (this.editedIndex > -1) {
             console.log('old data:', this.testlines[this.editedIndex])
-            console.log('new data:', this.editedItem)
+            console.log('new data:', editedItemTemp)
             // if testline is no change, close it.
-            if (
-              isObjectValueEqual(
-                this.testlines[this.editedIndex],
-                this.editedItem
-              )
-            ) {
+            if (isObjectValueEqual(this.testlines[this.editedIndex], editedItemTemp)) {
               this.close()
             } else {
               // update an exist testline
               this.$api.put(
                 '/api/testlines/',
-                this.editedItem,
+                editedItemTemp,
                 r => {
                   console.log('Update data successfully.')
                   Object.assign(
                     this.testlines[this.editedIndex],
-                    this.editedItem
+                    editedItemTemp
                   )
                   this.success_alert()
                   setTimeout(() => {
@@ -460,10 +458,10 @@ export default {
             // create a new testline
             this.$api.post(
               '/api/testlines/',
-              this.editedItem,
+              editedItemTemp,
               r => {
                 console.log('Push data successfully.')
-                this.testlines.push(this.editedItem)
+                this.testlines.push(editedItemTemp)
                 this.success_alert()
                 setTimeout(() => {
                   this.close()
