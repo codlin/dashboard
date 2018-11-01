@@ -75,7 +75,7 @@ export default {
   methods: {
     login () {
       if (this.$refs.form.validate()) {
-        this.$api.get(
+        this.$api.post(
           '/login',
           {
             username: this.username,
