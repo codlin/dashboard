@@ -3,9 +3,13 @@ import logging
 import json
 from django.db import connection
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 
+from utils.permissions import IsOwnerOrReadOnly
 from .models import Product, ProductRelease, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
 from .serializers import ProductSerializer, ProductReleaseSerializer, SysMenuSerializer, TestlineSerializer, CaseNameSerializer, CasePathSerializer, TestcaseReleaseSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
@@ -101,6 +105,9 @@ class LoadTestlineStatusViewApi(viewsets.ViewSet):
 
 
 class TestlineViewApi(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    authentication_classes = (JSONWebTokenAuthentication,
+                              SessionAuthentication)
     serializer_class = TestlineSerializer
 
     def get_queryset(self):

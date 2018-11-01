@@ -104,8 +104,6 @@ class CaseSchedule(models.Model):
 
 
 class TestcaseRelease(models.Model):
-    load_release = models.CharField(
-        'Release', max_length=16, default="")
     release = models.ForeignKey(ProductRelease, on_delete=models.DO_NOTHING,
                                 default="")
     case = models.ForeignKey(CaseName, on_delete=models.CASCADE, default="")
@@ -113,10 +111,10 @@ class TestcaseRelease(models.Model):
 
     class Meta:
         db_table = "crt_testcase_release"
-        unique_together = (("load_release", "case", "path"),)
+        unique_together = (("release", "case", "path"),)
 
     def __str__(self):
-        return "{}_{}_{}".format(self.load_release, self.case, self.path)
+        return "{}_{}_{}".format(self.release, self.case, self.path)
 
 
 class LoadTestcaseStatus(models.Model):

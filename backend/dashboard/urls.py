@@ -19,6 +19,7 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from rest_framework.routers import DefaultRouter
+from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token
 
 from apps.monitor.views import LoadStatusViewApi, ProductApi, ProductReleaseApi, SysMenuApi, TestlineViewApi, LoadTestcaseStatusViewApi, LoadTestlineStatusViewApi
 
@@ -35,6 +36,11 @@ router.register(r'testlines', TestlineViewApi, base_name="testlines")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', obtain_jwt_token),
+
+    # jwt的认证接口
+    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api-token-verify/', verify_jwt_token),
 
     # router的path路径
     re_path('^api/', include(router.urls)),

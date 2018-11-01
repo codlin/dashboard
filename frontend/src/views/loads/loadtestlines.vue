@@ -13,8 +13,7 @@
         </v-btn>
         <v-spacer></v-spacer>
         <v-content>
-          <v-layout align-center
-                    justify-start>
+          <v-layout>
             <v-checkbox hide-details
                         v-model="resultChkbox"
                         value="failed"
