@@ -33,23 +33,18 @@ def parse_args():
     args = p.parse_args()
     return args
 
-class LoadStatus(object):
-    def __init__(self, loadname):
-        self.loadname = loadname
-
-    def get_loadnames(mode):
-        """
-        :param type: FZM FDD = FLF
+def get_loadnames(mode):
+    """
+    :param type: FZM FDD = FLF
                  FZM TDD = TLF
                  CFZC FDD = FLC
                  CFZC TDD = TLC
-        :return loadname list
-        example: get_loadname('TLF')
-        """
-        crt_type = mode + '%'
-        # print('crt_type is :',crt_type)
-        logger.debug('mode is: %s', mode)
-        sql_str = '''
+    :return loadname list
+    example: get_loadname('TLF')
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
         select enb_build
         from test_results 
         where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
@@ -57,12 +52,16 @@ class LoadStatus(object):
         GROUP BY enb_build 
         order by time_epoch_start desc limit 30
         '''
-        data = mysqldb.get_DB(sql_str)
-        results = []
-        for row in data:
-            loadname = row[0]
-            results.append(loadname)
-            return results
+    data = mysqldb.get_DB(sql_str)
+    results = []
+    for row in data:
+        loadname = row[0]
+        results.append(loadname)
+    return results
+
+class LoadStatus(object):
+    def __init__(self, loadname):
+        self.loadname = loadname
 
     def get_jenkins_data(self):
         url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + self.loadname + ''
@@ -306,7 +305,7 @@ class LoadStatus(object):
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    loadnames = LoadStatus.get_loadnames(crt_type)
+    loadnames = get_loadnames(crt_type)
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
