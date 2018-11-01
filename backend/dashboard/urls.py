@@ -36,7 +36,6 @@ router.register(r'testlines', TestlineViewApi, base_name="testlines")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', obtain_jwt_token),
 
     # jwt的认证接口
     url(r'^api-token-auth/', obtain_jwt_token),
