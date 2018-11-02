@@ -19,18 +19,18 @@ axios.interceptors.request.use(
 )
 
 // http response interceptor
-axios.interceptors.response.use(undefined, error => {
-  let res = error.response
-  switch (res.status) {
-    case 401:
-      console.log('Not login or token expire.')
-      break
-    case 403:
-      console.log('you have not permission.')
-      break
-    case 500:
-      console.log('Server error.')
-      break
-  }
-  return Promise.reject(error.response.data)
-})
+// axios.interceptors.response.use(undefined, error => {
+//   let res = error.response
+//   switch (res.status) {
+//     case 401:
+//       console.log('Not login or token expire.')
+//       break
+//     case 403:
+//       console.log('you have not permission.')
+//       break
+//     case 500:
+//       console.log('Server error.')
+//       break
+//   }
+//   return Promise.reject(error.response.data)
+// })

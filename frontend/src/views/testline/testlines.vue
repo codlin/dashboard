@@ -209,6 +209,7 @@
 
 <script>
 import { isObjectValueEqual } from '../../../static/js/utils.js'
+import { mapGetters } from 'vuex'
 export default {
   created () {
     this.getProducts()
@@ -268,6 +269,9 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      userInfo: 'userInfo'
+    }),
     filteredItems () {
       let filteredData = this.testlines
       if (this.productChkbox !== null) {
@@ -311,7 +315,7 @@ export default {
       }
 
       this.$api.get(
-        '/api/products',
+        '/api/products/',
         null,
         r => {
           this.products = r.data
@@ -327,7 +331,7 @@ export default {
 
     getTestlines () {
       this.$api.get(
-        '/api/testlines',
+        '/api/testlines/',
         null,
         r => {
           this.testlines = r.data
@@ -395,15 +399,20 @@ export default {
 
       if (confirm('Are you sure you want to delete this item?')) {
         // delete an exist testline
+        // trap
         this.$api.delete(
-          '/api/testlines/',
-          { id: this.editedItem.id },
+          '/api/testlines/' + item.id + '/',
+          null,
           r => {
-            console.log('Delete data successfully.')
+            console.log('Delete testline successfully.')
             this.testlines.splice(index, 1)
           },
           r => {
             console.log('Error: ', r)
+            this.fail_alert(r)
+            if (r.response.status === 401 || r.response.status === 403) {
+              this.$router.push({ name: 'login' })
+            }
           }
         )
       }
@@ -436,10 +445,10 @@ export default {
             } else {
               // update an exist testline
               this.$api.put(
-                '/api/testlines/',
+                '/api/testlines/' + editedItemTemp.id + '/',
                 editedItemTemp,
                 r => {
-                  console.log('Update data successfully.')
+                  console.log('Update testline successfully.')
                   Object.assign(
                     this.testlines[this.editedIndex],
                     editedItemTemp
@@ -452,6 +461,11 @@ export default {
                 r => {
                   console.log('Error: ', r)
                   this.fail_alert(r)
+                  if (r.response.status === 401 || r.response.status === 403) {
+                    setTimeout(() => {
+                      this.closeDialogAndJumptoLogin()
+                    }, 1000)
+                  }
                 }
               )
             }
@@ -461,7 +475,7 @@ export default {
               '/api/testlines/',
               editedItemTemp,
               r => {
-                console.log('Push data successfully.')
+                console.log('Add testline successfully.')
                 this.testlines.push(editedItemTemp)
                 this.success_alert()
                 setTimeout(() => {
@@ -471,6 +485,11 @@ export default {
               r => {
                 console.log('Error: ', r)
                 this.fail_alert(r)
+                if (r.response.status === 401 || r.response.status === 403) {
+                  setTimeout(() => {
+                    this.closeDialogAndJumptoLogin()
+                  }, 1000)
+                }
               }
             )
           }
@@ -495,12 +514,17 @@ export default {
     fail_alert (r) {
       this.alert = true
       this.alert_type = 'error'
-      this.alert_text = 'Push data to server failed. ' + r.response
+      this.alert_text = 'Operation failed. ' + r.detail
     },
     success_alert () {
       this.alert = true
       this.alert_type = 'success'
-      this.alert_text = 'Push data successfully.'
+      this.alert_text = 'Operation successfully.'
+    },
+
+    closeDialogAndJumptoLogin () {
+      this.close()
+      this.$router.push({ name: 'login' })
     }
     // for testing
   }
