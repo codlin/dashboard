@@ -5,6 +5,8 @@ import app from '../views/app/app'
 import Head from '../views/head/head'
 import footer from '../views/footer/footer'
 
+import login from '../views/login/login'
+
 import index from '../views/loads/index'
 import loadsByProduct from '../views/loads/loads'
 import loadTLs from '../views/loads/loadtestlines'
@@ -33,6 +35,18 @@ var router = new Router({
         title: 'CRT Dashboard'
       },
       children: [
+        {
+          path: 'login',
+          name: 'login',
+          components: {
+            head: Head,
+            content: login,
+            footer: footer
+          },
+          meta: {
+            title: 'CRT Dashboard | Login'
+          }
+        },
         {
           path: 'crt',
           name: 'crt',
@@ -118,9 +132,7 @@ router.beforeEach((to, from, next) => {
   console.log('route from', from)
   console.log('route to', to)
   if (to.path === '/' || to.path === '/crt') {
-    next({
-      path: '/loads'
-    })
+    next({ path: '/loads' })
   } else if (to.matched.length === 0) {
     // if no route was mathec
     from.name ? next({ name: from.name }) : next('/')

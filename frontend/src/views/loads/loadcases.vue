@@ -14,8 +14,7 @@
 
         <v-spacer></v-spacer>
         <v-content>
-          <v-layout align-center
-                    justify-center>
+          <v-layout align-center>
             <v-checkbox hide-details
                         v-model="resultChkbox"
                         value="passed"
@@ -28,8 +27,7 @@
                         v-model="resultChkbox"
                         value="norun"
                         label="NORUN"></v-checkbox>
-            <h4 align-center
-                justify-center>Case Count: {{ filteredCaseNum }}</h4>
+            <h4>Case Count: {{ filteredCaseNum }}</h4>
           </v-layout>
         </v-content>
         <v-spacer></v-spacer>
@@ -146,7 +144,7 @@ export default {
       // create related chips
       this.$store.dispatch('setRelatedChips', [
         {
-          text: 'test lines',
+          text: 'testlines',
           path: '/loads/index/' + this.loadName + '/tls'
         }
       ])
