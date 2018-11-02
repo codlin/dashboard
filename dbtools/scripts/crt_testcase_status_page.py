@@ -31,23 +31,18 @@ def parse_args():
     args = p.parse_args()
     return args
 
-class TestCase_Status(object):
-
-    def __init__(self, loadname):
-        self.loadname = loadname
-
-    def get_loadnames(mode):
-        """
-        :param type: FZM FDD = FLF
-                     FZM TDD = TLF
-                     CFZC FDD = FLC
-                     CFZC TDD = TLC
-        :return loadname list
-        example: get_loadname('TLF')
-        """
-        crt_type = mode + '%'
-        logger.debug('Type is: %s', mode)
-        sql_str = '''
+def get_loadnames(mode):
+    """
+    :param type: FZM FDD = FLF
+                 FZM TDD = TLF
+                 CFZC FDD = FLC
+                 CFZC TDD = TLC
+    :return loadname list
+    example: get_loadname('TLF')
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
         select enb_build
         from test_results 
         where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
@@ -55,16 +50,35 @@ class TestCase_Status(object):
         GROUP BY enb_build 
         order by time_epoch_start desc limit 30
         '''
-        data = mysqldb.get_DB(sql_str)
-        results = []
-        for row in data:
-            loadname = row[0]
-            results.append(loadname)
-        return results
+    data = mysqldb.get_DB(sql_str)
+    results = []
+    for row in data:
+        loadname = row[0]
+        results.append(loadname)
+    return results
+
+def crt_project_type(crt_type):
+    if crt_type == 'FLF':
+        mode = '1'
+    elif crt_type == 'TLF':
+     mode = '2'
+    elif crt_type == 'FLC':
+     mode = '3'
+    elif crt_type == 'TLC':
+        mode = '4'
+    else :
+        mode = ''
+    return mode
+
+class TestCase_Status(object):
+
+    def __init__(self, loadname, crt_type):
+        self.loadname = loadname
+        self.crt_type = crt_type
 
     def get_release(self):
         branch = self.loadname.split('_')
-        result = branch[0] + '_' + branch[1] + '_' + branch[2]
+        result = branch[0]
         return result
 
     def get_load_name_time(self):
@@ -129,6 +143,7 @@ class TestCase_Status(object):
 
     # 根据testcase name 来获取全部平台信息
     def get_testline_info(self, tc_name):
+
         str = '''
             select * from 
             (SELECT crt_testcase_name.id, crt_testcase_name.casename, crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id,
@@ -137,7 +152,7 @@ class TestCase_Status(object):
             FROM crt_testcase_name 
             left JOIN crt_testcase_schedule ON crt_testcase_name.id = crt_testcase_schedule.case_id 
             left JOIN crt_testline ON crt_testcase_schedule.testline_id= crt_testline.id) as testpage
-            where casename="''' + tc_name + '''"
+            where casename="''' + tc_name + '''" and product_id= "''' + self.crt_type + ''' "
         '''
         results = mysqldb.get_DB(str)
         return results
@@ -146,11 +161,12 @@ def running(crt_type):
     t_start = datetime.now()  # 起x始时间
     # urllib3.getproxies = lambda: {}  # 设置代理
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
+    loadnames = get_loadnames(crt_type)
 
-    loadnames = TestCase_Status.get_loadnames(crt_type)
     for loadname in loadnames:
         logger.debug("loadname is %s" % loadname)
-        testcase = TestCase_Status(loadname)
+        print(crt_project_type(crt_type))
+        testcase = TestCase_Status(loadname, crt_project_type(crt_type))
         # 更新成功的用例
         data_passed = testcase.get_passed()
 
@@ -202,6 +218,7 @@ def running(crt_type):
             # 根据用例名字获取平台信息
             # print(item)
             testcase_name = item.strip('"')
+
             testline_info_list = testcase.get_testline_info(testcase_name)
             btsid = testline_info_list[0][11]
             jenkinsjob = testline_info_list[0][6]

@@ -11,10 +11,9 @@ import json
 import os
 import sys
 from datetime import datetime
-
 import requests
 import urllib3
-
+import time
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
@@ -33,23 +32,18 @@ def parse_args():
     args = p.parse_args()
     return args
 
-class LoadStatus(object):
-    def __init__(self, loadname):
-        self.loadname = loadname
-
-    def get_loadnames(mode):
-        """
-        :param type: FZM FDD = FLF
+def get_loadnames(mode):
+    """
+    :param type: FZM FDD = FLF
                  FZM TDD = TLF
                  CFZC FDD = FLC
                  CFZC TDD = TLC
-        :return loadname list
-        example: get_loadname('TLF')
-        """
-        crt_type = mode + '%'
-        # print('crt_type is :',crt_type)
-        logger.debug('mode is: %s', mode)
-        sql_str = '''
+    :return loadname list
+    example: get_loadname('TLF')
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
         select enb_build
         from test_results 
         where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
@@ -57,25 +51,29 @@ class LoadStatus(object):
         GROUP BY enb_build 
         order by time_epoch_start desc limit 30
         '''
-        data = mysqldb.get_DB(sql_str)
-        results = []
-        for row in data:
-            loadname = row[0]
-            results.append(loadname)
-            return results
+    data = mysqldb.get_DB(sql_str)
+    results = []
+    for row in data:
+        loadname = row[0]
+        results.append(loadname)
+    return results
 
-    def get_jenkins_data(self):
-        url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + self.loadname + ''
-        response = requests.get(url, verify=False)  # verify=False去掉鉴权
-        if response.status_code == 200:
-            data = response.text
-            results = json.loads(data)
-            if results:
-                results = results[0]
-                return results
-        else:
-            raise Exception("Server returned status code '%s' with message '%s'" % (
-                response.status_code, response.content))
+def get_jenkins_data(new_loadname):
+    url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + new_loadname + ''
+    response = requests.get(url, verify=False)  # verify=False去掉鉴权
+    if response.status_code == 200:
+        data = response.text
+        results = json.loads(data)
+        if results:
+            results = results[0]
+            return results
+    else:
+        raise Exception("Server returned status code '%s' with message '%s'" % (
+        response.status_code, response.content))
+
+class LoadStatus(object):
+    def __init__(self, loadname):
+        self.loadname = loadname
 
     def get_target_value(self, key, dic, tmp_list):
         """
@@ -123,7 +121,7 @@ class LoadStatus(object):
 
     def get_release(self):
         branch = self.loadname.split('_')
-        result = branch[0] + '_' + branch[1] + '_' + branch[2]
+        result = branch[0]
         return result
 
     def get_testcase_total(self):
@@ -247,24 +245,17 @@ class LoadStatus(object):
         branch = self.loadname.split('_')
         if branch[0] == "FLF18A" and branch[2] == '9999':  # Trunk的包需要FLF18A替换成FLF00
             loadname = self.loadname.replace("FLF18A", "FLF00")
-        else:
-            pass
-        if branch[0] == "TLF18A" and branch[2] == '9999':  # Trunk的包需要TLF18A替换成FLF00
+        elif branch[0] == "TLF18A" and branch[2] == '9999':  # Trunk的包需要TLF18A替换成FLF00 :
             loadname = self.loadname.replace("TLF18A", "TLF00")
-        else:
-            pass
-        if branch[0] == "FLC18A" and branch[2] == '9999':  # Trunk的包需要FLC18A替换成FLC00
+        elif branch[0] == "FLC18A" and branch[2] == '9999':  # Trunk的包需要FLC18A替换成FLC00
             loadname = self.loadname.replace("FLC18A", "FLC00")
-        else:
-            pass
-        if branch[0] == "TLC18A" and branch[2] == '9999':  # Trunk的包需要TLC18A替换成TLC00
+        elif branch[0] == "TLC18A" and branch[2] == '9999':  # Trunk的包需要TLC18A替换成TLC00
             loadname = self.loadname.replace("TLC18A", "TLC00")
         else:
-            pass
+            loadname = self.loadname
 
-        logger.debug('loadname is  %s :', self.loadname)
-
-        dic = self.get_jenkins_data()
+        logger.debug('loadname is  %s :', loadname)
+        dic = get_jenkins_data(loadname)
 
         if dic:
             list_temp = []
@@ -306,10 +297,11 @@ class LoadStatus(object):
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    loadnames = LoadStatus.get_loadnames(crt_type)
+    loadnames = get_loadnames(crt_type)
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
+        logger.debug("loadname: %s" % loadname)
         loadstatus = LoadStatus(loadname)
         logger.debug("loadname is %s" % loadname)
 
@@ -370,7 +362,7 @@ def running(crt_type):
 def main():
     logger.info('load status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
-    # list_project = ['TLC']
+    # list_project = ['FLF']
     for i in range(len(list_project)):
         running(list_project[i])
 
