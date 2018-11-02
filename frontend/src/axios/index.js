@@ -6,9 +6,10 @@ import store from '../store/index'
 // http request interceptor
 axios.interceptors.request.use(
   config => {
-    if (store.state.userInfo.token) {
+    console.log(store)
+    if (store.state.user.userInfo.token) {
       // 判断是否存在token，如果存在的话，则每个http header都加上token
-      config.headers.Authorization = `JWT ${store.state.userInfo.token}`
+      config.headers.Authorization = `JWT ${store.state.user.userInfo.token}`
     }
     return config
   },

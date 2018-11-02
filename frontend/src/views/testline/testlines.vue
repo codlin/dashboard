@@ -335,6 +335,7 @@ export default {
         },
         r => {
           console.log('Failed: ', r)
+          this.$router.push({ name: 'login' })
         }
       )
     },
@@ -347,7 +348,7 @@ export default {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
         if (item.id === productID) {
-          console.log('item.text: ', item.text)
+          // console.log('item.text: ', item.text)
           return item.text
         }
       }
@@ -358,7 +359,7 @@ export default {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
         if (item.id === productID) {
-          console.log('item.name: ', item.name)
+          // console.log('item.name: ', item.name)
           return item.name
         }
       }
@@ -369,7 +370,7 @@ export default {
       for (let i = 0, len = this.products.length; i < len; i++) {
         let item = this.products[i]
         if (item.text === productText) {
-          console.log('item.id: ', item.id)
+          // console.log('item.id: ', item.id)
           return item.id
         }
       }
@@ -494,7 +495,7 @@ export default {
     fail_alert (r) {
       this.alert = true
       this.alert_type = 'error'
-      this.alert_text = 'Push data to server failed. ' + r
+      this.alert_text = 'Push data to server failed. ' + r.response
     },
     success_alert () {
       this.alert = true

@@ -77,6 +77,9 @@ class LoadTestcaseStatusViewApi(viewsets.ModelViewSet):
 
 
 class LoadTestlineStatusViewApi(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    authentication_classes = (JSONWebTokenAuthentication,
+                              SessionAuthentication)
     # serializer_class = LoadTestlineStatusSerializer
 
     def list(self, request):

@@ -76,7 +76,7 @@ export default {
     login () {
       if (this.$refs.form.validate()) {
         this.$api.post(
-          '/api-token-auth',
+          '/api-token-auth/',
           {
             username: this.username,
             password: this.password

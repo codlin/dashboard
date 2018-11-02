@@ -18,11 +18,17 @@
     </v-toolbar-items>
     <v-spacer></v-spacer>
     <v-btn flat
+           v-if="userInfo.name"
+           @click="loginOut">Logout</v-btn>
+    <v-btn flat
+           v-else
            to="/login">Login</v-btn>
   </v-toolbar>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import cookie from '../../static/js/cookie.js'
 export default {
   created () {
     this.getSysMenus()
@@ -38,7 +44,10 @@ export default {
   computed: {
     sysMenuItems () {
       return this.sysMenus
-    }
+    },
+    ...mapGetters({
+      userInfo: 'userInfo'
+    })
   },
 
   methods: {
@@ -59,6 +68,15 @@ export default {
       )
 
       console.log('Leave getSysMenus')
+    },
+
+    loginOut () {
+      cookie.delCookie('token')
+      cookie.delCookie('name')
+      this.$store.dispatch('setUserInfo')
+
+      // 跳转到登录
+      this.$router.push({ name: 'login' })
     },
 
     toPage (item) {
