@@ -283,8 +283,8 @@ def running(crt_type):
 def main():
     set_log_level("DBTools", "ERROR")
     logger.info('load testcases status task began.')
-    # list_project = ['FLF', 'TLF', 'FLC', 'TLC']
-    list_project = ['TLF']
+    list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    # list_project = ['TLF']
     for i in range(len(list_project)):
         logger.info('Project is  %s ', list_project[i])
         running(list_project[i])
