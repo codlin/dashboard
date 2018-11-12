@@ -41,7 +41,7 @@ def get_loadnames(mode):
                  CFZC FDD = FLC
                  CFZC TDD = TLC
     :return loadname list
-    example: get_loadname('TLF')
+    example: get_loadname('FLF')
     """
     crt_type = str(mode) + '%'
     logger.debug('Type is: %s', mode)
@@ -53,12 +53,15 @@ def get_loadnames(mode):
         GROUP BY enb_build 
         order by time_epoch_start desc limit 30
         '''
-    data = mysqldb.get_DB(sql_str)
-    results = []
-    for row in data:
-        loadname = row[0]
-        results.append(loadname)
-    return results
+    try:
+        data = mysqldb.get_DB(sql_str)
+        results = []
+        for row in data:
+            loadname = row[0]
+            results.append(loadname)
+            return results
+    except Exception, e:
+        logger.debug('error: get_loadnames is %s', e)
 
 def crt_project_type(crt_type):
     if crt_type == 'FLF':
@@ -73,11 +76,15 @@ def crt_project_type(crt_type):
         mode = ''
     return mode
 
+# ===============
+# TestCase class
+# ===============
 class TestCase_Status(object):
-    def __init__(self, loadname, crt_type):
+    def __init__(self, loadname,crt_type):
         self.loadname = loadname
         self.crt_type = crt_type
 
+    # FLF17A convert FLF17ASP
     def _17ASP_convert(self):
         branch = self.loadname.split('_')
         if branch[0] == "FLF17A" and branch[-3] == '1000':
@@ -86,13 +93,17 @@ class TestCase_Status(object):
             result = self.loadname
         return result
 
+    # Get release id number
     def get_productrelease(self):
         branch = self._17ASP_convert().split('_')
         result = branch[0]
         sql = "select id from crt_productrelease where crt_productrelease.release='" + result + "'"
-        result = mysqldb.get_DB(sql)
-        result = str(result[0][0])
-        # print 'result is ', result
+        try:
+            result = mysqldb.get_DB(sql)
+            result = str(result[0][0])
+            logger.debug('result is %s', result)
+        except Exception, e:
+            logger.error('error: get_productrelease is %s', e)
         return result
 
     def get_load_name_time(self):
@@ -100,9 +111,13 @@ class TestCase_Status(object):
         select FROM_UNIXTIME(min(time_epoch_start),'%Y-%m-%d %H:%i:%s') AS time 
         from test_results where enb_build="''' + self.loadname + '''" and crt_type='CRT1_DB' 
         '''
-        data = mysqldb.get_DB(sql_str)
-        result = data[0][0]
-        return result
+        try:
+            data = mysqldb.get_DB(sql_str)
+            result = data[0][0]
+            return result
+        except Exception, e:
+            logger.error('error:get_load_name_time function is %s', e)
+
 
     def get_failed(self):
         sql_str = '''
@@ -113,8 +128,11 @@ class TestCase_Status(object):
                 select test_case_name from test_results where enb_build="''' + self.loadname + '''"  and crt_type='CRT1_DB' and record_valid=1
                 and test_status='Passed' group by test_case_name ) group by test_case_name order by robot_ip
         '''
-        results = mysqldb.get_DB(sql_str)
-        return results
+        try:
+            results = mysqldb.get_DB(sql_str)
+            return results
+        except Exception, e:
+            logger.error('error: get_failed function is %s', e)
 
     def get_passed(self):
         sql_str = '''
@@ -129,27 +147,25 @@ class TestCase_Status(object):
         branch = self.get_productrelease()
         logger.debug('branch is %s', branch)
         sql_str = '''
-                SELECT *
-                FROM (SELECT casename
-                      FROM crt_testcase_name
-                             INNER JOIN crt_testcase_release ON crt_testcase_release.case_id = crt_testcase_name.id
-                      WHERE crt_testcase_release.release_id = "''' + branch + '''" 
-                      GROUP BY casename) AS t1
-                WHERE t1.casename NOT IN (SELECT test_case_name
-                                          FROM test_results
-                                          WHERE enb_build = "''' + self.loadname + '''" 
-                                            AND record_valid = 1
-                                            AND crt_type = 'CRT1_DB'
-                                          GROUP BY test_case_name)
+            SELECT *
+            FROM (SELECT casename
+                  FROM crt_testcase_name
+                         INNER JOIN crt_testcase_release ON crt_testcase_release.case_id = crt_testcase_name.id
+                  WHERE crt_testcase_release.release_id = "''' + branch + '''" 
+                  GROUP BY casename) AS t1
+            WHERE t1.casename NOT IN (SELECT test_case_name
+                                      FROM test_results
+                                      WHERE enb_build = "''' + self.loadname + '''" 
+                                        AND record_valid = 1
+                                        AND crt_type = 'CRT1_DB'
+                                      GROUP BY test_case_name)
          '''
-        # print 'sql_str is ',sql_str
         try:
             results = mysqldb.get_DB(sql_str)
             logger.debug('results is : %s', results)
             return results
         except Exception, e:
             logger.error('get_testline_info is error %s ', e)
-
 
     def list_to_str(self, list):
         str = ''
@@ -161,7 +177,7 @@ class TestCase_Status(object):
         result = str[:-1]
         return result
 
-    # 根据testcase name 来获取全部平台信息
+    # Get all platform information by testcase name
     def get_testline_info(self, tc_name):
         branch = self.get_productrelease()
         logger.debug('branch is %s', branch)
@@ -175,7 +191,7 @@ class TestCase_Status(object):
             left JOIN crt_testline ON crt_testcase_schedule.testline_id = crt_testline.id) as testpage
             where casename="''' + tc_name + '''"
         '''
-        logger.debug('crt_type is %s', self.crt_type )
+        # logger.debug('crt_type is %s', self.crt_type )
         logger.debug('get_testline_info sql str is : %s', str)
         # print 'get_testline_info sql str is :', str
         try:
@@ -187,26 +203,25 @@ class TestCase_Status(object):
         return results
 
 def running(crt_type):
-    t_start = datetime.now()  # 起x始时间
-    # urllib3.getproxies = lambda: {}  # 设置代理
+    t_start = datetime.now()  # Start Time
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     loadnames = get_loadnames(crt_type)
 
     logger.debug("loadnames list is %s" % loadnames)
     for loadname in loadnames:
         logger.debug("loadname is %s" % loadname)
-        # print(crt_project_type(crt_type))
+
         testcase = TestCase_Status(loadname, crt_project_type(crt_type))
-        # 更新成功的用例
+        # Update success testcases
         data_passed = testcase.get_passed()
 
-        # 更新失败的用例
+        # Update failed testcases
         data_failed = testcase.get_failed()
 
-        # 更新未执行的用例
+        # Update unexecuted testcases
         data_unexecuted = testcase.get_unexecuted()
 
-        # 循环输出passwd的testcase，更新入数据库
+        # Loop update passed testcase
         for i in range(0, len(data_passed)):
             logger.debug('data_passwd length is %s:', len(data_passed))
             item = data_passed[i]
@@ -221,10 +236,10 @@ def running(crt_type):
             try:
                 mysqldb.update_DB(sql_str)
             except Exception as e:
-                print('update data failed is :', e)
-            logger.debug('i: %s:', i)
+                logger.error('error: Loop update passed testcase is %s :', e)
+            logger.debug('i: %s', i)
 
-        # 循环输出failed的testcase，更新入数据库
+        # Loop update failed testcase
         for i in range(0, len(data_failed)):
             item = data_failed[i]
             item = list(item)
@@ -237,16 +252,15 @@ def running(crt_type):
             try:
                 mysqldb.update_DB(sql_str)
             except Exception as e:
-                print('update data failed is :', e)
+                logger.error('error: Loop update failed testcase is %s :', e)
 
-        # 循环输出unexecuted的testcase，更新入数据库
+        # Loop update unexecuted testcase
         for i in range(0, len(data_unexecuted)):
             item = data_unexecuted[i]
             item = list(item)
             item = testcase.list_to_str(item)
 
-            # 根据用例名字获取平台信息
-            # print(item)
+            # Get platform information by use case name
             testcase_name = item.strip('"')
             try:
                 testline_info_list = testcase.get_testline_info(testcase_name)
@@ -258,16 +272,16 @@ def running(crt_type):
                     item = '"' + str(loadname) + '","' + str(
                         testcase_name) + '","' + str(btsid) + '","' + str(
                         jenkinsjob) + '","NUll",' + '"' + str(suite) + '"'
-                    # logger.debug('item is:', item)
+                    logger.debug('item is: %s', item)
                     sql_str = '''
                         REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
                     '''
-                    # logger.debug('sql_str:', sql_str)
+                    logger.debug('sql_str is: %s', sql_str)
 
                     try:
                         mysqldb.update_DB(sql_str)
                     except Exception as e:
-                        print('update data failed is :', e)
+                        logger.error('error: Loop update unexecuted testcase is  %s :', e)
                 else:
                     logger.error('loadname is %s', loadname)
                     logger.error('testcase_name is %s ', testcase_name)
@@ -275,13 +289,12 @@ def running(crt_type):
             except Exception, e:
                 logger.error('testline_info_list is error %s', e)
 
-
-    t_end = datetime.now()  # 关闭时间
+    t_end = datetime.now()  # end time
     time = (t_end - t_start).total_seconds()
     logger.info('The script run time is: %s sec' % (time))
 
 def main():
-    set_log_level("DBTools", "ERROR")
+    set_log_level("DBTools", "INFO")
     logger.info('load testcases status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
     # list_project = ['TLF']
