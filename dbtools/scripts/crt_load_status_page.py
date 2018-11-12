@@ -119,9 +119,20 @@ class LoadStatus(object):
             if key_value == value:
                 return result
 
-    def get_release(self):
+    def _17ASP_convert(self):
         branch = self.loadname.split('_')
+        if branch[0] == "FLF17A" and branch[-3] == '1000':
+            result = self.loadname.replace("FLF17A", "FLF17ASP")
+        else:
+            result = self.loadname
+        return result
+
+    def get_release(self):
+        branch = self._17ASP_convert().split('_')
         result = branch[0]
+        sql = "select id from crt_productrelease where crt_productrelease.release='"+result+"'"
+        result = mysqldb.get_DB(sql)
+        result = str(result[0][0])
         return result
 
     def get_testcase_total(self):
@@ -132,7 +143,7 @@ class LoadStatus(object):
             from (SELECT crt_testcase_name.casename
                   FROM crt_testcase_release
                          INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                  where crt_testcase_release.load_release = "''' + barnch + '''") as t
+                  where crt_testcase_release.release_id = "''' + barnch + '''") as t
         '''
         data = mysqldb.get_DB(sql_str)
         result = data[0][0]
@@ -188,14 +199,15 @@ class LoadStatus(object):
 
     def get_unexecuted_count(self):
         branch = self.get_release()
-        logger.debug('branch is %s', branch)
+        logger.debug('branch is  %s :', branch)
+        logger.debug('loadname is  %s :', self.loadname)
         sql_str = '''                
             SELECT count(*)
             FROM (SELECT *
                   FROM (SELECT crt_testcase_name.casename
                         FROM crt_testcase_release
                                INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                        WHERE crt_testcase_release.load_release = "''' + branch + '''") AS t1
+                        WHERE crt_testcase_release.release_id = "''' + branch + '''") AS t1
                   WHERE t1.casename NOT IN (SELECT test_case_name
                                             FROM test_results
                                             WHERE enb_build = "''' + self.loadname + '''"
@@ -243,13 +255,13 @@ class LoadStatus(object):
 
     def get_debug_result(self):
         branch = self.loadname.split('_')
-        if branch[0] == "FLF18A" and branch[2] == '9999':  # Trunk的包需要FLF18A替换成FLF00
+        if branch[0] == "FLF18A" and branch[-3] == '9999':  # Trunk的包需要FLF18A替换成FLF00
             loadname = self.loadname.replace("FLF18A", "FLF00")
-        elif branch[0] == "TLF18A" and branch[2] == '9999':  # Trunk的包需要TLF18A替换成FLF00 :
+        elif branch[0] == "TLF18A" and branch[-3] == '9999':  # Trunk的包需要TLF18A替换成FLF00 :
             loadname = self.loadname.replace("TLF18A", "TLF00")
-        elif branch[0] == "FLC18A" and branch[2] == '9999':  # Trunk的包需要FLC18A替换成FLC00
+        elif branch[0] == "FLC18A" and branch[-3] == '9999':  # Trunk的包需要FLC18A替换成FLC00
             loadname = self.loadname.replace("FLC18A", "FLC00")
-        elif branch[0] == "TLC18A" and branch[2] == '9999':  # Trunk的包需要TLC18A替换成TLC00
+        elif branch[0] == "TLC18A" and branch[-3] == '9999':  # Trunk的包需要TLC18A替换成TLC00
             loadname = self.loadname.replace("TLC18A", "TLC00")
         else:
             loadname = self.loadname
@@ -301,7 +313,6 @@ def running(crt_type):
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
-        logger.debug("loadname: %s" % loadname)
         loadstatus = LoadStatus(loadname)
         logger.debug("loadname is %s" % loadname)
 

@@ -24,10 +24,13 @@ mysqldb = Pymysql()
 def parse_args():
     p = argparse.ArgumentParser(
         description='Request CRT data of project from mysql database',
-        usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)"
-    )
-    p.add_argument('-t', '--type', action='store', default='FLF',
-                   help="Get the project type of CRT")
+        usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)")
+    p.add_argument(
+        '-t',
+        '--type',
+        action='store',
+        default='FLF',
+        help="Get the project type of CRT")
     args = p.parse_args()
     return args
 
@@ -61,24 +64,35 @@ def crt_project_type(crt_type):
     if crt_type == 'FLF':
         mode = '1'
     elif crt_type == 'TLF':
-     mode = '2'
+        mode = '2'
     elif crt_type == 'FLC':
-     mode = '3'
+        mode = '3'
     elif crt_type == 'TLC':
         mode = '4'
-    else :
+    else:
         mode = ''
     return mode
 
 class TestCase_Status(object):
-
     def __init__(self, loadname, crt_type):
         self.loadname = loadname
         self.crt_type = crt_type
 
-    def get_release(self):
+    def _17ASP_convert(self):
         branch = self.loadname.split('_')
+        if branch[0] == "FLF17A" and branch[-3] == '1000':
+            result = self.loadname.replace("FLF17A", "FLF17ASP")
+        else:
+            result = self.loadname
+        return result
+
+    def get_productrelease(self):
+        branch = self._17ASP_convert().split('_')
         result = branch[0]
+        sql = "select id from crt_productrelease where crt_productrelease.release='" + result + "'"
+        result = mysqldb.get_DB(sql)
+        result = str(result[0][0])
+        # print 'result is ', result
         return result
 
     def get_load_name_time(self):
@@ -112,14 +126,14 @@ class TestCase_Status(object):
         return results
 
     def get_unexecuted(self):
-        branch = self.get_release()
+        branch = self.get_productrelease()
         logger.debug('branch is %s', branch)
         sql_str = '''
                 SELECT *
                 FROM (SELECT casename
                       FROM crt_testcase_name
                              INNER JOIN crt_testcase_release ON crt_testcase_release.case_id = crt_testcase_name.id
-                      WHERE crt_testcase_release.load_release = "''' + branch + '''" 
+                      WHERE crt_testcase_release.release_id = "''' + branch + '''" 
                       GROUP BY casename) AS t1
                 WHERE t1.casename NOT IN (SELECT test_case_name
                                           FROM test_results
@@ -128,8 +142,14 @@ class TestCase_Status(object):
                                             AND crt_type = 'CRT1_DB'
                                           GROUP BY test_case_name)
          '''
-        results = mysqldb.get_DB(sql_str)
-        return results
+        # print 'sql_str is ',sql_str
+        try:
+            results = mysqldb.get_DB(sql_str)
+            logger.debug('results is : %s', results)
+            return results
+        except Exception, e:
+            logger.error('get_testline_info is error %s ', e)
+
 
     def list_to_str(self, list):
         str = ''
@@ -143,7 +163,8 @@ class TestCase_Status(object):
 
     # 根据testcase name 来获取全部平台信息
     def get_testline_info(self, tc_name):
-
+        branch = self.get_productrelease()
+        logger.debug('branch is %s', branch)
         str = '''
             select * from 
             (SELECT crt_testcase_name.id, crt_testcase_name.casename, crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id,
@@ -151,10 +172,18 @@ class TestCase_Status(object):
             crt_testline.mnode,crt_testline.cfgid,crt_testline.product_id
             FROM crt_testcase_name 
             left JOIN crt_testcase_schedule ON crt_testcase_name.id = crt_testcase_schedule.case_id 
-            left JOIN crt_testline ON crt_testcase_schedule.testline_id= crt_testline.id) as testpage
-            where casename="''' + tc_name + '''" and product_id= "''' + self.crt_type + ''' "
+            left JOIN crt_testline ON crt_testcase_schedule.testline_id = crt_testline.id) as testpage
+            where casename="''' + tc_name + '''"
         '''
-        results = mysqldb.get_DB(str)
+        logger.debug('crt_type is %s', self.crt_type )
+        logger.debug('get_testline_info sql str is : %s', str)
+        # print 'get_testline_info sql str is :', str
+        try:
+            results = mysqldb.get_DB(str)
+            logger.debug('results is : %s', results)
+        except Exception, e:
+            results = 'null'
+            logger.error('get_testline_info is error %s ', e)
         return results
 
 def running(crt_type):
@@ -163,9 +192,10 @@ def running(crt_type):
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     loadnames = get_loadnames(crt_type)
 
+    logger.debug("loadnames list is %s" % loadnames)
     for loadname in loadnames:
         logger.debug("loadname is %s" % loadname)
-        print(crt_project_type(crt_type))
+        # print(crt_project_type(crt_type))
         testcase = TestCase_Status(loadname, crt_project_type(crt_type))
         # 更新成功的用例
         data_passed = testcase.get_passed()
@@ -218,39 +248,47 @@ def running(crt_type):
             # 根据用例名字获取平台信息
             # print(item)
             testcase_name = item.strip('"')
-
-            testline_info_list = testcase.get_testline_info(testcase_name)
-            btsid = testline_info_list[0][11]
-            jenkinsjob = testline_info_list[0][6]
-            suite = testline_info_list[0][7]
-
-            item = '"' + str(loadname) + '","' + str(testcase_name) + '","' + str(btsid) + '","' + str(
-                jenkinsjob) + '","NUll",' + '"' + str(suite) + '"'
-            # logger.debug('item is:', item)
-            sql_str = '''
-                REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
-            '''
-            # logger.debug('sql_str:', sql_str)
-
             try:
-                mysqldb.update_DB(sql_str)
-            except Exception as e:
-                print('update data failed is :', e)
+                testline_info_list = testcase.get_testline_info(testcase_name)
+                if testline_info_list:
+                    btsid = testline_info_list[0][11]
+                    jenkinsjob = testline_info_list[0][6]
+                    suite = testline_info_list[0][7]
+
+                    item = '"' + str(loadname) + '","' + str(
+                        testcase_name) + '","' + str(btsid) + '","' + str(
+                        jenkinsjob) + '","NUll",' + '"' + str(suite) + '"'
+                    # logger.debug('item is:', item)
+                    sql_str = '''
+                        REPLACE INTO crt_load_testcase_status_page(loadname,casename,btsid,node,result,suite) VALUES(''' + item + ''');
+                    '''
+                    # logger.debug('sql_str:', sql_str)
+
+                    try:
+                        mysqldb.update_DB(sql_str)
+                    except Exception as e:
+                        print('update data failed is :', e)
+                else:
+                    logger.error('loadname is %s', loadname)
+                    logger.error('testcase_name is %s ', testcase_name)
+                    logger.error('testline_info_list is null')
+            except Exception, e:
+                logger.error('testline_info_list is error %s', e)
+
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
     logger.info('The script run time is: %s sec' % (time))
 
 def main():
+    set_log_level("DBTools", "ERROR")
     logger.info('load testcases status task began.')
-    list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    # list_project = ['FLF', 'TLF', 'FLC', 'TLC']
+    list_project = ['TLF']
     for i in range(len(list_project)):
+        logger.info('Project is  %s ', list_project[i])
         running(list_project[i])
-
     logger.info('load testcases status task done.')
 
 if __name__ == "__main__":
-    crt_type = (parse_args().type)
-    logger.info('crt_type is: %s', crt_type)
-    set_log_level("DBTools", "INFO")
     main()
