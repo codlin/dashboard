@@ -45,6 +45,7 @@ def get_loadnames(mode):
     """
     crt_type = str(mode) + '%'
     logger.debug('Type is: %s', mode)
+    logger.debug('crt_type is: %s', crt_type)
     sql_str = '''
         select enb_build
         from test_results 
@@ -59,7 +60,7 @@ def get_loadnames(mode):
         for row in data:
             loadname = row[0]
             results.append(loadname)
-            return results
+        return results
     except Exception, e:
         logger.debug('error: get_loadnames is %s', e)
 
@@ -117,7 +118,6 @@ class TestCase_Status(object):
             return result
         except Exception, e:
             logger.error('error:get_load_name_time function is %s', e)
-
 
     def get_failed(self):
         sql_str = '''
@@ -206,8 +206,8 @@ def running(crt_type):
     t_start = datetime.now()  # Start Time
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     loadnames = get_loadnames(crt_type)
-
     logger.debug("loadnames list is %s" % loadnames)
+
     for loadname in loadnames:
         logger.debug("loadname is %s" % loadname)
 
@@ -297,7 +297,7 @@ def main():
     set_log_level("DBTools", "INFO")
     logger.info('load testcases status task began.')
     list_project = ['FLF', 'TLF', 'FLC', 'TLC']
-    # list_project = ['TLF']
+    # list_project = ['FLF']
     for i in range(len(list_project)):
         logger.info('Project is  %s ', list_project[i])
         running(list_project[i])

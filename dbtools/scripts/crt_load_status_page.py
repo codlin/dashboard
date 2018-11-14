@@ -14,6 +14,7 @@ from datetime import datetime
 import requests
 import urllib3
 import time
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
@@ -58,7 +59,7 @@ def get_loadnames(mode):
             loadname = row[0]
             results.append(loadname)
         return results
-    except Exception ,e:
+    except Exception, e:
         logger.error('error: get_loadnames %s', e)
 
 def get_jenkins_data(new_loadname):
@@ -72,7 +73,7 @@ def get_jenkins_data(new_loadname):
             return results
     else:
         raise Exception("Server returned status code '%s' with message '%s'" % (
-        response.status_code, response.content))
+            response.status_code, response.content))
 
 class LoadStatus(object):
     def __init__(self, loadname):
@@ -133,12 +134,12 @@ class LoadStatus(object):
     def get_release(self):
         branch = self._17ASP_convert().split('_')
         result = branch[0]
-        sql = "select id from crt_productrelease where crt_productrelease.release='"+result+"'"
+        sql = "select id from crt_productrelease where crt_productrelease.release='" + result + "'"
         try:
             result = mysqldb.get_DB(sql)
             result = str(result[0][0])
             return result
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_release %s', e)
 
     def get_testcase_total(self):
@@ -155,7 +156,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             result = data[0][0]
             return result
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_testcase_total %s', e)
 
     def get_load_name_time(self):
@@ -168,7 +169,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             result = data[0][0]
             return result
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_load_name_time %s', e)
 
     def get_passed_count(self):
@@ -186,7 +187,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             results = data[0][0]
             return results
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_passed_count %s', e)
 
     def get_failed_count(self):
@@ -212,7 +213,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             results = data[0][0]
             return results
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_failed_count %s', e)
 
     def get_unexecuted_count(self):
@@ -236,7 +237,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             results = data[0][0]
             return results
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_unexecuted_count %s', e)
 
     def get_passed_first_count(self):
@@ -274,7 +275,7 @@ class LoadStatus(object):
             data = mysqldb.get_DB(sql_str)
             results = data[0][0]
             return results
-        except Exception,e:
+        except Exception, e:
             logger.error('error: get_passed_first_count %s', e)
 
     def get_debug_result(self):
@@ -313,7 +314,7 @@ class LoadStatus(object):
             else:
                 debug_status = 'NULL'
             return debug_status
-        except Exception,e:
+        except Exception, e:
             logger.error('error:%s', e)
 
     def get_pass_rate(self, passed_count):
@@ -324,7 +325,7 @@ class LoadStatus(object):
             result = round(passed_count * 100 / testcase_total, 1)
             logger.debug("pass_rate1: %s" % type(result))
             return result
-        except Exception,e:
+        except Exception, e:
             logger.error('error:  %s', e)
 
     def get_first_pass_rate(self, passed_count):
@@ -335,7 +336,7 @@ class LoadStatus(object):
             result = round(passed_count * 100 / testcase_total, 1)
             logger.debug("pass_rate2: %s" % type(result))
             return result
-        except Exception,e:
+        except Exception, e:
             logger.error('error:  %s', e)
 
 def running(crt_type):
