@@ -4,7 +4,6 @@ import Vue from 'vue'
 import App from './App'
 import store from './store/index.js'
 import router from './router/index.js'
-import api from './api/index.js'
 
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
@@ -13,6 +12,9 @@ import 'babel-polyfill'
 
 import VeeValidate from 'vee-validate'
 
+// load global resource interceptors
+import './axios/'
+import api from './api/index.js'
 Vue.prototype.$api = api
 Vue.config.productionTip = false
 

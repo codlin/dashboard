@@ -9,7 +9,6 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 
-from utils.permissions import IsOwnerOrReadOnly
 from .models import Product, ProductRelease, SysMenu, Testline, CaseName, CasePath, TestcaseRelease, LoadTestcaseStatus, LoadTestlineStatus, LoadStatus
 from .serializers import ProductSerializer, ProductReleaseSerializer, SysMenuSerializer, TestlineSerializer, CaseNameSerializer, CasePathSerializer, TestcaseReleaseSerializer, LoadTestcaseStatusSerializer, LoadTestlineStatusSerializer, LoadStatusSerializer
 
@@ -77,6 +76,9 @@ class LoadTestcaseStatusViewApi(viewsets.ModelViewSet):
 
 
 class LoadTestlineStatusViewApi(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (JSONWebTokenAuthentication,
+                              SessionAuthentication)
     # serializer_class = LoadTestlineStatusSerializer
 
     def list(self, request):
@@ -105,7 +107,7 @@ class LoadTestlineStatusViewApi(viewsets.ViewSet):
 
 
 class TestlineViewApi(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (IsAuthenticated, )
     authentication_classes = (JSONWebTokenAuthentication,
                               SessionAuthentication)
     serializer_class = TestlineSerializer
@@ -117,7 +119,9 @@ class TestlineViewApi(viewsets.ModelViewSet):
         return super().create(request)
 
     def update(self, request, pk=None):
+        logging.info("pk: {}".format(pk))
         return super().update(request, pk)
 
     def destroy(self, request, pk=None):
+        logging.info("pk: {}".format(pk))
         return super().destroy(request, pk)

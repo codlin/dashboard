@@ -16,7 +16,7 @@ function apiAxios (method, url, params, success, failure) {
   })
     .then(function (res) {
       console.log(res)
-      if (res.status === 200 || res.status === 201) {
+      if (res.status.toString().indexOf('2') === 0) {
         if (success) {
           success(res)
         }
