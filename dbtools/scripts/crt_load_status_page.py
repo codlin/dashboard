@@ -14,6 +14,7 @@ from datetime import datetime
 import requests
 import urllib3
 import time
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, root)
@@ -51,12 +52,15 @@ def get_loadnames(mode):
         GROUP BY enb_build 
         order by time_epoch_start desc limit 30
         '''
-    data = mysqldb.get_DB(sql_str)
-    results = []
-    for row in data:
-        loadname = row[0]
-        results.append(loadname)
-    return results
+    try:
+        data = mysqldb.get_DB(sql_str)
+        results = []
+        for row in data:
+            loadname = row[0]
+            results.append(loadname)
+        return results
+    except Exception, e:
+        logger.error('error: get_loadnames %s', e)
 
 def get_jenkins_data(new_loadname):
     url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + new_loadname + ''
@@ -69,7 +73,7 @@ def get_jenkins_data(new_loadname):
             return results
     else:
         raise Exception("Server returned status code '%s' with message '%s'" % (
-        response.status_code, response.content))
+            response.status_code, response.content))
 
 class LoadStatus(object):
     def __init__(self, loadname):
@@ -119,10 +123,24 @@ class LoadStatus(object):
             if key_value == value:
                 return result
 
-    def get_release(self):
+    def _17ASP_convert(self):
         branch = self.loadname.split('_')
-        result = branch[0]
+        if branch[0] == "FLF17A" and branch[-3] == '1000':
+            result = self.loadname.replace("FLF17A", "FLF17ASP")
+        else:
+            result = self.loadname
         return result
+
+    def get_release(self):
+        branch = self._17ASP_convert().split('_')
+        result = branch[0]
+        sql = "select id from crt_productrelease where crt_productrelease.release='" + result + "'"
+        try:
+            result = mysqldb.get_DB(sql)
+            result = str(result[0][0])
+            return result
+        except Exception, e:
+            logger.error('error: get_release %s', e)
 
     def get_testcase_total(self):
         barnch = self.get_release()
@@ -132,11 +150,14 @@ class LoadStatus(object):
             from (SELECT crt_testcase_name.casename
                   FROM crt_testcase_release
                          INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                  where crt_testcase_release.load_release = "''' + barnch + '''") as t
+                  where crt_testcase_release.release_id = "''' + barnch + '''") as t
         '''
-        data = mysqldb.get_DB(sql_str)
-        result = data[0][0]
-        return result
+        try:
+            data = mysqldb.get_DB(sql_str)
+            result = data[0][0]
+            return result
+        except Exception, e:
+            logger.error('error: get_testcase_total %s', e)
 
     def get_load_name_time(self):
         # print('loadname is ', self.loadname)
@@ -144,9 +165,12 @@ class LoadStatus(object):
         select FROM_UNIXTIME(min(time_epoch_start),'%Y-%m-%d %H:%i:%s') AS time 
         from test_results where enb_build="''' + self.loadname + '''" and crt_type='CRT1_DB' 
         '''
-        data = mysqldb.get_DB(sql_str)
-        result = data[0][0]
-        return result
+        try:
+            data = mysqldb.get_DB(sql_str)
+            result = data[0][0]
+            return result
+        except Exception, e:
+            logger.error('error: get_load_name_time %s', e)
 
     def get_passed_count(self):
         sql_str = '''
@@ -159,9 +183,12 @@ class LoadStatus(object):
                     and test_status = 'passed'
                   group by test_case_name) as t
         '''
-        data = mysqldb.get_DB(sql_str)
-        results = data[0][0]
-        return results
+        try:
+            data = mysqldb.get_DB(sql_str)
+            results = data[0][0]
+            return results
+        except Exception, e:
+            logger.error('error: get_passed_count %s', e)
 
     def get_failed_count(self):
         sql_str = '''
@@ -182,117 +209,135 @@ class LoadStatus(object):
                   group by test_case_name
                   order by robot_ip) as t;
         '''
-        data = mysqldb.get_DB(sql_str)
-        results = data[0][0]
-        return results
+        try:
+            data = mysqldb.get_DB(sql_str)
+            results = data[0][0]
+            return results
+        except Exception, e:
+            logger.error('error: get_failed_count %s', e)
 
     def get_unexecuted_count(self):
         branch = self.get_release()
-        logger.debug('branch is %s', branch)
+        logger.debug('branch is  %s :', branch)
+        logger.debug('loadname is  %s :', self.loadname)
         sql_str = '''                
             SELECT count(*)
             FROM (SELECT *
                   FROM (SELECT crt_testcase_name.casename
                         FROM crt_testcase_release
                                INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                        WHERE crt_testcase_release.load_release = "''' + branch + '''") AS t1
+                        WHERE crt_testcase_release.release_id = "''' + branch + '''") AS t1
                   WHERE t1.casename NOT IN (SELECT test_case_name
                                             FROM test_results
                                             WHERE enb_build = "''' + self.loadname + '''"
                                               AND record_valid = 1
                                               AND crt_type = 'CRT1_DB')) AS t2                             
          '''
-        data = mysqldb.get_DB(sql_str)
-        results = data[0][0]
-        return results
+        try:
+            data = mysqldb.get_DB(sql_str)
+            results = data[0][0]
+            return results
+        except Exception, e:
+            logger.error('error: get_unexecuted_count %s', e)
 
     def get_passed_first_count(self):
         sql_str = '''
-    select count(*)
-    from (select enb_build,
-                 FROM_UNIXTIME(time_epoch_start, '%Y-%m-%d %h:%i:%s') AS time,
-                 test_line_id,
-                 robot_ip,
-                 test_case_name,
-                 test_status,
-                 enb_config
-          from (select enb_build, time_epoch_start, test_line_id, robot_ip, test_case_name, test_status, enb_config
-                from test_results
-                where crt_type = 'CRT1_DB'
-                  and record_valid = 1
-                  and test_status = 'Passed'
-                  and enb_build = "''' + self.loadname + '''") t1
-          where time_epoch_start < (select min(time_epoch_start) + '18000'
-                                    from (select enb_build,
-                                                 time_epoch_start,
-                                                 test_line_id,
-                                                 robot_ip,
-                                                 test_case_name,
-                                                 test_status,
-                                                 enb_config
-                                          from test_results
-                                          where crt_type = 'CRT1_DB'
-                                            and record_valid = 1
-                                            and test_status = 'Passed'
-                                            and enb_build = "''' + self.loadname + '''") t2)
-          group by test_case_name) as t3
-        '''
-        data = mysqldb.get_DB(sql_str)
-        results = data[0][0]
-        return results
+        select count(*)
+        from (select enb_build,
+                     FROM_UNIXTIME(time_epoch_start, '%Y-%m-%d %h:%i:%s') AS time,
+                     test_line_id,
+                     robot_ip,
+                     test_case_name,
+                     test_status,
+                     enb_config
+              from (select enb_build, time_epoch_start, test_line_id, robot_ip, test_case_name, test_status, enb_config
+                    from test_results
+                    where crt_type = 'CRT1_DB'
+                      and record_valid = 1
+                      and test_status = 'Passed'
+                      and enb_build = "''' + self.loadname + '''") t1
+              where time_epoch_start < (select min(time_epoch_start) + '18000'
+                                        from (select enb_build,
+                                                     time_epoch_start,
+                                                     test_line_id,
+                                                     robot_ip,
+                                                     test_case_name,
+                                                     test_status,
+                                                     enb_config
+                                              from test_results
+                                              where crt_type = 'CRT1_DB'
+                                                and record_valid = 1
+                                                and test_status = 'Passed'
+                                                and enb_build = "''' + self.loadname + '''") t2)
+              group by test_case_name) as t3
+            '''
+        try:
+            data = mysqldb.get_DB(sql_str)
+            results = data[0][0]
+            return results
+        except Exception, e:
+            logger.error('error: get_passed_first_count %s', e)
 
     def get_debug_result(self):
         branch = self.loadname.split('_')
-        if branch[0] == "FLF18A" and branch[2] == '9999':  # Trunk的包需要FLF18A替换成FLF00
+        if branch[0] == "FLF18A" and branch[-3] == '9999':  # Trunk的包需要FLF18A替换成FLF00
             loadname = self.loadname.replace("FLF18A", "FLF00")
-        elif branch[0] == "TLF18A" and branch[2] == '9999':  # Trunk的包需要TLF18A替换成FLF00 :
+        elif branch[0] == "TLF18A" and branch[-3] == '9999':  # Trunk的包需要TLF18A替换成FLF00 :
             loadname = self.loadname.replace("TLF18A", "TLF00")
-        elif branch[0] == "FLC18A" and branch[2] == '9999':  # Trunk的包需要FLC18A替换成FLC00
+        elif branch[0] == "FLC18A" and branch[-3] == '9999':  # Trunk的包需要FLC18A替换成FLC00
             loadname = self.loadname.replace("FLC18A", "FLC00")
-        elif branch[0] == "TLC18A" and branch[2] == '9999':  # Trunk的包需要TLC18A替换成TLC00
+        elif branch[0] == "TLC18A" and branch[-3] == '9999':  # Trunk的包需要TLC18A替换成TLC00
             loadname = self.loadname.replace("TLC18A", "TLC00")
         else:
             loadname = self.loadname
 
         logger.debug('loadname is  %s :', loadname)
-        dic = get_jenkins_data(loadname)
-
-        if dic:
-            list_temp = []
-            dic_pci = self.get_target_value('pci', dic, list_temp)
-            list_temp2 = []
-            dic_children = self.get_target_value(
-                'children', self.get_key_value('name', 'crt', dic_pci), list_temp2)
-            dic_debug = self.get_key_value('name', 'debug', dic_children)
-            if (dic_debug.get('cases')):
-                dic_cases = dic_debug['cases'][0]
-                debug_status = dic_cases['result']
-                if debug_status == 'PASS':
-                    debug_status = 'Yes'
-                if debug_status == 'FAIL':
-                    debug_status = 'No'
-                return debug_status
+        try:
+            dic = get_jenkins_data(loadname)
+            if dic:
+                list_temp = []
+                dic_pci = self.get_target_value('pci', dic, list_temp)
+                list_temp2 = []
+                dic_children = self.get_target_value(
+                    'children', self.get_key_value('name', 'crt', dic_pci), list_temp2)
+                dic_debug = self.get_key_value('name', 'debug', dic_children)
+                if (dic_debug.get('cases')):
+                    dic_cases = dic_debug['cases'][0]
+                    debug_status = dic_cases['result']
+                    if debug_status == 'PASS':
+                        debug_status = 'Yes'
+                    if debug_status == 'FAIL':
+                        debug_status = 'No'
+                    return debug_status
+                else:
+                    debug_status = 'NULL'
             else:
                 debug_status = 'NULL'
-        else:
-            debug_status = 'NULL'
-        return debug_status
+            return debug_status
+        except Exception, e:
+            logger.error('error:%s', e)
 
     def get_pass_rate(self, passed_count):
         # object = LoadStatus(loadname)
         testcase_total = self.get_testcase_total()
         logger.debug('testcase_total: %s', testcase_total)
-        result = round(passed_count * 100 / testcase_total, 1)
-        logger.debug("pass_rate1: %s" % type(result))
-        return result
+        try:
+            result = round(passed_count * 100 / testcase_total, 1)
+            logger.debug("pass_rate1: %s" % type(result))
+            return result
+        except Exception, e:
+            logger.error('error:  %s', e)
 
     def get_first_pass_rate(self, passed_count):
         # object = LoadStatus(loadname)
         testcase_total = self.get_testcase_total()
         logger.debug('testcase_total: %s', testcase_total)
-        result = round(passed_count * 100 / testcase_total, 1)
-        logger.debug("pass_rate2: %s" % type(result))
-        return result
+        try:
+            result = round(passed_count * 100 / testcase_total, 1)
+            logger.debug("pass_rate2: %s" % type(result))
+            return result
+        except Exception, e:
+            logger.error('error:  %s', e)
 
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
@@ -301,7 +346,6 @@ def running(crt_type):
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
-        logger.debug("loadname: %s" % loadname)
         loadstatus = LoadStatus(loadname)
         logger.debug("loadname is %s" % loadname)
 
@@ -353,7 +397,7 @@ def running(crt_type):
         try:
             mysqldb.update_DB(sql_str)
         except Exception as e:
-            print('update data failed is :', e)
+            logger.error('update data failed is  %s:', e)
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()

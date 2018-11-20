@@ -201,7 +201,7 @@ def main():
 
 
 if __name__ == '__main__':
-	t_start = datetime.now()  # 起x始时间
+	t_start = datetime.now()  # 起始时间
 	main()
 	t_end = datetime.now()  # 关闭时间
 	print "The script run time is:", (t_end - t_start).total_seconds()  # 程序运行时间
