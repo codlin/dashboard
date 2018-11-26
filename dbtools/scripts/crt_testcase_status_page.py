@@ -183,13 +183,14 @@ class TestCase_Status(object):
         logger.debug('branch is %s', branch)
         str = '''
             select * from 
-            (SELECT crt_testcase_name.id, crt_testcase_release.release_id, crt_testcase_name.casename, crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id,
+            (SELECT crt_testcase_name.id, crt_testcase_release.release_id,crt_testcase_name.casename, crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id,
             crt_testline.`mode`,crt_testline.sitetype, crt_testline.node,crt_testline.ca,crt_testline.jenkinsjob,crt_testline.mbtsid,
             crt_testline.mnode,crt_testline.cfgid,crt_testline.product_id
             FROM crt_testcase_name 
+            left JOIN crt_testcase_release ON crt_testcase_name.id = crt_testcase_release.case_id 
             left JOIN crt_testcase_schedule ON crt_testcase_name.id = crt_testcase_schedule.case_id 
             left JOIN crt_testline ON crt_testcase_schedule.testline_id = crt_testline.id) as testpage
-            where casename="''' + tc_name + '''"  and  release_id ="''' + branch + '''"
+            where casename="''' + tc_name + '''"  and  release_id ="''' + branch + '''" 
         '''
         # logger.debug('crt_type is %s', self.crt_type )
         logger.debug('get_testline_info sql str is : %s', str)
