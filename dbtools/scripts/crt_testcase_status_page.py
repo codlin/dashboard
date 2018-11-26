@@ -203,7 +203,7 @@ FROM (
     SELECT crt_testcase_name.id, crt_testcase_release.release_id, crt_testcase_name.casename, 
         crt_testcase_schedule.case_id, crt_testcase_schedule.testline_id, crt_testline.`mode`, crt_testline.sitetype, 
         crt_testline.node, crt_testline.ca, crt_testline.jenkinsjob, crt_testline.mbtsid, crt_testline.mnode, 
-        crt_testline.cfgid,crt_testline.product_id
+        crt_testline.cfgid, crt_testline.product_id
     FROM crt_testcase_name 
         LEFT JOIN crt_testcase_release ON crt_testcase_name.id = crt_testcase_release.case_id 
         LEFT JOIN crt_testcase_schedule ON crt_testcase_name.id = crt_testcase_schedule.case_id 
@@ -227,7 +227,7 @@ def running(crt_type):
     t_start = datetime.now()  # Start Time
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
     loadnames = get_loadnames(crt_type)
-    logger.debug("loadnames list is %s" % loadnames)
+    logger.info("loadnames list is %s" % loadnames)
 
     for loadname in loadnames:
         logger.debug("loadname is %s" % loadname)
@@ -243,6 +243,7 @@ def running(crt_type):
         data_unexecuted = testcase.get_unexecuted()
 
         # Loop update passed testcase
+        logger.info("Update PASSED test cases start.")
         for i in range(0, len(data_passed)):
             logger.debug('data_passwd length is %s:', len(data_passed))
             item = data_passed[i]
@@ -258,8 +259,10 @@ VALUES(''' + item + '''); '''
             except Exception as e:
                 logger.error('error: Loop update passed testcase is %s :', e)
             logger.debug('i: %s', i)
+        logger.info("Update PASSED test cases finished.")
 
         # Loop update failed testcase
+        logger.info("Update FAILED test cases start.")
         for i in range(0, len(data_failed)):
             item = data_failed[i]
             item = list(item)
@@ -272,8 +275,10 @@ VALUES(''' + item + ''');'''
                 mysqldb.update_DB(sql_str)
             except Exception as e:
                 logger.error('error: Loop update failed testcase is %s :', e)
+        logger.info("Update FAILED test cases finished.")
 
         # Loop update unexecuted testcase
+        logger.info("Update UN-EXECUTED test cases start.")
         for i in range(0, len(data_unexecuted)):
             item = data_unexecuted[i]
             item = list(item)
@@ -284,9 +289,9 @@ VALUES(''' + item + ''');'''
             try:
                 testline_info_list = testcase.get_testline_info(testcase_name)
                 if testline_info_list:
-                    btsid = testline_info_list[0][11]
-                    jenkinsjob = testline_info_list[0][6]
-                    suite = testline_info_list[0][7]
+                    btsid = testline_info_list[0][10]
+                    jenkinsjob = testline_info_list[0][9]
+                    suite = testline_info_list[0][8]
 
                     item = '"' + str(loadname) + '","' + str(
                         testcase_name) + '","' + str(btsid) + '","' + str(
@@ -307,6 +312,7 @@ VALUES(''' + item + ''');'''
                     logger.error('testline_info_list is null')
             except Exception, e:
                 logger.error('testline_info_list is error %s', e)
+        logger.info("Update UN-EXECUTED test cases finished.")
 
     t_end = datetime.now()  # end time
     time = (t_end - t_start).total_seconds()
