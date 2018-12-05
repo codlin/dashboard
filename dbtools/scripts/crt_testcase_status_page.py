@@ -290,7 +290,7 @@ VALUES(''' + item + ''');'''
                 testline_info_list = testcase.get_testline_info(testcase_name)
                 if testline_info_list:
                     btsid = testline_info_list[0][10]
-                    jenkinsjob = testline_info_list[0][9]
+                    jenkinsjob = testline_info_list[0][7]
                     suite = testline_info_list[0][8]
 
                     item = '"' + str(loadname) + '","' + str(
