@@ -13,7 +13,6 @@ import sys
 from datetime import datetime
 import requests
 import urllib3
-import time
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
@@ -22,6 +21,7 @@ from common.logger import logger, set_log_level
 from scripts.mysql import Pymysql
 
 mysqldb = Pymysql()
+
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -33,9 +33,10 @@ def parse_args():
     args = p.parse_args()
     return args
 
+
 def get_loadnames(mode):
     """
-    :param type: FZM FDD = FLF
+    :param mode: FZM FDD = FLF
                  FZM TDD = TLF
                  CFZC FDD = FLC
                  CFZC TDD = TLC
@@ -62,6 +63,7 @@ def get_loadnames(mode):
     except Exception, e:
         logger.error('error: get_loadnames %s', e)
 
+
 def get_jenkins_data(new_loadname):
     url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + new_loadname + ''
     response = requests.get(url, verify=False)  # verify=False去掉鉴权
@@ -74,6 +76,7 @@ def get_jenkins_data(new_loadname):
     else:
         raise Exception("Server returned status code '%s' with message '%s'" % (
             response.status_code, response.content))
+
 
 class LoadStatus(object):
     def __init__(self, loadname):
@@ -109,17 +112,17 @@ class LoadStatus(object):
             elif isinstance(val_, (list, tuple)):
                 self._get_value(key, val_, tmp_list)  # 传入数据的value值是列表或者元组，则调用自身
 
-    def get_key_value(self, key, value, dict):
+    def get_key_value(self, key, value, json_obj):
         """
         :param key:   目标key值
         :param value: 目标key对应的value
         :param dic: JSON数据
         :return: list
         """
-        for i in range(0, len(dict[0])):
-            key_value = dict[0][i][key]
+        for i in range(0, len(json_obj[0])):
+            key_value = json_obj[0][i][key]
             # pprint("key_value: %s" % key_value)
-            result = dict[0][i]
+            result = json_obj[0][i]
             if key_value == value:
                 return result
 
@@ -301,7 +304,7 @@ class LoadStatus(object):
                 dic_children = self.get_target_value(
                     'children', self.get_key_value('name', 'crt', dic_pci), list_temp2)
                 dic_debug = self.get_key_value('name', 'debug', dic_children)
-                if (dic_debug.get('cases')):
+                if dic_debug.get('cases'):
                     dic_cases = dic_debug['cases'][0]
                     debug_status = dic_cases['result']
                     if debug_status == 'PASS':
@@ -379,7 +382,7 @@ def running(crt_type):
 
         debug = loadstatus.get_debug_result()
 
-        logger.debug('debug status is : %s', (debug))
+        logger.debug('debug status is : %s' % (debug, ))
 
         item = '"' + load_start_time + '","' + str(loadname) + '","' + str(passed_count) + '","' + str(
             failed_count) + '","' \
@@ -405,7 +408,8 @@ def running(crt_type):
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.info('The script run time is: %s sec' % (time))
+    logger.info('The script run time is: %s sec' % (time, ))
+
 
 def main():
     logger.info('load status task began.')
@@ -416,8 +420,9 @@ def main():
 
     logger.info('load status task done.')
 
+
 if __name__ == "__main__":
-    crt_type = (parse_args().type)
+    crt_type = parse_args().type
     logger.info('crt_type is: %s', crt_type)
     set_log_level("DBTools", "INFO")
     main()
