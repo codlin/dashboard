@@ -339,13 +339,17 @@ class LoadStatus(object):
         except Exception, e:
             logger.error('error:  %s', e)
 
+
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
-    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
+    logger.info('%s Start running for %s %s' % ('-' * 10, crt_type, '-' * 10))
     loadnames = get_loadnames(crt_type)
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
+        if loadname is None:
+            logger.warn("Invalid load name ('load_name' is None).")
+            continue
         loadstatus = LoadStatus(loadname)
         logger.debug("loadname is %s" % loadname)
 
