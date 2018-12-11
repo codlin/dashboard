@@ -146,14 +146,14 @@ class LoadStatus(object):
             logger.error('error: get_release %s', e)
 
     def get_testcase_total(self):
-        barnch = self.get_release()
+        branch = self.get_release()
         logger.debug('loadname branch is  %s' % self.get_release())
         sql_str = '''
             select count(*)
             from (SELECT crt_testcase_name.casename
                   FROM crt_testcase_release
                          INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                  where crt_testcase_release.release_id = "''' + barnch + '''") as t
+                  where crt_testcase_release.release_id = "''' + branch + '''") as t
         '''
         try:
             data = mysqldb.get_DB(sql_str)
@@ -221,6 +221,8 @@ class LoadStatus(object):
 
     def get_unexecuted_count(self):
         branch = self.get_release()
+        if branch is None:
+            raise ValueError("Invalid branch: None. Load name: %s" % (self.loadname, ))
         logger.debug('branch is  %s :', branch)
         logger.debug('loadname is  %s :', self.loadname)
         sql_str = '''                
