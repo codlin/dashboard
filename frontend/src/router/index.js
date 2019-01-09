@@ -1,17 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
 import app from '../views/app/app'
 import Head from '../views/head/head'
 import footer from '../views/footer/footer'
-
 import login from '../views/login/login'
-
 import index from '../views/loads/index'
 import loadsByProduct from '../views/loads/loads'
 import loadTLs from '../views/loads/loadtestlines'
 import loadCases from '../views/loads/loadcases'
-
 import testline from '../views/testline/testlines'
 
 // const index = () => import('../views/loads/index')
@@ -132,10 +128,10 @@ router.beforeEach((to, from, next) => {
   console.log('route from', from)
   console.log('route to', to)
   if (to.path === '/' || to.path === '/crt') {
-    next({ path: '/loads' })
+    next({path: '/loads'})
   } else if (to.matched.length === 0) {
     // if no route was mathec
-    from.name ? next({ name: from.name }) : next('/')
+    from.name ? next({name: from.name}) : next('/')
   } else {
     next()
   }
