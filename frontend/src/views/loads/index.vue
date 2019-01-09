@@ -81,7 +81,7 @@ export default {
           this.products = r.data
           console.log(getTimestamp(), 'getProducts: get result', this.products)
 
-          this.forwardDefaultPage(this.products[0])
+          // this.forwardDefaultPage(this.products[0])
         },
         r => {
           console.log('Failed: ', r)
