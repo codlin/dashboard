@@ -15,5 +15,3 @@ parameters:
 tables:
   test_results:
     updated-field: id
-  test_results:
-    updated-field: id

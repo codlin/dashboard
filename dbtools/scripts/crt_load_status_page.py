@@ -13,7 +13,6 @@ import sys
 from datetime import datetime
 import requests
 import urllib3
-import time
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
@@ -23,57 +22,6 @@ from scripts.mysql import Pymysql
 
 mysqldb = Pymysql()
 
-def parse_args():
-    p = argparse.ArgumentParser(
-        description='Request CRT data of project from mysql database',
-        usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)"
-    )
-    p.add_argument('-t', '--type', action='store', default='FLF',
-                   help="Get the project type of CRT")
-    args = p.parse_args()
-    return args
-
-def get_loadnames(mode):
-    """
-    :param type: FZM FDD = FLF
-                 FZM TDD = TLF
-                 CFZC FDD = FLC
-                 CFZC TDD = TLC
-    :return loadname list
-    example: get_loadname('TLF')
-    """
-    crt_type = str(mode) + '%'
-    logger.debug('Type is: %s', mode)
-    sql_str = '''
-        select enb_build
-        from test_results 
-        where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
-        and enb_release like("''' + crt_type + '''")
-        GROUP BY enb_build 
-        order by time_epoch_start desc limit 30
-        '''
-    try:
-        data = mysqldb.get_DB(sql_str)
-        results = []
-        for row in data:
-            loadname = row[0]
-            results.append(loadname)
-        return results
-    except Exception, e:
-        logger.error('error: get_loadnames %s', e)
-
-def get_jenkins_data(new_loadname):
-    url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + new_loadname + ''
-    response = requests.get(url, verify=False)  # verify=False去掉鉴权
-    if response.status_code == 200:
-        data = response.text
-        results = json.loads(data)
-        if results:
-            results = results[0]
-            return results
-    else:
-        raise Exception("Server returned status code '%s' with message '%s'" % (
-            response.status_code, response.content))
 
 class LoadStatus(object):
     def __init__(self, loadname):
@@ -109,17 +57,17 @@ class LoadStatus(object):
             elif isinstance(val_, (list, tuple)):
                 self._get_value(key, val_, tmp_list)  # 传入数据的value值是列表或者元组，则调用自身
 
-    def get_key_value(self, key, value, dict):
+    def get_key_value(self, key, value, json_obj):
         """
         :param key:   目标key值
         :param value: 目标key对应的value
         :param dic: JSON数据
         :return: list
         """
-        for i in range(0, len(dict[0])):
-            key_value = dict[0][i][key]
+        for i in range(0, len(json_obj[0])):
+            key_value = json_obj[0][i][key]
             # pprint("key_value: %s" % key_value)
-            result = dict[0][i]
+            result = json_obj[0][i]
             if key_value == value:
                 return result
 
@@ -143,14 +91,14 @@ class LoadStatus(object):
             logger.error('error: get_release %s', e)
 
     def get_testcase_total(self):
-        barnch = self.get_release()
+        branch = self.get_release()
         logger.debug('loadname branch is  %s' % self.get_release())
         sql_str = '''
             select count(*)
             from (SELECT crt_testcase_name.casename
                   FROM crt_testcase_release
                          INNER JOIN crt_testcase_name ON crt_testcase_name.id = crt_testcase_release.case_id
-                  where crt_testcase_release.release_id = "''' + barnch + '''") as t
+                  where crt_testcase_release.release_id = "''' + branch + '''") as t
         '''
         try:
             data = mysqldb.get_DB(sql_str)
@@ -218,6 +166,8 @@ class LoadStatus(object):
 
     def get_unexecuted_count(self):
         branch = self.get_release()
+        if branch is None:
+            raise ValueError("Invalid branch: None. Load name: %s" % (self.loadname,))
         logger.debug('branch is  %s :', branch)
         logger.debug('loadname is  %s :', self.loadname)
         sql_str = '''                
@@ -301,7 +251,35 @@ class LoadStatus(object):
                 dic_children = self.get_target_value(
                     'children', self.get_key_value('name', 'crt', dic_pci), list_temp2)
                 dic_debug = self.get_key_value('name', 'debug', dic_children)
-                if (dic_debug.get('cases')):
+                if dic_debug.get('cases'):
+                    dic_cases = dic_debug['cases'][0]
+                    debug_status = dic_cases['result']
+                    if debug_status == 'PASS':
+                        debug_status = 'Yes'
+                    if debug_status == 'FAIL':
+                        debug_status = 'No'
+                    return debug_status
+                else:
+                    debug_status = 'NULL'
+            else:
+                debug_status = 'NULL'
+            return debug_status
+        except Exception, e:
+            logger.error('error:%s', e)
+
+    def get_debug_asir_result(self):
+        loadname = 'ASIR_' + self.loadname
+        logger.debug('loadname is: %s ', loadname)
+        try:
+            dic = get_jenkins_data(loadname)
+            if dic:
+                list_temp = []
+                dic_pci = self.get_target_value('pci', dic, list_temp)
+                list_temp2 = []
+                dic_children = self.get_target_value(
+                    'children', self.get_key_value('name', 'crt', dic_pci), list_temp2)
+                dic_debug = self.get_key_value('name', 'debug', dic_children)
+                if dic_debug.get('cases'):
                     dic_cases = dic_debug['cases'][0]
                     debug_status = dic_cases['result']
                     if debug_status == 'PASS':
@@ -339,33 +317,129 @@ class LoadStatus(object):
         except Exception, e:
             logger.error('error:  %s', e)
 
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        description='Request CRT data of project from mysql database',
+        usage="%(prog)s [OPTION]... (type '-h' or '--help' for help)"
+    )
+    p.add_argument('-t', '--type', action='store', default='FLF',
+                   help="Get the project type of CRT")
+    args = p.parse_args()
+    return args
+
+
+def get_loadnames(mode):
+    """
+    :param mode: FZM FDD = FLF
+                 FZM TDD = TLF
+                 CFZC FDD = FLC
+                 CFZC TDD = TLC
+    :return loadname list
+    example: get_loadname('TLF')
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
+        select enb_build
+        from test_results 
+        where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
+        and enb_release like("''' + crt_type + '''")
+        GROUP BY enb_build 
+        order by time_epoch_start desc limit 30
+        '''
+    try:
+        data = mysqldb.get_DB(sql_str)
+        results = []
+        for row in data:
+            loadname = row[0]
+            results.append(loadname)
+        return results
+    except Exception, e:
+        logger.error('error: get_loadnames %s', e)
+
+
+def get_asir_loadnames(mode):
+    """
+    get asir loadnames
+    :param mode: ASIR FDD = FL
+                 ASIR TDD = TL
+    :return: loadname list
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
+        select enb_build
+        from test_results 
+        where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
+        and enb_release like("''' + crt_type + '''") and enb_hw_type='AIRSCALE' 
+        GROUP BY enb_build 
+        order by time_epoch_start desc limit 30
+        '''
+    try:
+        data = mysqldb.get_DB(sql_str)
+        results = []
+        for row in data:
+            loadname = row[0]
+            results.append(loadname)
+        return results
+    except Exception, e:
+        logger.error('error: get_loadnames %s', e)
+
+
+def get_jenkins_data(new_loadname):
+    url = 'https://coop.int.net.nokia.com/ext/api/pci/build/buildinfo?buildid=' + new_loadname + ''
+    response = requests.get(url, verify=False)  # verify=False去掉鉴权
+    if response.status_code == 200:
+        data = response.text
+        results = json.loads(data)
+        if results:
+            results = results[0]
+            return results
+    else:
+        raise Exception("Server returned status code '%s' with message '%s'" % (
+            response.status_code, response.content))
+
+
 def running(crt_type):
     t_start = datetime.now()  # 起x始时间
-    logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    loadnames = get_loadnames(crt_type)
+    logger.info('%s Start running for %s %s' % ('-' * 10, crt_type, '-' * 10))
+    if crt_type is 'FL' or crt_type is 'TL':
+        loadnames = get_asir_loadnames(crt_type)
+    else:
+        loadnames = get_loadnames(crt_type)
 
     # object = ['FLF18A_ENB_9999_180921_001290']
     for loadname in loadnames:
+        if loadname is None:
+            logger.warn("Invalid load name ('load_name' is None).")
+            continue
         loadstatus = LoadStatus(loadname)
         logger.debug("loadname is %s" % loadname)
 
         load_start_time = str(loadstatus.get_load_name_time())
         logger.debug('load_start_time: %s', type(load_start_time))
+        logger.debug('load_start_time: %s', load_start_time)
 
         passed_count = loadstatus.get_passed_count()
         logger.debug('passed_count: %s', type(passed_count))
+        logger.debug('passed_count: %s', passed_count)
 
         passed_first_count = loadstatus.get_passed_first_count()
         logger.debug('passed_first_count: %s', type(passed_first_count))
+        logger.debug('passed_first_count: %s', passed_first_count)
 
         failed_count = str(loadstatus.get_failed_count())
         logger.debug('failed_count: %s', type(failed_count))
+        logger.debug('failed_count: %s', failed_count)
 
         unexecuted_count = str(loadstatus.get_unexecuted_count())
         logger.debug('unexecuted_count: %s', type(unexecuted_count))
+        logger.debug('unexecuted_count: %s', unexecuted_count)
 
         totle_count = str(loadstatus.get_testcase_total())
         logger.debug('totle_count: %s', type(totle_count))
+        logger.debug('totle_count: %s', totle_count)
 
         pass_rate = str(loadstatus.get_pass_rate(passed_count))
         logger.debug('pass_rate: %s', pass_rate)
@@ -373,13 +447,16 @@ def running(crt_type):
         first_pass_rate = str(loadstatus.get_first_pass_rate(passed_first_count))
         logger.debug('first_pass_rate: %s', first_pass_rate)
 
-        debug = loadstatus.get_debug_result()
+        if crt_type is 'FL' or crt_type is 'TL':
+            # debug = loadstatus.get_debug_asir_result()
+            debug = ''
+        else:
+            debug = loadstatus.get_debug_result()
 
-        logger.debug('debug status is : %s', (debug))
+        logger.debug('debug status is : %s' % (debug,))
 
         item = '"' + load_start_time + '","' + str(loadname) + '","' + str(passed_count) + '","' + str(
-            failed_count) + '","' \
-               + unexecuted_count + '","' + totle_count + '","' + \
+            failed_count) + '","' + unexecuted_count + '","' + totle_count + '","' + \
                first_pass_rate + '","' + pass_rate + '","' + debug + '"'
         logger.debug('item: %s', item)
         sql_str = '''
@@ -401,19 +478,21 @@ def running(crt_type):
 
     t_end = datetime.now()  # 关闭时间
     time = (t_end - t_start).total_seconds()
-    logger.info('The script run time is: %s sec' % (time))
+    logger.info('The script run time is: %s sec' % (time,))
+
 
 def main():
     logger.info('load status task began.')
-    list_project = ['FLF', 'TLF', 'FLC', 'TLC']
-    # list_project = ['FLF']
+    list_project = ['FLF', 'TLF', 'FLC', 'TLC', 'FL', 'TL']
+    # list_project = ['FL', 'TL']
     for i in range(len(list_project)):
         running(list_project[i])
 
     logger.info('load status task done.')
 
+
 if __name__ == "__main__":
-    crt_type = (parse_args().type)
+    crt_type = parse_args().type
     logger.info('crt_type is: %s', crt_type)
     set_log_level("DBTools", "INFO")
     main()
