@@ -49,14 +49,14 @@ def get_loadnames(mode):
     logger.debug('Type is: %s', mode)
     logger.debug('crt_type is: %s', crt_type)
     sql_str = '''SELECT enb_build
-FROM test_results 
-WHERE enb_build !='Null' 
-    AND enb_build !='' 
-    AND enb_build NOT LIKE '%MF%' 
-    AND crt_type='CRT1_DB' 
-    AND enb_release LIKE("''' + crt_type + '''")
-GROUP BY enb_build 
-ORDER BY time_epoch_start DESC LIMIT 30
+        FROM test_results 
+        WHERE enb_build !='Null' 
+            AND enb_build !='' 
+            AND enb_build NOT LIKE '%MF%' 
+            AND crt_type='CRT1_DB' 
+            AND enb_release LIKE("''' + crt_type + '''")
+        GROUP BY enb_build 
+        ORDER BY time_epoch_start DESC LIMIT 30
         '''
     try:
         data = mysqldb.get_DB(sql_str)
@@ -67,6 +67,34 @@ ORDER BY time_epoch_start DESC LIMIT 30
         return results
     except Exception, e:
         logger.debug('error: get_loadnames is %s', e)
+
+
+def get_asir_loadnames(mode):
+    """
+    get asir loadnames
+    :param mode: ASIR FDD = FL
+                 ASIR TDD = TL
+    :return: loadname list
+    """
+    crt_type = str(mode) + '%'
+    logger.debug('Type is: %s', mode)
+    sql_str = '''
+        select enb_build
+        from test_results 
+        where enb_build !='Null' and enb_build !='' and enb_build not like '%MF%' and crt_type='CRT1_DB' 
+        and enb_release like("''' + crt_type + '''") and enb_hw_type='AIRSCALE' 
+        GROUP BY enb_build 
+        order by time_epoch_start desc limit 30
+        '''
+    try:
+        data = mysqldb.get_DB(sql_str)
+        results = []
+        for row in data:
+            loadname = row[0]
+            results.append(loadname)
+        return results
+    except Exception, e:
+        logger.error('error: get_loadnames %s', e)
 
 
 def crt_project_type(crt_type):
@@ -226,7 +254,10 @@ WHERE casename="''' + tc_name + '''"  AND  release_id ="''' + branch + '''"
 def running(crt_type):
     t_start = datetime.now()  # Start Time
     logger.info('%s Start running %s' % ('-' * 10, '-' * 10))
-    loadnames = get_loadnames(crt_type)
+    if crt_type is 'FL' or crt_type is 'TL':
+        loadnames = get_asir_loadnames(crt_type)
+    else:
+        loadnames = get_loadnames(crt_type)
     logger.info("loadnames list is %s" % loadnames)
 
     for loadname in loadnames:
@@ -298,8 +329,8 @@ VALUES(''' + item + ''');'''
                         jenkinsjob) + '","NUll",' + '"' + str(suite) + '"'
                     logger.debug('item is: %s', item)
                     sql_str = '''REPLACE INTO crt_load_testcase_status_page
-    (loadname, casename, btsid, node, result, suite)
-VALUES(''' + item + ''');'''
+                        (loadname, casename, btsid, node, result, suite)
+                        VALUES(''' + item + ''');'''
                     logger.debug('sql_str is: %s', sql_str)
 
                     try:
@@ -316,14 +347,13 @@ VALUES(''' + item + ''');'''
 
     t_end = datetime.now()  # end time
     time = (t_end - t_start).total_seconds()
-    logger.info('The script run time is: %s sec' % (time, ))
+    logger.info('The script run time is: %s sec' % (time,))
 
 
 def main():
     set_log_level("DBTools", "INFO")
     logger.info('load testcases status task began.')
-    list_project = ['FLF', 'TLF', 'FLC', 'TLC']
-    # list_project = ['FLF']
+    list_project = ['FLF', 'TLF', 'FLC', 'TLC', 'FL', 'TL']
     for i in range(len(list_project)):
         logger.info('Project is  %s ', list_project[i])
         running(list_project[i])
