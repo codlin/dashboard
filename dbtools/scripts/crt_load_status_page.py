@@ -483,8 +483,8 @@ def running(crt_type):
 
 def main():
     logger.info('load status task began.')
-    # list_project = ['FLF', 'TLF', 'FLC', 'TLC','FL','TL']
-    list_project = ['FL', 'TL']
+    list_project = ['FLF', 'TLF', 'FLC', 'TLC', 'FL', 'TL']
+    # list_project = ['FL', 'TL']
     for i in range(len(list_project)):
         running(list_project[i])
 
@@ -494,5 +494,5 @@ def main():
 if __name__ == "__main__":
     crt_type = parse_args().type
     logger.info('crt_type is: %s', crt_type)
-    set_log_level("DBTools", "DEBUG")
+    set_log_level("DBTools", "INFO")
     main()
