@@ -32,7 +32,7 @@
                     :items="filteredItems"
                     :search="item_search"
                     :class="['text-xs-left']"
-                    hide-actions>
+                    >
         <template slot="headers"
                   slot-scope="props">
           <tr>
@@ -149,7 +149,7 @@ export default {
       // table data
       item_search: '',
       // sorting by descending
-      pagination: { sortBy: 'testline', descending: false, rowsPerPage: -1 },
+      pagination: { sortBy: 'testline', descending: false, rowsPerPage: 15 },
 
       // UI Components related
       resultChkbox: null,

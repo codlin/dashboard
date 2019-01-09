@@ -61,7 +61,7 @@
                     :headers="loadTblHeaders"
                     :items="filteredItems"
                     :search="load_search"
-                    hide-actions>
+                    >
         <template slot="items"
                   slot-scope="props">
           <tr class="text-xs-left">
@@ -136,7 +136,7 @@ export default {
       // table data
       load_search: '',
       // sorting by descending
-      pagination: { sortBy: 'start_time', descending: true, rowsPerPage: -1 },
+      pagination: { sortBy: 'start_time', descending: true, rowsPerPage: 15 },
 
       // UI Components related
       dateChkbox: null,

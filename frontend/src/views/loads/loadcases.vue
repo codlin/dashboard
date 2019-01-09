@@ -41,8 +41,7 @@
       <v-data-table :pagination.sync="pagination"
                     :headers="tblHeaders"
                     :items="filteredItems"
-                    :search="items_search"
-                    hide-actions>
+                    :search="items_search">
         <template slot="items"
                   slot-scope="props">
           <td>
@@ -101,7 +100,7 @@ export default {
       // table data
       items_search: '',
       // sorting by descending
-      pagination: { sortBy: 'result', descending: false, rowsPerPage: -1 },
+      pagination: { sortBy: 'result', descending: false, rowsPerPage: 15 },
 
       // UI Components related
       resultChkbox: null
