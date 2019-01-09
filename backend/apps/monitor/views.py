@@ -42,8 +42,8 @@ loadStatusFilter = {
     'fzmtdd': 'TLF',
     'cfzcfdd': 'FLC',
     'cfzctdd': 'TLC',
-    'asirfdd': 'FL',
-    'asirtdd': 'TL'
+    # 'asirfdd': 'FL',
+    # 'asirtdd': 'TL'
 }
 
 
