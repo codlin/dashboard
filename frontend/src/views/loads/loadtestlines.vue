@@ -108,9 +108,9 @@ export default {
 
   created () {
     // fix loadname
-    if (this.loadName.indexOf('LC') > -1) {
-      this.loadName = this.loadName.replace('18A', '00')
-    }
+    // if (this.loadName.indexOf('LC') > -1) {
+    //   this.loadName = this.loadName.replace('18A', '00')
+    // }
     // get data from server
     this.getLoadToTLs()
     this.createBreadcrums()
