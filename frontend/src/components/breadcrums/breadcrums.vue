@@ -1,7 +1,6 @@
 <template>
-  <v-layout align-center>
-    <v-breadcrumbs id="breadcrums">
-      <v-icon slot="divider">chevron_right</v-icon>
+  <v-layout align-center style="height: 40px">
+    <v-breadcrumbs id="breadcrums" style="height: 40px">
       <v-breadcrumbs-item v-for="item in breadcrums"
                           :disabled="item.disabled"
                           :key="item.text"

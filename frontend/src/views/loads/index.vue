@@ -3,7 +3,7 @@
             fill-height>
     <v-content>
       <v-flex>
-        <v-toolbar dense
+        <v-toolbar dense height=25
                    flat>
           <v-toolbar-items>
             <v-btn flat
@@ -16,7 +16,7 @@
         </v-toolbar>
       </v-flex>
       <v-flex>
-        <v-card flat>
+        <v-card flat height=40>
           <breadcrumbs>
           </breadcrumbs>
         </v-card>
