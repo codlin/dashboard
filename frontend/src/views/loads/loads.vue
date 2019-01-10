@@ -18,12 +18,12 @@
           <v-layout>
             <v-checkbox hide-details
                         v-model="dateChkbox"
-                        label="1 Week"
-                        value="oneweek"></v-checkbox>
+                        label="1 day"
+                        value="oneday"></v-checkbox>
             <v-checkbox hide-details
                         v-model="dateChkbox"
-                        label="2 Weeks"
-                        value="twoweek"></v-checkbox>
+                        label="1 Week"
+                        value="oneweek"></v-checkbox>
             <v-checkbox hide-details
                         v-model="passrateChkBox"
                         value="Passed"
@@ -156,7 +156,7 @@ export default {
       if (this.dateChkbox !== null || this.passrateChkBox !== null) {
         if (this.dateChkbox !== null) {
           let today = getCurrentDate()
-          let days = (this.dateChkbox === 'oneweek') ? 7 : 14
+          let days = (this.dateChkbox === 'oneday') ? 1 : 7
           filteredData = filteredData.filter((item, i) => {
             let starTime = item.start_time
             let date = starTime.substring(0, starTime.indexOf(' ')).trim()
