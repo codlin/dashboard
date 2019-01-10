@@ -61,6 +61,7 @@
                     :headers="loadTblHeaders"
                     :items="filteredItems"
                     :search="load_search"
+                    :rows-per-page-items="rowsPerPageItems"
                     >
         <template slot="items"
                   slot-scope="props">
@@ -137,6 +138,7 @@ export default {
       load_search: '',
       // sorting by descending
       pagination: { sortBy: 'start_time', descending: true, rowsPerPage: 15 },
+      rowsPerPageItems: [5, 10, 15, 25, 50, 100, {'text': '$vuetify.dataIterator.rowsPerPageAll', 'value': -1}],
 
       // UI Components related
       dateChkbox: null,

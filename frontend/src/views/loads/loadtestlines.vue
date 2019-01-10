@@ -31,6 +31,7 @@
                     :headers="subHeaders"
                     :items="filteredItems"
                     :search="item_search"
+                    :rows-per-page-items="rowsPerPageItems"
                     :class="['text-xs-left']"
                     >
         <template slot="headers"
@@ -150,6 +151,7 @@ export default {
       item_search: '',
       // sorting by descending
       pagination: { sortBy: 'testline', descending: false, rowsPerPage: 15 },
+      rowsPerPageItems: [5, 10, 15, 25, 50, 100, {'text': '$vuetify.dataIterator.rowsPerPageAll', 'value': -1}],
 
       // UI Components related
       resultChkbox: null,

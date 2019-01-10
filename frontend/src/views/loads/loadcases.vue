@@ -41,7 +41,8 @@
       <v-data-table :pagination.sync="pagination"
                     :headers="tblHeaders"
                     :items="filteredItems"
-                    :search="items_search">
+                    :search="items_search"
+                    :rows-per-page-items="rowsPerPageItems">
         <template slot="items"
                   slot-scope="props">
           <td>
@@ -101,6 +102,7 @@ export default {
       items_search: '',
       // sorting by descending
       pagination: { sortBy: 'result', descending: false, rowsPerPage: 15 },
+      rowsPerPageItems: [5, 10, 15, 25, 50, 100, {'text': '$vuetify.dataIterator.rowsPerPageAll', 'value': -1}],
 
       // UI Components related
       resultChkbox: null
