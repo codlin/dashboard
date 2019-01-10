@@ -7,8 +7,8 @@
 FROM python:3.7-slim
 
 ENV REFRESHED_AT 2018-08-01
-ENV http_proxy http://93.183.14.14:8080
-ENV https_proxy http://93.183.14.14:8080
+ENV http_proxy http://87.254.212.120:8080
+ENV https_proxy http://87.254.212.120:8080
 
 LABEL Name=dashboard Version=0.0.1
 EXPOSE 8000
