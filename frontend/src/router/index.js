@@ -127,7 +127,7 @@ var router = new Router({
 router.beforeEach((to, from, next) => {
   console.log('route from', from)
   console.log('route to', to)
-  if (to.path === '/' || to.path === '/crt') {
+  if (to.path === '/' || to.path === '/crt' || to.path === '/loads') {
     next({ path: '/loads/index/fzmfdd' })
   } else if (to.matched.length === 0) {
     // if no route was mathec
