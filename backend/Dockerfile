@@ -23,6 +23,9 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt \
     && rm -rf requirements.txt \
     && apt-get purge -y --auto-remove $buildDeps
 
+ADD tools /tools
+RUN cd /tools && pip install xadmin-django2.zip
+
 ENV http_proxy ""
 ENV https_proxy ""
 
